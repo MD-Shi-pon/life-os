@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIPON's Life | Android Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <title>SHIPON'S LIFE | Modern</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script type="module">
@@ -34,75 +34,74 @@
           };
           try {
               await setDoc(doc(db, "users", "shipon", "history", date), data);
-              alert("✅ Synced to Google Cloud");
+              alert("✅ Cloud Backup Successful");
           } catch (e) { alert("Sync Error: " + e.message); }
       };
     </script>
 
     <style>
         :root { 
-            --p: #6750A4; --s: #006A60; --a: #916F00; 
-            --bg: #1C1B1F; --surface: #2B2930; --text: #E6E1E5;
-            --outline: #938F99;
+            --p: #6366f1; --s: #10b981; --bg: #0f172a; --surface: #1e293b; --text: #f8fafc;
         }
         .light-mode { 
-            --bg: #FFFBFE; --surface: #F3EDF7; --text: #1C1B1F;
-            --outline: #79747E;
+            --bg: #f8fafc; --surface: #ffffff; --text: #0f172a;
         }
 
         body { 
-            font-family: 'Roboto', sans-serif; margin: 0; background: var(--bg); color: var(--text); 
-            min-height: 100vh; padding-bottom: 90px; transition: 0.3s;
+            font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); 
+            min-height: 100vh; padding-bottom: 100px; transition: 0.3s;
         }
 
-        /* Android Bottom Nav */
+        /* Modern Bottom Nav */
         .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; height: 80px; background: var(--surface);
+            position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--surface);
             display: flex; justify-content: space-around; align-items: center;
-            border-top: 1px solid var(--outline); z-index: 1000;
+            border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000;
         }
-        .nav-item { flex: 1; text-align: center; cursor: pointer; color: var(--outline); font-size: 0.75rem; font-weight: 700; }
+        .nav-item { flex: 1; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
         .nav-item.active { color: var(--p); }
-        .nav-item.active .icon-bg { background: #D0BCFF; color: #381E72; padding: 4px 20px; border-radius: 16px; margin-bottom: 4px; display: inline-block; }
 
-        .header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
-        .page { display: none; padding: 0 20px; animation: androidFade 0.3s ease-out; }
+        .header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: baseline; }
+        .page { display: none; padding: 0 20px; animation: fadeInUp 0.4s ease; }
         .active-page { display: block; }
-        @keyframes androidFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .m3-card { background: var(--surface); border-radius: 28px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--outline); }
+        .m3-card { background: var(--surface); border-radius: 24px; padding: 22px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         
-        /* The Motivation Line */
-        .motivation-line { text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: #B3261E; opacity: 0.5; font-weight: 900; }
+        /* Home Tab Alignment: Date on Right */
+        .home-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        #mainDate { background: transparent; color: var(--p); border: 1px solid var(--p); padding: 8px 12px; border-radius: 12px; font-weight: 700; font-family: inherit; }
 
-        button { width: 100%; padding: 16px; border-radius: 100px; border: none; font-weight: 700; cursor: pointer; background: var(--p); color: white; margin-top: 10px; }
-        input, select { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--outline); background: transparent; color: inherit; margin: 8px 0; }
+        .motivation-line { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--s); opacity: 0.5; font-weight: 800; font-style: italic; }
+
+        button { width: 100%; padding: 18px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; transition: 0.2s; }
+        button:active { transform: scale(0.97); }
+        input, select { width: 100%; padding: 16px; border-radius: 14px; border: 1px solid rgba(128,128,128,0.2); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; box-sizing: border-box; }
         
-        /* Analytics Toggle */
-        .chip-group { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 5px; }
-        .chip { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--outline); font-size: 0.8rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
-        .chip.active { background: var(--p); color: white; border-color: var(--p); }
+        .chip-group { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding: 5px 0; }
+        .chip { padding: 8px 18px; border-radius: 12px; background: rgba(128,128,128,0.1); font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap; border: 1px solid transparent; }
+        .chip.active { background: var(--p); color: white; }
 
-        .timer { font-size: 4rem; font-weight: 900; color: var(--a); text-align: center; }
-        .list-item { display: flex; align-items: center; padding: 16px; background: rgba(128,128,128,0.1); border-radius: 16px; margin-bottom: 8px; }
+        .list-item { display: flex; align-items: center; padding: 16px; background: rgba(128,128,128,0.05); border-radius: 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.03); }
     </style>
 </head>
 <body class="dark-mode">
 
     <div class="header">
-        <h2 style="margin:0; font-weight:900;">SHIPON'S LIFE</h2>
-        <div onclick="toggleMode()" style="font-size:1.5rem;">🌗</div>
+        <h1 style="margin:0; font-weight:800; letter-spacing: -1.5px;">SHIPON'S LIFE</h1>
+        <div onclick="toggleMode()" style="cursor:pointer; font-size:1.2rem;">🌗</div>
     </div>
 
     <div id="homeP" class="page active-page">
-        <div class="m3-card" style="text-align: center; background: #381E72; color: #D0BCFF;">
-            <small style="text-transform: uppercase; letter-spacing: 2px;">Lifetime Hours</small>
-            <div style="font-size: 4.5rem; font-weight: 900;" id="lifeH">0.0h</div>
+        <div class="m3-card" style="text-align: center; border-left: 5px solid var(--p);">
+            <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-weight: 800;">Lifetime Mastery</small>
+            <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0h</div>
         </div>
-        <div class="m3-card">
+        <div class="home-controls">
+            <span style="font-weight: 800; opacity: 0.7;">History View</span>
             <input type="date" id="mainDate" onchange="refresh()">
-            <button onclick="backupToCloud()" style="background:var(--s)">SYNC PROGRESS</button>
         </div>
+        <button onclick="backupToCloud()" style="background:var(--s)">SYNC TO CLOUD</button>
     </div>
 
     <div id="statsP" class="page">
@@ -111,49 +110,40 @@
             <div class="chip" onclick="setChart('week', this)">Weekly</div>
             <div class="chip" onclick="setChart('month', this)">Monthly</div>
             <div class="chip" onclick="setChart('year', this)">Yearly</div>
+            <div class="chip" onclick="setChart('compare', this)" style="border-color: var(--s);">Comparison</div>
         </div>
-        <div class="m3-card" style="height: 300px;"><canvas id="mainChart"></canvas></div>
-        
-        <h3>Progress Comparison</h3>
-        <div class="m3-card" style="height: 250px;"><canvas id="compareChart"></canvas></div>
+        <div class="m3-card" style="height: 350px;"><canvas id="mainChart"></canvas></div>
     </div>
 
     <div id="tasksP" class="page">
         <div class="m3-card">
-            <input type="text" id="tIn" placeholder="New priority goal...">
-            <button onclick="addT()">ADD GOAL</button>
+            <input type="text" id="tIn" placeholder="Enter priority task...">
+            <button onclick="addT()">COMMIT TASK</button>
         </div>
         <div id="tList"></div>
     </div>
 
-    <div id="studyP" class="page">
+    <div id="vaultP" class="page">
         <div class="m3-card">
-            <div class="timer" id="timer">25:00</div>
-            <div style="display:flex; gap:10px;">
-                <button onclick="startTimer()" style="background:var(--a)">START</button>
-                <button onclick="resetTimer()" style="background:grey">RESET</button>
-            </div>
+            <input type="text" id="lTitle" placeholder="Resource Name (e.g. IELTS Book)">
+            <input type="text" id="lUrl" placeholder="URL (https://...)">
+            <button onclick="addL()" style="background: var(--s);">SAVE LINK</button>
         </div>
-        <div class="m3-card">
-            <select id="sSub"></select>
-            <input type="number" id="sHr" placeholder="Manual Log (Hours)">
-            <button onclick="addS()">LOG SESSION</button>
-        </div>
+        <div id="lList"></div>
     </div>
 
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="nav('homeP', this)"><div class="icon-bg">Home</div></div>
-        <div class="nav-item" onclick="nav('statsP', this)"><div class="icon-bg">Stats</div></div>
-        <div class="nav-item" onclick="nav('tasksP', this)"><div class="icon-bg">Tasks</div></div>
-        <div class="nav-item" onclick="nav('studyP', this)"><div class="icon-bg">Study</div></div>
+        <div class="nav-item active" onclick="nav('homeP', this)">Home</div>
+        <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
+        <div class="nav-item" onclick="nav('tasksP', this)">Tasks</div>
+        <div class="nav-item" onclick="nav('vaultP', this)">Vault</div>
     </nav>
 
     <script>
         let tDB = JSON.parse(localStorage.getItem('s_t')) || {};
         let sDB = JSON.parse(localStorage.getItem('s_s')) || {};
-        let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English (IELTS)", "Digital Marketing"];
+        let lDB = JSON.parse(localStorage.getItem('s_l')) || [];
         let chartMode = 'day';
-        let timerInt;
 
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
@@ -170,12 +160,10 @@
             let tL = 0; Object.values(sDB).forEach(day => day.forEach(s => tL += s.hours));
             document.getElementById('lifeH').innerText = tL.toFixed(1) + "h";
 
-            const sel = document.getElementById('sSub'); sel.innerHTML = '';
-            subs.forEach(s => sel.innerHTML += `<option>${s}</option>`);
-
-            renderT(date); updateChart(); updateCompareChart();
+            renderT(date); renderL(); updateChart();
             localStorage.setItem('s_t', JSON.stringify(tDB));
             localStorage.setItem('s_s', JSON.stringify(sDB));
+            localStorage.setItem('s_l', JSON.stringify(lDB));
         }
 
         function setChart(m, el) {
@@ -187,46 +175,36 @@
 
         function updateChart() {
             const ctx = document.getElementById('mainChart').getContext('2d');
-            let labels = [], data = [];
-            let iterations = chartMode === 'day' ? 7 : chartMode === 'week' ? 4 : chartMode === 'month' ? 12 : 5;
-
-            for(let i=iterations-1; i>=0; i--) {
-                const d = new Date();
-                if(chartMode === 'day') d.setDate(d.getDate()-i);
-                if(chartMode === 'year') d.setFullYear(d.getFullYear()-i);
-                
-                const s = d.toISOString().split('T')[0];
-                labels.push(chartMode === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : d.getFullYear());
-                let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
-                data.push(h);
+            let labels = [], data = [], data2 = [];
+            
+            if(chartMode === 'compare') {
+                labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                data = [2, 5, 3, 6, 2, 0, 0]; // Sample logic for this week
+                data2 = [1, 4, 2, 5, 1, 2, 3]; // Sample logic for last week
+            } else {
+                let count = chartMode === 'day' ? 7 : chartMode === 'week' ? 4 : chartMode === 'month' ? 12 : 5;
+                for(let i=count-1; i>=0; i--) {
+                    const d = new Date();
+                    if(chartMode === 'day') d.setDate(d.getDate()-i);
+                    if(chartMode === 'year') d.setFullYear(d.getFullYear()-i);
+                    const s = d.toISOString().split('T')[0];
+                    labels.push(chartMode === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : d.getFullYear());
+                    let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
+                    data.push(h);
+                }
             }
 
             if(window.chartO) window.chartO.destroy();
             window.chartO = new Chart(ctx, {
-                type: 'bar',
-                data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#D0BCFF', borderRadius: 10 }] },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
-            });
-        }
-
-        function updateCompareChart() {
-            const ctx = document.getElementById('compareChart').getContext('2d');
-            // Comparing last 2 weeks logic
-            const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            const thisWeek = [2, 4, 3, 5, 2, 0, 0]; // Sample logic
-            const lastWeek = [1, 3, 2, 4, 1, 1, 2];
-
-            if(window.compO) window.compO.destroy();
-            window.compO = new Chart(ctx, {
-                type: 'line',
+                type: chartMode === 'compare' ? 'line' : 'bar',
                 data: { 
                     labels, 
                     datasets: [
-                        { label: 'Current', data: thisWeek, borderColor: '#D0BCFF', tension: 0.4 },
-                        { label: 'Previous', data: lastWeek, borderColor: '#938F99', tension: 0.4, borderDash: [5, 5] }
+                        { label: 'Hours', data, backgroundColor: '#6366f1', borderColor: '#6366f1', borderRadius: 8, tension: 0.4 },
+                        ...(chartMode === 'compare' ? [{ label: 'Previous', data: data2, borderColor: '#94a3b8', borderDash: [5, 5], tension: 0.4 }] : [])
                     ]
                 },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                options: { maintainAspectRatio: false, plugins: { legend: { display: chartMode === 'compare' } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
             });
         }
 
@@ -240,23 +218,25 @@
             const l = document.getElementById('tList'); l.innerHTML = '';
             (tDB[d] || []).forEach((t, i) => {
                 l.innerHTML += `<div class="list-item">
-                    <input type="checkbox" style="width:24px; height:24px;" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
-                    <span style="margin-left:15px; font-size:1.1rem;" class="${t.done?'motivation-line':''}">${t.text}</span>
+                    <input type="checkbox" style="width:22px; height:22px;" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
+                    <span style="margin-left:15px; font-weight:700;" class="${t.done?'motivation-line':''}">${t.text}</span>
                 </div>`;
             });
         }
-        function toggleT(d, i) { tDB[d][i].done = !tDB[d][i].done; refresh(); }
+        function toggleT(d, i) { tDB[d][i].done = !taskDB[d][i].done; refresh(); }
 
-        function startTimer() {
-            clearInterval(timerInt);
-            let t = 25 * 60;
-            timerInt = setInterval(() => {
-                let m = Math.floor(t/60), s = t%60;
-                document.getElementById('timer').innerText = `${m}:${s<10?'0':''}${s}`;
-                if(t-- <= 0) { clearInterval(timerInt); alert("Focus Done!"); }
-            }, 1000);
+        function addL() {
+            const t = document.getElementById('lTitle').value; const u = document.getElementById('lUrl').value;
+            if(t && u) { lDB.push({t, u}); document.getElementById('lTitle').value=''; document.getElementById('lUrl').value=''; refresh(); }
         }
-        function resetTimer() { clearInterval(timerInt); document.getElementById('timer').innerText = "25:00"; }
+        function renderL() {
+            const l = document.getElementById('lList'); l.innerHTML = '';
+            lDB.forEach((link, i) => l.innerHTML += `<div class="list-item">
+                <a href="${link.u}" target="_blank" style="color:var(--s);text-decoration:none;font-weight:800;flex:1;">🔗 ${link.t}</a>
+                <span onclick="delL(${i})" style="color:#ef4444;font-size:0.7rem;cursor:pointer;">DELETE</span>
+            </div>`);
+        }
+        function delL(i) { lDB.splice(i, 1); refresh(); }
 
         document.getElementById('mainDate').valueAsDate = new Date();
         window.onload = refresh;

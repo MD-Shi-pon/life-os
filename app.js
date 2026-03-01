@@ -9,10 +9,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAskdYkHhoxKH52icAEeqYaq2XRrmCcdBs",
+  apiKey: "YOUR_REAL_API_KEY",
   authDomain: "shipon-life-os.firebaseapp.com",
   projectId: "shipon-life-os",
-  appId: "1:957123699373:web:b3c579ad5c2604cf6b5c24"
+  appId: "YOUR_REAL_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -58,7 +58,6 @@ function render() {
   tasks.forEach((task, i) => {
     const li = document.createElement("li");
     li.textContent = task.text;
-
     if (task.completed) li.classList.add("completed");
 
     li.onclick = () => {
@@ -110,6 +109,31 @@ async function calculateLifetime() {
 
   document.getElementById("lifetimeHours").textContent = total.toFixed(1);
 }
+
+// Sync Indicator
+const syncDot = document.getElementById("syncDot");
+const syncText = document.getElementById("syncText");
+const manualSyncBtn = document.getElementById("manualSync");
+
+function updateSyncStatus() {
+  if (navigator.onLine) {
+    syncDot.style.background = "#10b981";
+    syncText.textContent = "Live Sync Active";
+  } else {
+    syncDot.style.background = "#ef4444";
+    syncText.textContent = "Offline Mode";
+  }
+}
+
+window.addEventListener("online", updateSyncStatus);
+window.addEventListener("offline", updateSyncStatus);
+updateSyncStatus();
+
+manualSyncBtn.onclick = async () => {
+  syncText.textContent = "Syncing...";
+  await calculateLifetime();
+  setTimeout(updateSyncStatus, 800);
+};
 
 document.querySelectorAll(".bottom-nav button").forEach(btn => {
   btn.onclick = () => {

@@ -1,247 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIPON'S LIFE | Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { getFirestore, doc, setDoc, getDocs, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  <title>SHIPON’S LIFE · Life OS</title>
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyAskdYkHhoxKH52icAEeqYaq2XRrmCcdBs",
-        authDomain: "shipon-life-os.firebaseapp.com",
-        projectId: "shipon-life-os",
-        storageBucket: "shipon-life-os.firebasestorage.app",
-        messagingSenderId: "957123699373",
-        appId: "1:957123699373:web:b3c579ad5c2604cf6b5c24"
-      };
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-      // UNIVERSAL SYNC ENGINE
-      window.syncData = async (date) => {
-          const localData = {
-              tasks: JSON.parse(localStorage.getItem('s_t'))?.[date] || [],
-              study: JSON.parse(localStorage.getItem('s_s'))?.[date] || [],
-              dayLog: JSON.parse(localStorage.getItem('s_dayLog'))?.[date] || [],
-              subs: JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"]
-          };
-          try { await setDoc(doc(db, "global_master", "history", "dates", date), localData); } 
-          catch (e) { console.error("Sync Error", e); }
-      };
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
 
-      onSnapshot(collection(db, "global_master", "history", "dates"), (snap) => {
-          let s_s = {}, s_t = {}, s_d = {};
-          snap.forEach(d => {
-              const data = d.data();
-              s_s[d.id] = data.study || [];
-              s_t[d.id] = data.tasks || [];
-              s_d[d.id] = data.dayLog || [];
-          });
-          localStorage.setItem('s_s', JSON.stringify(s_s));
-          localStorage.setItem('s_t', JSON.stringify(s_t));
-          localStorage.setItem('s_dayLog', JSON.stringify(s_d));
-          window.refresh();
-      });
-    </script>
-
-    <style>
-        :root { --p: #6366f1; --s: #10b981; --bg: #0f172a; --surface: #1e293b; --text: #f8fafc; --border: rgba(255, 255, 255, 0.1); }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; overflow-x: hidden; }
-        
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--surface); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
-        .nav-item.active { color: var(--p); }
-
-        .page { display: none; padding: 25px; max-width: 500px; margin: 0 auto; animation: fadeInUp 0.4s ease; }
-        .active-page { display: block; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .m3-card { background: var(--surface); border-radius: 28px; padding: 22px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        input, select { width: 100%; padding: 15px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: inherit; margin: 8px 0; font-family: inherit; }
-        button { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; margin-top: 8px; }
-        
-        .list-item { display: flex; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 20px; margin-bottom: 10px; border-left: 5px solid var(--p); }
-        .item-label { flex: 1; margin-left: 12px; font-weight: 700; font-size: 0.95rem; }
-        .motivation-line { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--s); opacity: 0.4; }
-        .del-btn { color: #ef4444; font-size: 0.65rem; font-weight: 800; cursor: pointer; }
-    </style>
 </head>
 <body>
 
-    <div id="homeP" class="page active-page">
-        <h1 style="margin:0; font-weight:800; letter-spacing: -2px;">SHIPON'S LIFE</h1>
-        <div class="m3-card" style="text-align: center; border-left: 5px solid var(--p); margin-top: 20px;">
-            <small id="homeDay" style="text-transform: uppercase; font-weight: 800; color: var(--p); letter-spacing: 1px;"></small>
-            <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0</div>
-            <small style="opacity: 0.6; font-weight: 700;">Lifetime Study Hours</small>
-        </div>
-        <div class="m3-card">
-            <input type="date" id="mainDate" onchange="window.refresh()">
-            <button onclick="window.syncData(document.getElementById('mainDate').value)" style="background:var(--s); margin-top: 15px;">🔄 GLOBAL CLOUD SYNC</button>
-        </div>
-    </div>
+  <!-- ================= HEADER ================= -->
+  <header class="app-header glass">
+    <h1>SHIPON’S LIFE</h1>
+    <span id="todayDate">—</span>
+  </header>
 
-    <div id="statsP" class="page">
-        <h1>Analytics</h1>
-        <div class="m3-card" style="height: 350px;">
-            <canvas id="mainChart"></canvas>
-        </div>
-        <p style="text-align: center; font-size: 0.7rem; opacity: 0.5;">7-Day Study Performance</p>
-    </div>
+  <!-- ================= MAIN CONTENT ================= -->
+  <main id="app">
 
-    <div id="tasksP" class="page">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h1>Goals</h1>
-            <input type="date" id="taskDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--p); border: none;">
-        </div>
-        <div class="m3-card"><input type="text" id="tIn" placeholder="New goal..."><button onclick="addT()">ADD TASK</button></div>
-        <div id="tList"></div>
-    </div>
+    <!-- ===== HOME TAB ===== -->
+    <section class="tab active" id="tab-home">
+      <h2>Lifetime Mastery</h2>
 
-    <div id="dayLogP" class="page">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h1>Today</h1>
-            <input type="date" id="todayDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--s); border: none;">
-        </div>
-        <div class="m3-card">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <input type="time" id="startTime"><input type="time" id="endTime">
-            </div>
-            <input type="text" id="logAct" placeholder="Activity..."><button onclick="addLog()">LOG ROUTINE</button>
-        </div>
-        <div id="logList"></div>
-    </div>
+      <div class="metric-card">
+        <span class="metric-label">Total Study Hours</span>
+        <span class="metric-value" id="lifetimeHours">0</span>
+      </div>
 
-    <div id="studyP" class="page">
-        <h1>Study Center</h1>
-        <div class="m3-card">
-            <select id="sSub"></select>
-            <input type="number" id="sHr" placeholder="Duration (Hours)" step="0.5">
-            <button onclick="addS()">SAVE PROGRESS</button>
-        </div>
-        <div id="sLog"></div>
-    </div>
+      <canvas id="lifetimeChart"></canvas>
+    </section>
 
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="nav('homeP', this)">Home</div>
-        <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
-        <div class="nav-item" onclick="nav('tasksP', this)">Tasks</div>
-        <div class="nav-item" onclick="nav('dayLogP', this)">Today</div>
-        <div class="nav-item" onclick="nav('studyP', this)">Study</div>
-    </nav>
+    <!-- ===== STATS TAB ===== -->
+    <section class="tab" id="tab-stats">
+      <h2>Analytics</h2>
 
-    <script>
-        function format12(t) {
-            if(!t) return ""; let [h, m] = t.split(':');
-            let a = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
-            return `${h}:${m} ${a}`;
-        }
+      <canvas id="weeklyChart"></canvas>
+      <canvas id="monthlyChart"></canvas>
+    </section>
 
-        window.refresh = function() {
-            const mDate = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
-            const tDate = document.getElementById('taskDate').value;
-            const logDate = document.getElementById('todayDate').value;
+    <!-- ===== TASK TAB ===== -->
+    <section class="tab" id="tab-tasks">
+      <h2>Tasks</h2>
 
-            document.getElementById('homeDay').innerText = new Date(mDate).toLocaleDateString('en-US', { weekday: 'long' });
+      <input type="date" id="taskDateSelector" />
 
-            const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
-            const tDB = JSON.parse(localStorage.getItem('s_t')) || {};
-            const dLogDB = JSON.parse(localStorage.getItem('s_dayLog')) || {};
-            const subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"];
+      <div class="input-row">
+        <input type="text" id="taskInput" placeholder="Add a task…" />
+        <button id="addTaskBtn">+</button>
+      </div>
 
-            let total = 0; 
-            Object.values(sDB).forEach(day => (day || []).forEach(e => total += parseFloat(e.hours || 0)));
-            document.getElementById('lifeH').innerText = total.toFixed(1);
+      <ul id="taskList"></ul>
 
-            const sSel = document.getElementById('sSub'); sSel.innerHTML = '';
-            subs.forEach(s => sSel.innerHTML += `<option>${s}</option>`);
+      <div class="progress-wrapper">
+        <div id="taskProgressBar"></div>
+      </div>
+    </section>
 
-            renderT(tDate, tDB); renderS(mDate, sDB); renderLog(logDate, dLogDB);
-            updateChart(sDB);
-        };
+    <!-- ===== TODAY TAB ===== -->
+    <section class="tab" id="tab-today">
+      <h2>Today Timeline</h2>
 
-        function nav(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-            document.getElementById(id).classList.add('active-page');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active'); window.refresh();
-        }
+      <div class="input-row">
+        <input type="time" id="logTime" />
+        <input type="text" id="logActivity" placeholder="Activity description" />
+        <button id="addLogBtn">+</button>
+      </div>
 
-        function addT() {
-            let d = document.getElementById('taskDate').value, v = document.getElementById('tIn').value;
-            if(!v) return; let db = JSON.parse(localStorage.getItem('s_t')) || {};
-            if(!db[d]) db[d] = []; db[d].push({text: v, done: false});
-            localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d); document.getElementById('tIn').value='';
-        }
-        function renderT(d, db) {
-            const l = document.getElementById('tList'); l.innerHTML = '';
-            (db[d] || []).forEach((t, i) => { 
-                l.innerHTML += `<div class="list-item"><input type="checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})"><span class="item-label ${t.done?'motivation-line':''}">${t.text}</span><span onclick="delT('${d}',${i})" class="del-btn">DEL</span></div>`; 
-            });
-        }
-        function toggleT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d); }
-        function delT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d].splice(i, 1); localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d); }
+      <ul id="timelineList" class="timeline"></ul>
+    </section>
 
-        function addLog() {
-            let d = document.getElementById('todayDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
-            if(!s || !e || !a) return; let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
-            if(!db[d]) db[d] = []; db[d].push({start: s, end: e, act: a});
-            localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d); document.getElementById('logAct').value='';
-        }
-        function renderLog(d, db) {
-            const l = document.getElementById('logList'); l.innerHTML = '';
-            (db[d] || []).forEach((item, i) => { 
-                l.innerHTML += `<div class="list-item">
-                    <span style="font-weight:800; color:var(--p); font-size:0.7rem; min-width:110px;">${format12(item.start)}-${format12(item.end)}</span>
-                    <span class="item-label">${item.act}</span>
-                    <span onclick="delLog('${d}',${i})" class="del-btn">DEL</span>
-                </div>`; 
-            });
-        }
-        function delLog(d, i) { let db = JSON.parse(localStorage.getItem('s_dayLog')); db[d].splice(i, 1); localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d); }
+    <!-- ===== STUDY TAB ===== -->
+    <section class="tab" id="tab-study">
+      <h2>Study</h2>
 
-        function addS() {
-            let d = document.getElementById('mainDate').value, h = parseFloat(document.getElementById('sHr').value), sub = document.getElementById('sSub').value;
-            if(!h) return; let db = JSON.parse(localStorage.getItem('s_s')) || {};
-            if(!db[d]) db[d] = []; let ex = db[d].find(x => x.subject === sub);
-            if(ex) ex.hours += h; else db[d].push({subject: sub, hours: h});
-            localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(d); document.getElementById('sHr').value='';
-        }
-        function renderS(d, db) {
-            const l = document.getElementById('sLog'); l.innerHTML = '';
-            (db[d] || []).forEach(s => l.innerHTML += `<div class="list-item"><b>${s.subject}</b>: ${s.hours}h</div>`);
-        }
+      <div class="input-row">
+        <select id="subjectSelect"></select>
+        <input type="number" id="studyHours" placeholder="Hours" step="0.25" />
+        <button id="addStudyBtn">+</button>
+      </div>
 
-        function updateChart(sDB) {
-            const canvas = document.getElementById('mainChart');
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let labels = [], data = [];
-            for(let i=6; i>=0; i--) {
-                const d = new Date(); d.setDate(d.getDate()-i);
-                const s = d.toISOString().split('T')[0];
-                labels.push(d.toLocaleDateString([],{weekday:'short'}));
-                let h = 0; (sDB[s]||[]).forEach(x => h += parseFloat(x.hours || 0));
-                data.push(h);
-            }
-            if(window.chartO) window.chartO.destroy();
-            window.chartO = new Chart(ctx, {
-                type: 'bar',
-                data: { labels, datasets: [{ label: 'Study Hours', data, backgroundColor: '#6366f1', borderRadius: 8 }] },
-                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
-            });
-        }
+      <ul id="studyList"></ul>
 
-        document.getElementById('taskDate').valueAsDate = new Date();
-        document.getElementById('todayDate').valueAsDate = new Date();
-        document.getElementById('mainDate').valueAsDate = new Date();
-        window.refresh();
-    </script>
+      <canvas id="studyChart"></canvas>
+    </section>
+
+  </main>
+
+  <!-- ================= BOTTOM NAV ================= -->
+  <nav class="bottom-nav glass">
+    <button data-tab="home">🏠</button>
+    <button data-tab="stats">📊</button>
+    <button data-tab="tasks">✅</button>
+    <button data-tab="today">🕒</button>
+    <button data-tab="study">📚</button>
+  </nav>
+
+  <!-- ================= SCRIPTS ================= -->
+
+  <!-- Firebase (Config Only – Logic Must Be External) -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "REPLACE_WITH_SECURE_KEY",
+      authDomain: "shipon-life-os.firebaseapp.com",
+      projectId: "shipon-life-os",
+      appId: "REPLACE_WITH_APP_ID"
+    };
+  </script>
+
+  <!-- Core Logic -->
+  <script src="app.js"></script>
+
 </body>
 </html>

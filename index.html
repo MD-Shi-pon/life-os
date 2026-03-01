@@ -11,7 +11,7 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
       import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-      // Firebase Configuration
+      // Your Firebase configuration
       const firebaseConfig = {
         apiKey: "AIzaSyAskdYkHhoxKH52icAEeqYaq2XRrmCcdBs",
         authDomain: "shipon-life-os.firebaseapp.com",
@@ -43,31 +43,110 @@
     </script>
 
     <style>
-        :root { --primary: #4f46e5; --accent: #f59e0b; --success: #10b981; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 100px; }
-        .page { display: none; padding: 20px; max-width: 500px; margin: 0 auto; animation: fadeIn 0.3s ease; }
+        :root { 
+            --primary: #6366f1; 
+            --accent: #fbbf24; 
+            --success: #10b981; 
+            --glass: rgba(255, 255, 255, 0.92);
+            --text: #1e293b; 
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding-bottom: 100px;
+            color: var(--text);
+            /* Catchy Animated Gradient */
+            background: linear-gradient(-45deg, #4f46e5, #ec4899, #06b6d4, #10b981);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .page { display: none; padding: 20px; max-width: 500px; margin: 0 auto; animation: fadeIn 0.4s ease; }
         .active-page { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; background: #0f172a; display: flex; justify-content: space-around; padding: 10px; border-radius: 20px; z-index: 1000; }
-        .nav-item { cursor: pointer; color: #94a3b8; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 10px; border-radius: 12px; transition: 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { 
+            background: var(--glass); 
+            backdrop-filter: blur(12px);
+            padding: 22px; 
+            border-radius: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+            margin-bottom: 18px; 
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+
+        h1 { font-weight: 800; font-size: 1.8rem; color: white; text-shadow: 0 3px 6px rgba(0,0,0,0.2); margin-bottom: 25px; }
+        
+        .lifetime-card { 
+            background: rgba(15, 23, 42, 0.88); 
+            backdrop-filter: blur(15px);
+            color: white; 
+            text-align: center; 
+            padding: 30px; 
+            border-radius: 30px; 
+            margin-bottom: 18px; 
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        input, select, button { 
+            width: 100%; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 18px; 
+            border: none; 
+            font-size: 1rem; 
+            font-weight: 600;
+            box-sizing: border-box; 
+        }
+
+        button { background: var(--primary); color: white; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); }
+        button:active { transform: scale(0.96); }
+        .btn-sync { background: var(--success); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4); }
+
+        .score-display { 
+            text-align: center; 
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: white; 
+            padding: 25px; 
+            border-radius: 30px; 
+            margin-bottom: 18px; 
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .item { display: flex; align-items: center; padding: 14px; background: white; border-radius: 18px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .item span { flex: 1; margin-left: 12px; font-weight: 700; color: #334155; }
+        .completed { text-decoration: line-through; opacity: 0.4; }
+        .del-btn { color: #ef4444; font-weight: 800; font-size: 0.75rem; cursor: pointer; padding: 5px 10px; }
+
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 25px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 90%; 
+            max-width: 450px; 
+            background: rgba(15, 23, 42, 0.95); 
+            backdrop-filter: blur(20px);
+            display: flex; 
+            justify-content: space-around; 
+            padding: 14px; 
+            border-radius: 28px; 
+            z-index: 1000; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        .nav-item { color: #64748b; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; padding: 12px 18px; border-radius: 18px; transition: 0.3s; cursor: pointer; }
         .nav-item.active { color: #fff; background: var(--primary); }
-
-        .card { background: var(--card); padding: 20px; border-radius: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        h1 { font-weight: 800; font-size: 1.5rem; margin-bottom: 15px; }
-        input, select, button { width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px; border: 1.5px solid #e2e8f0; font-size: 1rem; box-sizing: border-box; outline: none; }
-        button { background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        button:active { transform: scale(0.98); }
-        .btn-sync { background: var(--success); margin-top: 10px; }
-        
-        .score-display { text-align: center; background: linear-gradient(135deg, #4f46e5, #818cf8); color: white; padding: 20px; border-radius: 24px; margin-bottom: 15px; }
-        .item { display: flex; align-items: center; padding: 12px; background: #f9fafb; border-radius: 15px; margin-bottom: 8px; border: 1px solid #f1f5f9; }
-        .item span { flex: 1; margin-left: 10px; font-weight: 600; }
-        .completed { text-decoration: line-through; opacity: 0.5; }
-        .del-btn { color: #ef4444; font-weight: 700; font-size: 0.8rem; cursor: pointer; margin-left: auto; }
-        
-        /* Lifetime Card Styling */
-        .lifetime-card { background: #0f172a; color: white; text-align: center; padding: 25px; border-radius: 24px; margin-bottom: 15px; border: 2px solid #334155; }
     </style>
 </head>
 <body>
@@ -76,33 +155,32 @@
         <h1>Dashboard</h1>
         
         <div class="lifetime-card">
-            <small style="opacity: 0.7; text-transform: uppercase; letter-spacing: 1px;">Lifetime Study Hours</small>
-            <div style="font-size: 3rem; font-weight: 800; color: #fbbf24; margin-top: 5px;" id="lifetimeHours">0.0h</div>
+            <small style="opacity: 0.7; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;">Lifetime Progress</small>
+            <div style="font-size: 3.5rem; font-weight: 900; color: var(--accent); margin-top: 8px;" id="lifetimeHours">0.0h</div>
         </div>
 
         <div class="card">
-            <small>Select Date</small>
             <input type="date" id="mainDate" onchange="refreshUI()">
             <button class="btn-sync" onclick="backupToCloud()">Sync to Cloud</button>
         </div>
 
         <div class="score-display">
-            <small>Today's Performance Score</small>
-            <div style="font-size: 3.5rem; font-weight: 800;" id="perfScore">0</div>
+            <small style="font-weight: 700; opacity: 0.9;">Daily Performance Score</small>
+            <div style="font-size: 4rem; font-weight: 900;" id="perfScore">0</div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="card" style="margin:0"><small>Daily Tasks</small><div id="homeTask" style="font-size:1.5rem; font-weight:800;">0%</div></div>
-            <div class="card" style="margin:0"><small>Today's Study</small><div id="homeStudy" style="font-size:1.5rem; font-weight:800; color:var(--accent)">0.0h</div></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="card" style="margin:0; text-align:center;"><small style="font-weight: 800; opacity: 0.6;">Tasks</small><div id="homeTask" style="font-size:1.8rem; font-weight:900; margin-top:5px;">0%</div></div>
+            <div class="card" style="margin:0; text-align:center;"><small style="font-weight: 800; opacity: 0.6;">Study</small><div id="homeStudy" style="font-size:1.8rem; font-weight:900; color:var(--primary); margin-top:5px;">0.0h</div></div>
         </div>
-        <div class="card"><canvas id="myChart" style="height:180px;"></canvas></div>
+        <div class="card" style="padding:15px;"><canvas id="myChart" style="height:180px;"></canvas></div>
     </div>
 
     <div id="tasksPage" class="page">
-        <h1>Daily Tasks</h1>
+        <h1>Tasks</h1>
         <div class="card">
-            <input type="text" id="taskInput" placeholder="Enter a goal for today...">
-            <button onclick="addTask()">Add Task</button>
+            <input type="text" id="taskInput" placeholder="What is your goal today?">
+            <button onclick="addTask()">Add Daily Goal</button>
         </div>
         <div id="taskList"></div>
     </div>
@@ -110,22 +188,22 @@
     <div id="studyPage" class="page">
         <h1>Study Log</h1>
         <div class="card">
-            <div style="display:flex; gap:8px">
+            <div style="display:flex; gap:10px">
                 <select id="subSelect" style="flex:2"></select>
-                <button onclick="addNewSubject()" style="flex:1; font-size:0.75rem; background:#64748b">+ Subject</button>
+                <button onclick="addNewSubject()" style="flex:1; background:#475569; font-size:0.8rem;">+ Sub</button>
             </div>
-            <input type="number" id="hrInput" placeholder="Enter hours (e.g. 1.5)" step="0.5">
-            <button style="background:var(--accent)" onclick="addStudy()">Log Hours</button>
+            <input type="number" id="hrInput" placeholder="Hours" step="0.5">
+            <button style="background:var(--accent); color:#1e293b" onclick="addStudy()">Log Progress</button>
         </div>
         <div id="studyLog"></div>
     </div>
 
     <div id="vaultPage" class="page">
-        <h1>Link Vault</h1>
+        <h1>Resource Vault</h1>
         <div class="card">
-            <input type="text" id="linkTitle" placeholder="Resource Name (e.g. Marketing Course)">
-            <input type="text" id="linkURL" placeholder="https://...">
-            <button style="background:#6366f1" onclick="addLink()">Save Link</button>
+            <input type="text" id="linkTitle" placeholder="Title">
+            <input type="text" id="linkURL" placeholder="URL">
+            <button style="background:#6366f1" onclick="addLink()">Save Reference</button>
         </div>
         <div id="linkList"></div>
     </div>
@@ -158,27 +236,20 @@
             const dayT = taskDB[date] || [];
             const dayS = studyDB[date] || [];
 
-            // Task Progress
             const done = dayT.filter(t => t.done).length;
             const tPct = dayT.length ? (done/dayT.length)*100 : 0;
             document.getElementById('homeTask').innerText = Math.round(tPct) + "%";
 
-            // Today's Study Total
             let hToday = 0; dayS.forEach(s => hToday += s.hours);
             document.getElementById('homeStudy').innerText = hToday.toFixed(1) + "h";
 
-            // Calculate Lifetime Total
             let totalLife = 0;
-            Object.values(studyDB).forEach(day => {
-                day.forEach(session => totalLife += session.hours);
-            });
+            Object.values(studyDB).forEach(day => day.forEach(s => totalLife += s.hours));
             document.getElementById('lifetimeHours').innerText = totalLife.toFixed(1) + "h";
 
-            // Performance Score (Tasks 50% + Study 50% based on 4hr goal)
             const sScore = Math.min((hToday / 4) * 100, 100);
             document.getElementById('perfScore').innerText = Math.round((tPct * 0.5) + (sScore * 0.5));
 
-            // Subjects Dropdown
             const sel = document.getElementById('subSelect');
             sel.innerHTML = ''; subjects.forEach(s => sel.innerHTML += `<option>${s}</option>`);
 
@@ -187,7 +258,6 @@
             renderLinks();
             updateChart();
 
-            // Save Local
             localStorage.setItem('shipon_tasks', JSON.stringify(taskDB));
             localStorage.setItem('shipon_study', JSON.stringify(studyDB));
             localStorage.setItem('shipon_links', JSON.stringify(linkDB));
@@ -217,16 +287,11 @@
         function addLink() {
             const t = document.getElementById('linkTitle').value;
             const u = document.getElementById('linkURL').value;
-            if(t && u) { 
-                linkDB.push({title: t, url: u}); 
-                document.getElementById('linkTitle').value = '';
-                document.getElementById('linkURL').value = '';
-                refreshUI(); 
-            }
+            if(t && u) { linkDB.push({title: t, url: u}); refreshUI(); }
         }
 
         function addNewSubject() {
-            const s = prompt("Enter new subject name:");
+            const s = prompt("New Subject:");
             if(s && !subjects.includes(s)) { subjects.push(s); refreshUI(); }
         }
 
@@ -234,7 +299,7 @@
             const l = document.getElementById('taskList'); l.innerHTML = '';
             (taskDB[d] || []).forEach((t, i) => {
                 l.innerHTML += `<div class="item">
-                    <input type="checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
+                    <input type="checkbox" style="width:20px" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
                     <span class="${t.done?'completed':''}">${t.text}</span>
                     <div class="del-btn" onclick="deleteT('${d}',${i})">REMOVE</div>
                 </div>`;
@@ -252,9 +317,7 @@
         function renderLinks() {
             const l = document.getElementById('linkList'); l.innerHTML = '';
             linkDB.forEach(link => {
-                l.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                    <a href="${link.url}" target="_blank" style="text-decoration:none; color:var(--primary); font-weight:700;">${link.title}</a>
-                </div>`;
+                l.innerHTML += `<div class="card" style="padding:15px"><a href="${link.url}" target="_blank" style="text-decoration:none; color:var(--primary); font-weight:800;">🔗 ${link.title}</a></div>`;
             });
         }
 
@@ -271,8 +334,8 @@
             if(chart) chart.destroy();
             chart = new Chart(ctx, { 
                 type:'line', 
-                data:{ labels, datasets:[{label:'Hours', data, borderColor:'#4f46e5', tension:0.4, fill:true, backgroundColor:'rgba(79, 70, 229, 0.05)'}] }, 
-                options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}} 
+                data:{ labels, datasets:[{label:'Hours', data, borderColor:'#fff', borderWidth:3, tension:0.4, fill:true, backgroundColor:'rgba(255, 255, 255, 0.1)'}] }, 
+                options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, display:false}, x:{grid:{display:false}, ticks:{color:'#fff'}}}} 
             });
         }
 

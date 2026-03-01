@@ -10,10 +10,10 @@ import {
 
 /* ===== FIREBASE CONFIG ===== */
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
+  apiKey: "AIzaSyAskdYkHhoxKH52icAEeqYaq2XRrmCcdBs",
   authDomain: "shipon-life-os.firebaseapp.com",
   projectId: "shipon-life-os",
-  appId: "YOUR_APP_ID"
+  appId: "1:957123699373:web:b3c579ad5c2604cf6b5c24"
 };
 
 const app = initializeApp(firebaseConfig);

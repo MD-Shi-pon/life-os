@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, setDoc, getDocs, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAskdYkHhoxKH52icAEeqYaq2XRrmCcdBs",
@@ -13,33 +13,30 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// GLOBAL HELPERS
+// --- GLOBAL EXPORTS ---
 window.toggleTheme = () => document.body.classList.toggle('light-mode');
-function format12(t) {
+const format12 = (t) => {
     if(!t) return ""; let [h, m] = t.split(':');
     let a = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
     return `${h}:${m} ${a}`;
-}
+};
 
-// SYNC
+// --- CORE SYNC ---
 window.syncData = async (date) => {
-    const localData = {
+    const data = {
         tasks: JSON.parse(localStorage.getItem('s_t'))?.[date] || [],
         study: JSON.parse(localStorage.getItem('s_s'))?.[date] || [],
         dayLog: JSON.parse(localStorage.getItem('s_dayLog'))?.[date] || [],
         subs: JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"]
     };
-    try { await setDoc(doc(db, "global_master", "history", "dates", date), localData); } 
-    catch (e) { console.error("Cloud Error", e); }
+    await setDoc(doc(db, "global_master", "history", "dates", date), data);
 };
 
 onSnapshot(collection(db, "global_master", "history", "dates"), (snap) => {
     let s_s = {}, s_t = {}, s_d = {}, subs = ["English", "Marketing"];
     snap.forEach(d => {
         const data = d.data();
-        s_s[d.id] = data.study || [];
-        s_t[d.id] = data.tasks || [];
-        s_d[d.id] = data.dayLog || [];
+        s_s[d.id] = data.study || []; s_t[d.id] = data.tasks || []; s_d[d.id] = data.dayLog || [];
         if(data.subs) subs = data.subs;
     });
     localStorage.setItem('s_s', JSON.stringify(s_s));
@@ -49,135 +46,111 @@ onSnapshot(collection(db, "global_master", "history", "dates"), (snap) => {
     window.refresh();
 });
 
-// NAVIGATION
+// --- UI REFRESH & NAV ---
 window.nav = (id, el) => {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
     document.getElementById(id).classList.add('active-page');
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    el.classList.add('active'); 
-    window.refresh();
+    el.classList.add('active'); window.refresh();
 };
 
-window.refresh = function() {
-    const mDate = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
-    const tDate = document.getElementById('taskDate').value || mDate;
-    const logDate = document.getElementById('todayDate').value || mDate;
-    const studyDate = document.getElementById('studyDate').value || mDate;
+window.refresh = () => {
+    const d = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
+    const sDB = JSON.parse(localStorage.getItem('s_s')) || {}, tDB = JSON.parse(localStorage.getItem('s_t')) || {};
+    const dLogDB = JSON.parse(localStorage.getItem('s_dayLog')) || {}, subs = JSON.parse(localStorage.getItem('s_subs')) || [];
 
-    document.getElementById('homeDay').innerText = new Date(mDate).toLocaleDateString('en-US', { weekday: 'long' });
-
-    const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
-    const tDB = JSON.parse(localStorage.getItem('s_t')) || {};
-    const dLogDB = JSON.parse(localStorage.getItem('s_dayLog')) || {};
-    const subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"];
-
+    document.getElementById('homeDay').innerText = new Date(d).toLocaleDateString('en-US', { weekday: 'long' });
     let total = 0; Object.values(sDB).forEach(day => (day || []).forEach(e => total += parseFloat(e.hours || 0)));
     document.getElementById('lifeH').innerText = total.toFixed(1);
 
-    const sSel = document.getElementById('sSub'); 
-    if(sSel) {
-        sSel.innerHTML = '';
-        subs.forEach(s => sSel.innerHTML += `<option value="${s}">${s}</option>`);
+    const sSel = document.getElementById('sSub'); if(sSel) {
+        sSel.innerHTML = ''; subs.forEach(s => sSel.innerHTML += `<option value="${s}">${s}</option>`);
     }
 
-    renderT(tDate, tDB); 
-    renderS(studyDate, sDB); 
-    renderLog(logDate, dLogDB);
-    renderSubM(subs);
+    renderTasks(document.getElementById('taskDate').value || d, tDB);
+    renderStudy(document.getElementById('studyDate').value || d, sDB);
+    renderLog(document.getElementById('todayDate').value || d, dLogDB);
+    renderSubManage(subs);
     updateChart(sDB);
 };
 
-// TASKS
+// --- TASK LOGIC ---
 window.addT = () => {
-    let d = document.getElementById('taskDate').value, v = document.getElementById('tIn').value;
+    const d = document.getElementById('taskDate').value, v = document.getElementById('tIn').value;
     if(!v) return; let db = JSON.parse(localStorage.getItem('s_t')) || {};
     if(!db[d]) db[d] = []; db[d].push({text: v, done: false});
     localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d); document.getElementById('tIn').value='';
 };
-function renderT(d, db) {
+const renderTasks = (d, db) => {
     const l = document.getElementById('tList'); l.innerHTML = '';
-    (db[d] || []).forEach((t, i) => { 
-        l.innerHTML += `<div class="list-item"><input type="checkbox" ${t.done?'checked':''} onchange="window.toggleT('${d}',${i})" style="width:20px; height:20px; accent-color:var(--s);"><span class="item-label ${t.done?'motivation-line':''}">${t.text}</span><span onclick="window.delT('${d}',${i})" class="del-btn">DEL</span></div>`; 
+    (db[d] || []).forEach((t, i) => {
+        l.innerHTML += `<div class="list-item"><input type="checkbox" ${t.done?'checked':''} onchange="window.toggleT('${d}',${i})"><span class="item-label ${t.done?'motivation-line':''}">${t.text}</span><span onclick="window.delT('${d}',${i})" class="del-btn">DEL</span></div>`;
     });
-}
+};
 window.toggleT = (d, i) => { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d); window.refresh(); };
 window.delT = (d, i) => { let db = JSON.parse(localStorage.getItem('s_t')); db[d].splice(i, 1); localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d); window.refresh(); };
 
-// TODAY (12H)
+// --- TODAY LOGIC ---
 window.addLog = () => {
-    let d = document.getElementById('todayDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
-    if (!s || !e || !a) return; 
-    let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
-    if (!db[d]) db[d] = []; db[d].push({start: s, end: e, act: a});
-    localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d); document.getElementById('logAct').value = ''; window.refresh();
+    const d = document.getElementById('todayDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
+    if(!s || !e || !a) return; let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
+    if(!db[d]) db[d] = []; db[d].push({start: s, end: e, act: a});
+    localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d); document.getElementById('logAct').value=''; window.refresh();
 };
-function renderLog(d, db) {
+const renderLog = (d, db) => {
     const l = document.getElementById('logList'); l.innerHTML = '';
-    (db[d] || []).forEach((item, i) => { 
-        l.innerHTML += `<div class="list-item"><span style="font-weight:800; color:var(--p); font-size:0.75rem; min-width:115px; text-align:left;">${format12(item.start)} — ${format12(item.end)}</span><span class="item-label">${item.act}</span><span onclick="window.delLog('${d}',${i})" class="del-btn">DEL</span></div>`; 
+    (db[d] || []).forEach((item, i) => {
+        l.innerHTML += `<div class="list-item"><span style="font-weight:800; color:var(--p); font-size:0.75rem; min-width:115px;">${format12(item.start)} — ${format12(item.end)}</span><span class="item-label">${item.act}</span><span onclick="window.delLog('${d}',${i})" class="del-btn">DEL</span></div>`;
     });
-}
+};
 window.delLog = (d, i) => { let db = JSON.parse(localStorage.getItem('s_dayLog')); db[d].splice(i, 1); localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d); window.refresh(); };
 
-// STUDY & SUBJECT MANAGEMENT
+// --- STUDY & SUBJECTS ---
 window.addS = () => {
-    let d = document.getElementById('studyDate').value, h = parseFloat(document.getElementById('sHr').value), sub = document.getElementById('sSub').value;
-    let time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const d = document.getElementById('studyDate').value, h = parseFloat(document.getElementById('sHr').value), sub = document.getElementById('sSub').value;
     if(!h) return; let db = JSON.parse(localStorage.getItem('s_s')) || {};
-    if(!db[d]) db[d] = []; db[d].push({ subject: sub, hours: h, time: time });
-    localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(d); document.getElementById('sHr').value = ''; window.refresh();
+    if(!db[d]) db[d] = []; db[d].push({subject: sub, hours: h, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})});
+    localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(d); document.getElementById('sHr').value=''; window.refresh();
 };
-function renderS(d, db) {
+const renderStudy = (d, db) => {
     const l = document.getElementById('sLog'); l.innerHTML = '';
-    (db[d] || []).forEach((s, i) => { l.innerHTML += `<div class="list-item"><span class="item-label"><small>${s.time}</small> <b>${s.subject}</b>: ${s.hours}h</span><span onclick="window.delS('${d}',${i})" class="del-btn">DEL</span></div>`; });
-}
+    (db[d] || []).forEach((s, i) => {
+        l.innerHTML += `<div class="list-item"><span class="item-label"><small>${s.time}</small> <b>${s.subject}</b>: ${s.hours}h</span><span onclick="window.delS('${d}',${i})" class="del-btn">DEL</span></div>`;
+    });
+};
 window.delS = (d, i) => { let db = JSON.parse(localStorage.getItem('s_s')); db[d].splice(i, 1); localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(d); window.refresh(); };
 
 window.addNewSub = () => {
-    const v = document.getElementById('newSubIn').value;
-    let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"];
+    const v = document.getElementById('newSubIn').value; let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"];
     if(v && !subs.includes(v)) {
-        subs.push(v);
-        localStorage.setItem('s_subs', JSON.stringify(subs));
-        document.getElementById('newSubIn').value = '';
-        window.syncData(new Date().toISOString().split('T')[0]);
-        window.refresh();
+        subs.push(v); localStorage.setItem('s_subs', JSON.stringify(subs));
+        document.getElementById('newSubIn').value = ''; window.syncData(new Date().toISOString().split('T')[0]); window.refresh();
     }
 };
-function renderSubM(subs) {
+const renderSubManage = (subs) => {
     const l = document.getElementById('subManageList'); if(!l) return; l.innerHTML = '';
-    subs.forEach((s, i) => {
-        l.innerHTML += `<div class="list-item"><span class="item-label">${s}</span><span onclick="window.remSub(${i})" class="del-btn">REMOVE</span></div>`;
-    });
-}
+    subs.forEach((s, i) => { l.innerHTML += `<div class="list-item"><span class="item-label">${s}</span><span onclick="window.remSub(${i})" class="del-btn">REMOVE</span></div>`; });
+};
 window.remSub = (i) => {
-    let subs = JSON.parse(localStorage.getItem('s_subs'));
-    subs.splice(i, 1);
-    localStorage.setItem('s_subs', JSON.stringify(subs));
-    window.syncData(new Date().toISOString().split('T')[0]);
-    window.refresh();
+    let subs = JSON.parse(localStorage.getItem('s_subs')); subs.splice(i, 1);
+    localStorage.setItem('s_subs', JSON.stringify(subs)); window.syncData(new Date().toISOString().split('T')[0]); window.refresh();
 };
 
-function updateChart(sDB) {
+const updateChart = (sDB) => {
     const canvas = document.getElementById('mainChart'); if(!canvas) return;
-    let labels = [], data = [];
-    for(let i=6; i>=0; i--) {
-        const d = new Date(); d.setDate(d.getDate()-i);
-        const s = d.toISOString().split('T')[0];
+    let labels = [], data = []; for(let i=6; i>=0; i--) {
+        const d = new Date(); d.setDate(d.getDate()-i); const s = d.toISOString().split('T')[0];
         labels.push(d.toLocaleDateString([],{weekday:'short'}));
-        let h = 0; (sDB[s]||[]).forEach(x => h += parseFloat(x.hours || 0));
-        data.push(h);
+        let h = 0; (sDB[s]||[]).forEach(x => h += parseFloat(x.hours || 0)); data.push(h);
     }
     if(window.chartO) window.chartO.destroy();
     window.chartO = new Chart(canvas.getContext('2d'), {
         type: 'bar', data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 8 }] },
         options: { maintainAspectRatio: false }
     });
-}
+};
 
 // INIT
-document.getElementById('taskDate').valueAsDate = new Date();
-document.getElementById('todayDate').valueAsDate = new Date();
-document.getElementById('mainDate').valueAsDate = new Date();
-document.getElementById('studyDate').valueAsDate = new Date();
+const today = new Date().toISOString().split('T')[0];
+['taskDate', 'todayDate', 'mainDate', 'studyDate'].forEach(id => document.getElementById(id).value = today);
 window.refresh();

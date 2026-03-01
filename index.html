@@ -9,7 +9,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="dark-mode">
-
     <div class="theme-toggle" onclick="window.toggleTheme()">🌗</div>
 
     <div id="homeP" class="page active-page">
@@ -33,7 +32,7 @@
     <div id="tasksP" class="page">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h1>Mission</h1>
-            <input type="date" id="taskDate" onchange="window.refresh()" class="date-chip">
+            <input type="date" id="taskDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--p); border: none; color: white; border-radius: 8px;">
         </div>
         <div class="glass-card">
             <input type="text" id="tIn" placeholder="New goal...">
@@ -45,7 +44,7 @@
     <div id="dayLogP" class="page">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h1>Today</h1>
-            <input type="date" id="todayDate" onchange="window.refresh()" class="date-chip">
+            <input type="date" id="todayDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--s); border: none; color: white; border-radius: 8px;">
         </div>
         <div class="glass-card">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
@@ -59,15 +58,15 @@
     <div id="studyP" class="page">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h1>Study</h1>
-            <input type="date" id="studyDate" onchange="window.refresh()" class="date-chip">
+            <input type="date" id="studyDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--p); border: none; color: white; border-radius: 8px;">
         </div>
         <div class="glass-card">
             <select id="sSub"></select>
             <input type="number" id="sHr" placeholder="Duration (Hours)" step="0.5">
             <button onclick="window.addS()">SAVE PROGRESS</button>
             <hr style="opacity:0.1; margin:20px 0;">
-            <input type="text" id="newSubIn" placeholder="New Field (e.g. English)">
-            <button onclick="window.addNewSub()" style="background:#475569">+ ADD SUBJECT</button>
+            <input type="text" id="newSubIn" placeholder="New Career Field...">
+            <button onclick="window.addNewSub()">+ ADD SUBJECT</button>
         </div>
         <div id="sLog"></div>
         <h3 style="margin-top:20px;">Manage Fields</h3>
@@ -81,7 +80,6 @@
         <div class="nav-item" onclick="window.nav('dayLogP', this)">Today</div>
         <div class="nav-item" onclick="window.nav('studyP', this)">Study</div>
     </nav>
-
     <script type="module" src="./app.js"></script>
 </body>
 </html>

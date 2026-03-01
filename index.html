@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIPON'S LIFE | 5-Year Mastery</title>
+    <title>SHIPON'S LIFE | Elite Mastery</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -62,7 +62,7 @@
         input, select { width: 100%; padding: 16px; border-radius: 14px; border: 1px solid rgba(128,128,128,0.2); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; box-sizing: border-box; }
         
         .list-item { display: flex; align-items: center; padding: 16px; background: rgba(128,128,128,0.05); border-radius: 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.03); }
-        .comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .chart-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; display: block; color: var(--p); }
     </style>
 </head>
 <body class="dark-mode">
@@ -73,7 +73,7 @@
 
     <div id="homeP" class="page active-page">
         <div class="m3-card" style="text-align: center; border-left: 5px solid var(--p);">
-            <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-weight: 800;">Lifetime Mastery</small>
+            <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-weight: 800;">Lifetime Progress</small>
             <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0h</div>
         </div>
         <div class="home-controls">
@@ -83,20 +83,21 @@
         <button onclick="backupToCloud()" style="background:var(--s)">SYNC TO CLOUD</button>
     </div>
 
-    <div id="compareP" class="page">
-        <h1>Custom Comparison</h1>
+    <div id="statsP" class="page">
+        <h1>Productivity Engine</h1>
         <div class="m3-card">
-            <div class="comp-grid">
-                <div><small>Date A</small><input type="date" id="dateA" onchange="updateCompare()"></div>
-                <div><small>Date B</small><input type="date" id="dateB" onchange="updateCompare()"></div>
-            </div>
+            <span class="chart-label">Subject Distribution (Lifetime)</span>
+            <div style="height: 250px;"><canvas id="subjectChart"></canvas></div>
         </div>
-        <div class="m3-card" style="height: 350px;"><canvas id="compChart"></canvas></div>
+        <div class="m3-card">
+            <span class="chart-label">Hourly Activity (7-Day Average)</span>
+            <div style="height: 250px;"><canvas id="hourChart"></canvas></div>
+        </div>
     </div>
 
     <div id="tasksP" class="page">
         <div class="m3-card">
-            <input type="text" id="tIn" placeholder="Enter daily focus goal...">
+            <input type="text" id="tIn" placeholder="Commit to a goal...">
             <button onclick="addT()">COMMIT TASK</button>
         </div>
         <div id="tList"></div>
@@ -105,12 +106,15 @@
     <div id="studyP" class="page">
         <div class="m3-card">
             <select id="sSub"></select>
-            <input type="number" id="sHr" placeholder="Hours (e.g. 2.0)" step="0.5">
-            <button onclick="addS()">LOG HOURS</button>
+            <input type="number" id="sHr" placeholder="Log Hours" step="0.5">
+            <button onclick="addS()">SAVE PROGRESS</button>
             <hr style="opacity: 0.1; margin: 20px 0;">
-            <input type="text" id="newSub" placeholder="New Subject Name...">
-            <button onclick="addNewSub()" style="background:#475569">+ ADD SUBJECT</button>
+            <input type="text" id="newSub" placeholder="New Course Name...">
+            <button onclick="addNewSub()" style="background:#4f46e5">+ ADD SUBJECT</button>
         </div>
+        <h3>Manage Subjects</h3>
+        <div id="subManageList"></div>
+        <h3>Daily Log</h3>
         <div id="sLog"></div>
     </div>
 
@@ -125,7 +129,7 @@
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="nav('homeP', this)">Home</div>
-        <div class="nav-item" onclick="nav('compareP', this)">Compare</div>
+        <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
         <div class="nav-item" onclick="nav('tasksP', this)">Tasks</div>
         <div class="nav-item" onclick="nav('studyP', this)">Study</div>
         <div class="nav-item" onclick="nav('vaultP', this)">Vault</div>
@@ -151,13 +155,11 @@
             Object.values(sDB).forEach(day => day.forEach(s => tL += s.hours));
             document.getElementById('lifeH').innerText = tL.toFixed(1) + "h";
 
+            // Subject Dropdown
             const sel = document.getElementById('sSub'); sel.innerHTML = '';
             subs.forEach(s => sel.innerHTML += `<option>${s}</option>`);
 
-            renderT(date); 
-            renderS(date);
-            renderL(); 
-            updateCompare();
+            renderT(date); renderS(date); renderL(); renderSubManager(); updateStats();
             
             localStorage.setItem('s_t', JSON.stringify(tDB));
             localStorage.setItem('s_s', JSON.stringify(sDB));
@@ -170,6 +172,20 @@
             if(v && !subs.includes(v)) { subs.push(v); document.getElementById('newSub').value=''; refresh(); }
         }
 
+        function removeSub(index) {
+            if(confirm("Remove this subject from your active list?")) {
+                subs.splice(index, 1);
+                refresh();
+            }
+        }
+
+        function renderSubManager() {
+            const list = document.getElementById('subManageList'); list.innerHTML = '';
+            subs.forEach((s, i) => {
+                list.innerHTML += `<div class="list-item"><span>${s}</span><span onclick="removeSub(${i})" style="color:#ef4444; cursor:pointer; font-size:0.7rem; font-weight:800; margin-left:auto;">DELETE</span></div>`;
+            });
+        }
+
         function addS() {
             const d = document.getElementById('mainDate').value; 
             const h = parseFloat(document.getElementById('sHr').value);
@@ -177,7 +193,6 @@
             if(!h) return;
             if(!sDB[d]) sDB[d] = [];
 
-            // Logic: Merge hours if subject already exists for this day
             const existing = sDB[d].find(s => s.subject === sub);
             if(existing) { existing.hours += h; } 
             else { sDB[d].push({subject: sub, hours: h}); }
@@ -186,22 +201,40 @@
             refresh();
         }
 
-        function updateCompare() {
-            const dA = document.getElementById('dateA').value;
-            const dB = document.getElementById('dateB').value;
-            const ctx = document.getElementById('compChart').getContext('2d');
-            
-            let hA = 0; if(dA) (sDB[dA]||[]).forEach(s => hA += s.hours);
-            let hB = 0; if(dB) (sDB[dB]||[]).forEach(s => hB += s.hours);
+        function updateStats() {
+            // Subject Chart (Donut)
+            const subCtx = document.getElementById('subjectChart').getContext('2d');
+            const subData = {};
+            Object.values(sDB).flat().forEach(s => {
+                subData[s.subject] = (subData[s.subject] || 0) + s.hours;
+            });
 
-            if(window.compO) window.compO.destroy();
-            window.compO = new Chart(ctx, {
-                type: 'bar',
+            if(window.subO) window.subO.destroy();
+            window.subO = new Chart(subCtx, {
+                type: 'doughnut',
                 data: {
-                    labels: [dA || 'Date A', dB || 'Date B'],
-                    datasets: [{ label: 'Study Hours', data: [hA, hB], backgroundColor: ['#6366f1', '#10b981'] }]
+                    labels: Object.keys(subData),
+                    datasets: [{ data: Object.values(subData), backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'], borderWidth: 0 }]
                 },
-                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#f8fafc' } } } }
+            });
+
+            // Hour Chart (Bar) - Shows your 7-day trend
+            const hourCtx = document.getElementById('hourChart').getContext('2d');
+            const labels = []; const values = [];
+            for(let i=6; i>=0; i--) {
+                const d = new Date(); d.setDate(d.getDate()-i);
+                const s = d.toISOString().split('T')[0];
+                labels.push(d.toLocaleDateString([],{weekday:'short'}));
+                let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
+                values.push(h);
+            }
+
+            if(window.hourO) window.hourO.destroy();
+            window.hourO = new Chart(hourCtx, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Hours', data: values, backgroundColor: '#6366f1', borderRadius: 8 }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } }
             });
         }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIPON'S LIFE | Elite Mastery</title>
+    <title>SHIPON'S LIFE</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -30,120 +30,128 @@
               tasks: JSON.parse(localStorage.getItem('s_t'))?.[date] || [],
               study: JSON.parse(localStorage.getItem('s_s'))?.[date] || [],
               links: JSON.parse(localStorage.getItem('s_l')) || [],
-              subs: JSON.parse(localStorage.getItem('s_subs')) || ["English (IELTS)", "Digital Marketing"]
+              subs: JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"]
           };
           try {
               await setDoc(doc(db, "users", "shipon", "history", date), data);
-              alert("✅ Cloud Sync Success");
+              alert("✅ System State Synced to Cloud");
           } catch (e) { alert("Sync Error: " + e.message); }
       };
     </script>
 
     <style>
         :root { --p: #6366f1; --s: #10b981; --bg: #0f172a; --surface: #1e293b; --text: #f8fafc; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 100px; transition: 0.3s; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; }
         
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--surface); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.7rem; font-weight: 800; }
+        /* Navigation */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: var(--surface); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
         .nav-item.active { color: var(--p); }
 
-        .header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: baseline; }
-        .page { display: none; padding: 0 20px; animation: fadeInUp 0.4s ease; }
+        .page { display: none; padding: 25px; max-width: 500px; margin: 0 auto; }
         .active-page { display: block; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .m3-card { background: var(--surface); border-radius: 24px; padding: 22px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); }
-        #mainDate { background: transparent; color: var(--p); border: 1px solid var(--p); padding: 8px 12px; border-radius: 12px; font-weight: 700; font-family: inherit; }
-
-        .motivation-line { text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--s); opacity: 0.5; font-weight: 800; }
-
-        button { width: 100%; padding: 18px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; transition: 0.2s; }
-        input, select { width: 100%; padding: 16px; border-radius: 14px; border: 1px solid rgba(128,128,128,0.2); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; box-sizing: border-box; }
+        /* Components */
+        .block-card { background: var(--surface); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .section-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--p); margin-bottom: 15px; display: block; }
         
-        .list-item { display: flex; align-items: center; padding: 16px; background: rgba(128,128,128,0.05); border-radius: 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.03); }
-        .chart-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .c-tab { padding: 8px 16px; border-radius: 12px; border: 1px solid var(--p); font-size: 0.7rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
-        .c-tab.active { background: var(--p); color: white; }
+        button { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; margin: 5px 0; }
+        input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: inherit; margin: 8px 0; box-sizing: border-box; }
+        
+        .list-item { display: flex; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; }
+        .strikethrough { text-decoration: line-through; text-decoration-color: var(--s); text-decoration-thickness: 3px; opacity: 0.5; }
+
+        /* Progress Bar */
+        .progress-container { background: rgba(255,255,255,0.1); height: 10px; border-radius: 5px; overflow: hidden; margin: 10px 0; }
+        .progress-fill { height: 100%; background: var(--s); width: 0%; transition: 0.5s; }
     </style>
 </head>
-<body class="dark-mode">
-
-    <div class="header">
-        <h1 style="margin:0; font-weight:800; letter-spacing: -1.5px;">SHIPON'S LIFE</h1>
-    </div>
+<body>
 
     <div id="homeP" class="page active-page">
-        <div class="m3-card" style="text-align: center; border-left: 5px solid var(--p);">
-            <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-weight: 800;">Lifetime Progress</small>
-            <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0h</div>
-        </div>
-        <div class="m3-card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-weight:800; opacity:0.7;">Archive Date</span>
-                <input type="date" id="mainDate" onchange="refresh()">
-            </div>
-            <button onclick="backupToCloud()" style="background:var(--s); margin-top:15px;">SYNC TO CLOUD</button>
-        </div>
-    </div>
+        <h2 style="margin:0">SHIPON'S LIFE</h2>
+        <p id="displayDate" style="opacity:0.6; font-size:0.9rem; margin-bottom:20px;"></p>
 
-    <div id="statsP" class="page">
-        <h1>Analytics Engine</h1>
-        <div class="chart-tabs">
-            <div class="c-tab active" onclick="setMode('day', this)">Daily</div>
-            <div class="c-tab" onclick="setMode('month', this)">Monthly</div>
-            <div class="c-tab" onclick="setMode('year', this)">Yearly</div>
-            <div class="c-tab" onclick="setMode('compare', this)" style="border-color:var(--a); color:var(--a);">Comparison</div>
-        </div>
-        
-        <div id="compareInputs" style="display:none;" class="m3-card">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <input type="date" id="compA" onchange="updateChart()">
-                <input type="date" id="compB" onchange="updateChart()">
+        <div class="block-card">
+            <span class="section-title">Performance Score</span>
+            <div style="font-size: 3rem; font-weight: 900;" id="perfScore">0%</div>
+            <div class="progress-container"><div class="progress-fill" id="perfBar"></div></div>
+            <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:800; margin-top:10px;">
+                <span>Tasks: <span id="statT">0%</span></span>
+                <span>Study: <span id="statS">0/4h</span></span>
             </div>
         </div>
 
-        <div class="m3-card" style="height: 350px;">
-            <canvas id="mainChart"></canvas>
+        <div class="block-card">
+            <span class="section-title">System Controls</span>
+            <input type="date" id="mainDate" onchange="refresh()">
+            <button onclick="backupToCloud()" style="background:var(--s)">Backup to Cloud</button>
         </div>
     </div>
 
     <div id="tasksP" class="page">
-        <h1>Priority Goals</h1>
-        <div class="m3-card">
-            <input type="text" id="tIn" placeholder="Commit to a goal...">
-            <button onclick="addT()">COMMIT TASK</button>
+        <span class="section-title">Daily Task Management</span>
+        <div class="block-card">
+            <input type="text" id="tIn" placeholder="What must be done?">
+            <button onclick="addT()">Add Task</button>
         </div>
         <div id="tList"></div>
     </div>
 
     <div id="studyP" class="page">
-        <h1>Deep Study</h1>
-        <div class="m3-card">
+        <span class="section-title">Academic Consistency</span>
+        <div class="block-card" id="studyForm">
             <select id="sSub"></select>
-            <input type="number" id="sHr" placeholder="Log Hours" step="0.5">
-            <button onclick="addS()">SAVE PROGRESS</button>
-            <hr style="opacity: 0.1; margin: 20px 0;">
-            <input type="text" id="newSub" placeholder="New Course Name...">
-            <button onclick="addNewSub()" style="background:#4f46e5">+ ADD SUBJECT</button>
+            <input type="number" id="sHr" placeholder="Hours" step="0.5">
+            <button onclick="addS()">Log Study Session</button>
+            <hr style="opacity:0.1; margin:15px 0;">
+            <input type="text" id="newSub" placeholder="New Subject...">
+            <button onclick="addNewSub()" style="background:#475569">+ Add Subject to List</button>
         </div>
-        <h3>Manage Subjects</h3>
-        <div id="subManageList"></div>
-        <h3>Daily Log</h3>
         <div id="sLog"></div>
+        <div class="block-card" style="text-align:center;">
+            <small>Lifetime Mastery</small>
+            <div style="font-size: 2rem; font-weight: 800;" id="lifeH">0.0h</div>
+        </div>
+    </div>
+
+    <div id="vaultP" class="page">
+        <span class="section-title">Resource Vault</span>
+        <div class="block-card">
+            <input type="text" id="lTitle" placeholder="Link Name (e.g. IELTS Intro)">
+            <input type="text" id="lUrl" placeholder="URL (https://...)">
+            <button onclick="addL()" style="background:var(--s)">Save Reference</button>
+        </div>
+        <div id="lList"></div>
+    </div>
+
+    <div id="statsP" class="page">
+        <span class="section-title">Discipline Analytics</span>
+        <div class="block-card" style="height: 300px;">
+            <canvas id="mainChart"></canvas>
+        </div>
+        <div class="block-card">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <input type="date" id="compA" onchange="updateChart()">
+                <input type="date" id="compB" onchange="updateChart()">
+            </div>
+            <p style="font-size:0.7rem; text-align:center; opacity:0.6;">Select two dates to compare logic</p>
+        </div>
     </div>
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="nav('homeP', this)">Home</div>
-        <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
         <div class="nav-item" onclick="nav('tasksP', this)">Tasks</div>
         <div class="nav-item" onclick="nav('studyP', this)">Study</div>
+        <div class="nav-item" onclick="nav('vaultP', this)">Vault</div>
+        <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
     </nav>
 
     <script>
         let tDB = JSON.parse(localStorage.getItem('s_t')) || {};
         let sDB = JSON.parse(localStorage.getItem('s_s')) || {};
-        let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English (IELTS)", "Digital Marketing"];
-        let chartMode = 'day';
+        let lDB = JSON.parse(localStorage.getItem('s_l')) || [];
+        let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"];
 
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
@@ -155,56 +163,110 @@
 
         function refresh() {
             const date = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
-            let tL = 0; 
-            Object.values(sDB).forEach(day => day.forEach(s => tL += s.hours));
+            document.getElementById('displayDate').innerText = new Date(date).toDateString();
+            
+            // 1. Lifetime Logic
+            let tL = 0; Object.values(sDB).forEach(day => day.forEach(s => tL += s.hours));
             document.getElementById('lifeH').innerText = tL.toFixed(1) + "h";
 
+            // 2. Study Dropdown Logic
             const sel = document.getElementById('sSub'); sel.innerHTML = '';
             subs.forEach(s => sel.innerHTML += `<option>${s}</option>`);
 
-            renderT(date); renderS(date); renderSubManager(); updateChart();
+            // 3. Performance Score Logic
+            const dT = tDB[date] || []; const dS = sDB[date] || [];
+            const tDone = dT.filter(t => t.done).length;
+            const tPct = dT.length ? (tDone/dT.length)*100 : 0;
+            
+            let sHrs = 0; dS.forEach(s => sHrs += s.hours);
+            const sPct = Math.min((sHrs / 4) * 100, 100); // 4h daily goal
+
+            const finalScore = Math.round((tPct * 0.5) + (sPct * 0.5));
+            document.getElementById('perfScore').innerText = finalScore + "%";
+            document.getElementById('perfBar').style.width = finalScore + "%";
+            document.getElementById('statT').innerText = Math.round(tPct) + "%";
+            document.getElementById('statS').innerText = sHrs.toFixed(1) + "/4h";
+
+            // 4. Integrity Logic: Warn on past dates
+            const isPast = date < new Date().toISOString().split('T')[0];
+            document.getElementById('studyForm').style.opacity = isPast ? "0.3" : "1";
+            document.getElementById('studyForm').style.pointerEvents = isPast ? "none" : "all";
+
+            renderT(date); renderS(date); renderL(); updateChart();
             localStorage.setItem('s_t', JSON.stringify(tDB));
             localStorage.setItem('s_s', JSON.stringify(sDB));
+            localStorage.setItem('s_l', JSON.stringify(lDB));
             localStorage.setItem('s_subs', JSON.stringify(subs));
         }
 
-        function checkPastDate() {
-            const today = new Date().toISOString().split('T')[0];
-            const selDate = document.getElementById('mainDate').value;
-            if (selDate < today) {
-                return confirm("⚠️ INTEGRITY WARNING: You are modifying a PAST date. This may distort your true history. Continue?");
-            }
-            return true;
+        function addT() {
+            const d = document.getElementById('mainDate').value; const v = document.getElementById('tIn').value;
+            if(!v) return; if(!tDB[d]) tDB[d] = [];
+            tDB[d].push({text: v, done: false}); document.getElementById('tIn').value = ''; refresh();
         }
 
-        function setMode(m, el) {
-            chartMode = m;
-            document.querySelectorAll('.c-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('compareInputs').style.display = m === 'compare' ? 'block' : 'none';
-            updateChart();
+        function toggleT(d, i) { tDB[d][i].done = !tDB[d][i].done; refresh(); }
+
+        function renderT(d) {
+            const l = document.getElementById('tList'); l.innerHTML = '';
+            (tDB[d] || []).forEach((t, i) => {
+                l.innerHTML += `<div class="list-item">
+                    <input type="checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
+                    <span style="margin-left:10px;" class="${t.done?'strikethrough':''}">${t.text}</span>
+                    <span onclick="delT('${d}',${i})" style="margin-left:auto; color:#ef4444; font-size:0.6rem;">DEL</span>
+                </div>`;
+            });
         }
+        function delT(d, i) { tDB[d].splice(i, 1); refresh(); }
+
+        function addS() {
+            const d = document.getElementById('mainDate').value; const h = parseFloat(document.getElementById('sHr').value);
+            const sub = document.getElementById('sSub').value;
+            if(!h) return; if(!sDB[d]) sDB[d] = [];
+            const exist = sDB[d].find(s => s.subject === sub);
+            if(exist) exist.hours += h; else sDB[d].push({subject: sub, hours: h});
+            document.getElementById('sHr').value = ''; refresh();
+        }
+
+        function renderS(d) {
+            const l = document.getElementById('sLog'); l.innerHTML = '';
+            (sDB[d] || []).forEach(s => l.innerHTML += `<div class="list-item"><b>${s.subject}</b>: ${s.hours}h</div>`);
+        }
+
+        function addNewSub() {
+            const v = document.getElementById('newSub').value;
+            if(v && !subs.includes(v)) { subs.push(v); document.getElementById('newSub').value=''; refresh(); }
+        }
+
+        function addL() {
+            const t = document.getElementById('lTitle').value; const u = document.getElementById('lUrl').value;
+            if(t && u) { lDB.push({t, u}); document.getElementById('lTitle').value=''; document.getElementById('lUrl').value=''; refresh(); }
+        }
+
+        function renderL() {
+            const l = document.getElementById('lList'); l.innerHTML = '';
+            lDB.forEach((link, i) => l.innerHTML += `<div class="list-item">
+                <a href="${link.u}" target="_blank" style="color:var(--s);text-decoration:none;font-weight:800;flex:1;">🔗 ${link.t}</a>
+                <span onclick="delL(${i})" style="color:#ef4444;font-size:0.6rem;cursor:pointer;">DELETE</span>
+            </div>`);
+        }
+        function delL(i) { lDB.splice(i, 1); refresh(); }
 
         function updateChart() {
             const ctx = document.getElementById('mainChart').getContext('2d');
-            let labels = [], data = [], data2 = [];
-
-            if (chartMode === 'compare') {
-                const dA = document.getElementById('compA').value;
-                const dB = document.getElementById('compB').value;
-                labels = [dA || 'Date A', dB || 'Date B'];
-                let hA = 0; if(dA) (sDB[dA]||[]).forEach(s => hA += s.hours);
-                let hB = 0; if(dB) (sDB[dB]||[]).forEach(s => hB += s.hours);
+            const dA = document.getElementById('compA').value; const dB = document.getElementById('compB').value;
+            
+            let labels = [], data = [];
+            if(dA && dB) {
+                labels = [dA, dB];
+                let hA = 0; (sDB[dA]||[]).forEach(s => hA += s.hours);
+                let hB = 0; (sDB[dB]||[]).forEach(s => hB += s.hours);
                 data = [hA, hB];
             } else {
-                let count = chartMode === 'day' ? 7 : chartMode === 'month' ? 12 : 5;
-                for(let i=count-1; i>=0; i--) {
-                    const d = new Date();
-                    if(chartMode === 'day') d.setDate(d.getDate()-i);
-                    if(chartMode === 'month') d.setMonth(d.getMonth()-i);
-                    if(chartMode === 'year') d.setFullYear(d.getFullYear()-i);
+                for(let i=6; i>=0; i--) {
+                    const d = new Date(); d.setDate(d.getDate()-i);
                     const s = d.toISOString().split('T')[0];
-                    labels.push(chartMode === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : (chartMode === 'month' ? d.toLocaleDateString([],{month:'short'}) : d.getFullYear()));
+                    labels.push(d.toLocaleDateString([],{weekday:'short'}));
                     let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
                     data.push(h);
                 }
@@ -213,61 +275,9 @@
             if(window.chartO) window.chartO.destroy();
             window.chartO = new Chart(ctx, {
                 type: 'bar',
-                data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 8 }] },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                data: { labels, datasets: [{ label: 'Study Hours', data, backgroundColor: '#6366f1', borderRadius: 8 }] },
+                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
             });
-        }
-
-        function addT() {
-            if (!checkPastDate()) return;
-            const d = document.getElementById('mainDate').value; const v = document.getElementById('tIn').value;
-            if(!v) return; if(!tDB[d]) tDB[d] = [];
-            tDB[d].push({text: v, done: false}); document.getElementById('tIn').value = ''; refresh();
-        }
-
-        function toggleT(d, i) {
-            if (!checkPastDate()) return;
-            tDB[d][i].done = !tDB[d][i].done; refresh();
-        }
-
-        function addS() {
-            if (!checkPastDate()) return;
-            const d = document.getElementById('mainDate').value; const h = parseFloat(document.getElementById('sHr').value);
-            const sub = document.getElementById('sSub').value;
-            if(!h) return;
-            if(!sDB[d]) sDB[d] = [];
-            const existing = sDB[d].find(s => s.subject === sub);
-            if(existing) existing.hours += h; else sDB[d].push({subject: sub, hours: h});
-            document.getElementById('sHr').value = ''; refresh();
-        }
-
-        function removeSub(i) {
-            if(confirm("Permanently remove this subject from focus?")) { subs.splice(i, 1); refresh(); }
-        }
-
-        function renderT(d) {
-            const l = document.getElementById('tList'); l.innerHTML = '';
-            (tDB[d] || []).forEach((t, i) => {
-                l.innerHTML += `<div class="list-item">
-                    <input type="checkbox" style="width:22px; height:22px;" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
-                    <span style="margin-left:15px; font-weight:700;" class="${t.done?'motivation-line':''}">${t.text}</span>
-                </div>`;
-            });
-        }
-
-        function renderS(d) {
-            const l = document.getElementById('sLog'); l.innerHTML = '';
-            (sDB[d] || []).forEach(s => l.innerHTML += `<div class="list-item"><b>${s.subject}</b>: ${s.hours}h</div>`);
-        }
-
-        function renderSubManager() {
-            const l = document.getElementById('subManageList'); l.innerHTML = '';
-            subs.forEach((s, i) => { l.innerHTML += `<div class="list-item">${s} <span onclick="removeSub(${i})" style="color:#ef4444; margin-left:auto; cursor:pointer; font-size:0.7rem; font-weight:800;">DELETE</span></div>`; });
-        }
-
-        function addNewSub() {
-            const v = document.getElementById('newSub').value;
-            if(v && !subs.includes(v)) { subs.push(v); document.getElementById('newSub').value=''; refresh(); }
         }
 
         document.getElementById('mainDate').valueAsDate = new Date();

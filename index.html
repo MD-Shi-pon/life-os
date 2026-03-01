@@ -1,57 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SHIPON'S LIFE</title>
 
-  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="app-header">
   <h1>SHIPON'S LIFE</h1>
-  <span id="todayDate"></span>
+  <p id="todayDate"></p>
 </header>
 
 <main>
 
-  <!-- HOME -->
-  <section id="home" class="tab active">
-    <h2>Lifetime Mastery</h2>
-    <div class="card">
-      <span>Total Study Hours</span>
-      <h3 id="lifetimeHours">0</h3>
-    </div>
-  </section>
+<section id="home" class="tab active">
+  <h2>Lifetime Mastery</h2>
+  <div class="card">
+    <span>Total Study Hours</span>
+    <h3 id="lifetimeHours">0</h3>
+  </div>
+</section>
 
-  <!-- TASKS -->
-  <section id="tasks" class="tab">
-    <h2>Tasks</h2>
-    <input type="date" id="taskDate" />
-    <div class="row">
-      <input type="text" id="taskInput" placeholder="New Task" />
-      <button id="addTask">Add</button>
-    </div>
-    <ul id="taskList"></ul>
-  </section>
+<section id="tasks" class="tab">
+  <h2>Tasks</h2>
+  <div class="row">
+    <input type="text" id="taskInput" placeholder="New Task">
+    <button id="addTask">Add</button>
+  </div>
+  <ul id="taskList"></ul>
+</section>
 
-  <!-- STUDY -->
-  <section id="study" class="tab">
-    <h2>Study</h2>
-    <div class="row">
-      <input type="text" id="subjectInput" placeholder="Subject" />
-      <input type="number" id="hoursInput" placeholder="Hours" step="0.25" />
-      <button id="addStudy">Add</button>
-    </div>
-    <ul id="studyList"></ul>
-  </section>
+<section id="study" class="tab">
+  <h2>Study</h2>
+  <div class="row">
+    <input type="text" id="subjectInput" placeholder="Subject">
+    <input type="number" id="hoursInput" placeholder="Hours" step="0.25">
+    <button id="addStudy">Add</button>
+  </div>
+  <ul id="studyList"></ul>
+</section>
 
 </main>
 

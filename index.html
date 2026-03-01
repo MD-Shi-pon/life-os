@@ -23,7 +23,6 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
-      // GLOBAL SYNC ENGINE: Seamless Mobile/Laptop Parity
       window.syncData = async (date) => {
           const localData = {
               tasks: JSON.parse(localStorage.getItem('s_t'))?.[date] || [],
@@ -32,10 +31,9 @@
               subs: JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"]
           };
           try { await setDoc(doc(db, "global_master", "history", "dates", date), localData); } 
-          catch (e) { console.error("Cloud Sync Error", e); }
+          catch (e) { console.error("Cloud Error", e); }
       };
 
-      // REAL-TIME LISTENER
       onSnapshot(collection(db, "global_master", "history", "dates"), (snap) => {
           let s_s = {}, s_t = {}, s_d = {};
           snap.forEach(d => {
@@ -54,26 +52,19 @@
     <style>
         :root { --p: #6366f1; --s: #10b981; --bg: #0f172a; --surface: #1e293b; --text: #f8fafc; --border: rgba(255, 255, 255, 0.1); }
         body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; }
-        
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--surface); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-item { flex: 1; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
         .nav-item.active { color: var(--p); }
-
         .page { display: none; padding: 25px; max-width: 500px; margin: 0 auto; animation: fadeInUp 0.4s ease; }
         .active-page { display: block; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
         .m3-card { background: var(--surface); border-radius: 28px; padding: 22px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        input, select { width: 100%; padding: 15px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: inherit; margin: 8px 0; font-family: inherit; }
-        button { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; transition: 0.2s; }
-        
-        /* List Styling */
-        .list-item { display: flex; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 20px; margin-bottom: 10px; border-left: 5px solid var(--p); text-align: left; }
-        .item-label { flex: 1; margin-left: 12px; font-weight: 700; font-size: 0.95rem; }
+        input, select { width: 100%; padding: 15px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: inherit; margin: 8px 0; box-sizing: border-box; font-family: inherit; }
+        button { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; margin-top: 8px; }
+        .list-item { display: flex; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 20px; margin-bottom: 10px; border-left: 5px solid var(--p); }
+        .item-label { flex: 1; margin-left: 12px; font-weight: 700; font-size: 0.95rem; text-align: left; }
         .motivation-line { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--s); opacity: 0.4; }
-        .del-btn { color: #ef4444; font-size: 0.65rem; font-weight: 800; cursor: pointer; }
-
-        /* Progress Circle */
+        .del-btn { color: #ef4444; font-size: 0.6rem; font-weight: 800; cursor: pointer; }
         .circle-container { position: relative; width: 120px; height: 120px; margin: 0 auto 15px; }
         svg { transform: rotate(-90deg); }
         circle { fill: none; stroke-width: 10; stroke-linecap: round; }
@@ -88,7 +79,7 @@
         <div class="m3-card" style="text-align: center; border-left: 5px solid var(--p); margin-top: 20px;">
             <small id="homeDay" style="text-transform: uppercase; font-weight: 800; color: var(--p); letter-spacing: 1px;"></small>
             <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0</div>
-            <small style="opacity: 0.6; font-weight: 700;">Lifetime Mastery Hours</small>
+            <small style="opacity: 0.6; font-weight: 700;">Total Mastery Hours</small>
         </div>
         <div class="m3-card">
             <input type="date" id="mainDate" onchange="window.refresh()">
@@ -106,7 +97,7 @@
             <h1>Mission</h1>
             <input type="date" id="taskDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--p); border: none;">
         </div>
-        <div class="m3-card"><input type="text" id="tIn" placeholder="Enter task..."><button onclick="addT()">ADD TASK</button></div>
+        <div class="m3-card"><input type="text" id="tIn" placeholder="Goal..."><button onclick="addT()">ADD</button></div>
         <div id="tList"></div>
     </div>
 
@@ -115,7 +106,6 @@
             <h1>Today</h1>
             <input type="date" id="todayDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--s); border: none;">
         </div>
-        
         <div class="circle-container">
             <svg width="120" height="120"><circle class="bg-circle" cx="60" cy="60" r="50"></circle><circle class="fg-circle" id="progCircle" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314"></circle></svg>
             <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
@@ -123,22 +113,21 @@
                 <div id="clockA" style="font-size:0.5rem; font-weight:800; opacity:0.6;">AM</div>
             </div>
         </div>
-
         <div class="m3-card">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <input type="time" id="startTime"><input type="time" id="endTime">
             </div>
-            <input type="text" id="logAct" placeholder="Activity..."><button onclick="addLog()">LOG ROUTINE</button>
+            <input type="text" id="logAct" placeholder="Activity..."><button onclick="addLog()">LOG</button>
         </div>
         <div id="logList"></div>
     </div>
 
     <div id="studyP" class="page">
-        <h1>Study Center</h1>
+        <h1>Study</h1>
         <div class="m3-card">
             <select id="sSub"></select>
-            <input type="number" id="sHr" placeholder="Duration (Hours)" step="0.5">
-            <button onclick="addS()">SAVE PROGRESS</button>
+            <input type="number" id="sHr" placeholder="Hours" step="0.5">
+            <button onclick="addS()">SAVE</button>
         </div>
         <div id="sLog"></div>
     </div>
@@ -158,22 +147,21 @@
             return `${h}:${m} ${a}`;
         }
 
-        function updateLiveCircle() {
+        function updateClock() {
             const now = new Date(); const h = now.getHours(); const m = now.getMinutes();
-            const total = (h * 60) + m; const pct = (total / 1440) * 100;
-            const offset = 314 - (314 * pct) / 100;
+            const offset = 314 - (314 * (((h * 60) + m) / 1440));
             if(document.getElementById('progCircle')) {
                 document.getElementById('progCircle').style.strokeDashoffset = offset;
                 document.getElementById('clockH').innerText = (h % 12 || 12) + ":" + (m < 10 ? '0'+m : m);
                 document.getElementById('clockA').innerText = h >= 12 ? 'PM' : 'AM';
             }
         }
-        setInterval(updateLiveCircle, 1000);
+        setInterval(updateClock, 1000);
 
         window.refresh = function() {
             const mDate = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
-            const tDate = document.getElementById('taskDate').value;
-            const lDate = document.getElementById('todayDate').value;
+            const tDate = document.getElementById('taskDate').value || mDate;
+            const lDate = document.getElementById('todayDate').value || mDate;
 
             document.getElementById('homeDay').innerText = new Date(mDate).toLocaleDateString('en-US', { weekday: 'long' });
 
@@ -220,14 +208,8 @@
         }
         function renderLog(d, db) {
             const l = document.getElementById('logList'); l.innerHTML = '';
-            (db[d] || []).forEach((item, i) => { 
-                l.innerHTML += `<div class="list-item">
-                    <span style="font-weight:800; color:var(--p); font-size:0.7rem; min-width:110px;">${format12(item.start)}-${format12(item.end)}</span>
-                    <span class="item-label">${item.act}</span><span onclick="delLog('${d}',${i})" class="del-btn">DEL</span>
-                </div>`; 
-            });
+            (db[d] || []).forEach(item => { l.innerHTML += `<div class="list-item"><span style="font-weight:800; color:var(--p); font-size:0.7rem; min-width:110px;">${format12(item.start)}-${format12(item.end)}</span><span class="item-label">${item.act}</span></div>`; });
         }
-        function delLog(d, i) { let db = JSON.parse(localStorage.getItem('s_dayLog')); db[d].splice(i, 1); localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d); }
 
         function addS() {
             let d = document.getElementById('mainDate').value, h = parseFloat(document.getElementById('sHr').value), sub = document.getElementById('sSub').value;
@@ -242,7 +224,7 @@
         }
 
         function updateChart(sDB) {
-            const canvas = document.getElementById('mainChart'); if(!canvas) return;
+            const ctx = document.getElementById('mainChart').getContext('2d');
             let labels = [], data = [];
             for(let i=6; i>=0; i--) {
                 const d = new Date(); d.setDate(d.getDate()-i);
@@ -252,16 +234,13 @@
                 data.push(h);
             }
             if(window.chartO) window.chartO.destroy();
-            window.chartO = new Chart(canvas.getContext('2d'), {
-                type: 'bar', data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 8 }] },
-                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
-            });
+            window.chartO = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 8 }] }, options: { maintainAspectRatio: false } });
         }
 
+        document.getElementById('mainDate').valueAsDate = new Date();
         document.getElementById('taskDate').valueAsDate = new Date();
         document.getElementById('todayDate').valueAsDate = new Date();
-        document.getElementById('mainDate').valueAsDate = new Date();
-        window.refresh();
+        window.refresh(); updateClock();
     </script>
 </body>
 </html>

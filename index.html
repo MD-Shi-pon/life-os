@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIPON'S LIFE | Task Master</title>
+    <title>SHIPON'S LIFE | Ultimate</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -24,7 +24,6 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
-      // GLOBAL SYNC LOGIC
       window.syncData = async (date, silent = false) => {
           const localData = {
               tasks: JSON.parse(localStorage.getItem('s_t'))?.[date] || [],
@@ -67,23 +66,26 @@
     <style>
         :root { --p: #6366f1; --s: #10b981; --bg: #0f172a; --surface: #1e293b; --text: #f8fafc; --border: rgba(255, 255, 255, 0.1); }
         body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; }
+        
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--surface); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-item { flex: 1; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
         .nav-item.active { color: var(--p); }
+
         .page { display: none; padding: 25px; max-width: 500px; margin: 0 auto; animation: fadeInUp 0.4s ease; }
         .active-page { display: block; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .m3-card { background: var(--surface); border-radius: 28px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        input, select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid var(--border); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; box-sizing: border-box; font-family: inherit; }
+        button { width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; transition: 0.2s; }
         
-        .m3-card { background: var(--surface); border-radius: 28px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); }
-        input, select { width: 100%; padding: 14px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: inherit; margin: 8px 0; box-sizing: border-box; }
-        button { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; margin-top: 8px; }
-        
-        /* Left-Aligned Catchy List */
+        /* Task & List Alignment */
         .list-item { display: flex; align-items: center; padding: 18px; background: rgba(255,255,255,0.03); border-radius: 20px; margin-bottom: 12px; border-left: 5px solid var(--p); text-align: left; }
         .task-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: var(--s); }
         .task-label { flex: 1; margin-left: 15px; font-weight: 700; font-size: 1rem; color: var(--text); }
-        .motivation-line { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--s); opacity: 0.4; font-style: italic; }
-        
+        .motivation-line { text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--s); opacity: 0.4; font-style: italic; }
+
+        /* Stats Tab Specifics */
         .chip-group { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 5px; }
         .chip { padding: 8px 16px; border-radius: 10px; background: rgba(128,128,128,0.1); font-size: 0.7rem; font-weight: 800; cursor: pointer; white-space: nowrap; border: 1px solid var(--border); }
         .chip.active { background: var(--p); color: white; }
@@ -94,7 +96,7 @@
     <div id="homeP" class="page active-page">
         <h1 style="margin:0; font-weight:800; letter-spacing: -2px;">SHIPON'S LIFE</h1>
         <div class="m3-card" style="text-align: center; border-left: 5px solid var(--p); margin-top: 20px;">
-            <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-weight: 800;">Lifetime Progress</small>
+            <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-weight: 800;">Lifetime Mastery</small>
             <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0</div>
         </div>
         <div class="m3-card">
@@ -111,7 +113,17 @@
             <div class="chip" onclick="setChartMode('week', this)">Week</div>
             <div class="chip" onclick="setChartMode('month', this)">Month</div>
             <div class="chip" onclick="setChartMode('year', this)">Year</div>
+            <div class="chip" onclick="setChartMode('comp', this)" style="border-color: var(--s);">Compare</div>
         </div>
+
+        <div id="compUI" style="display:none;" class="m3-card">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><small>Date A</small><input type="date" id="dateA" onchange="updateChart()"></div>
+                <div><small>Date B</small><input type="date" id="dateB" onchange="updateChart()"></div>
+            </div>
+            <select id="compSub" onchange="updateChart()" style="margin-top:10px;"></select>
+        </div>
+
         <div class="m3-card" style="height: 350px;"><canvas id="mainChart"></canvas></div>
     </div>
 
@@ -121,7 +133,7 @@
             <input type="date" id="taskDate" onchange="window.refresh()" style="width: auto; padding: 8px; font-size: 0.8rem; background: var(--p); border:none; color:white; border-radius: 10px;">
         </div>
         <div class="m3-card">
-            <input type="text" id="tIn" placeholder="Add a goal for this date...">
+            <input type="text" id="tIn" placeholder="Mission for this date...">
             <button onclick="addT()">COMMIT TASK</button>
         </div>
         <div id="tList"></div>
@@ -169,19 +181,68 @@
             const dLogDB = JSON.parse(localStorage.getItem('s_dayLog')) || {};
             const subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"];
 
+            // Real Lifetime Mastery Logic
             let total = 0;
             Object.values(sDB).forEach(day => (day || []).forEach(e => total += parseFloat(e.hours || 0)));
             document.getElementById('lifeH').innerText = total.toFixed(1);
 
-            const sSel = document.getElementById('sSub'); if(sSel) { sSel.innerHTML = ''; subs.forEach(s => sSel.innerHTML += `<option>${s}</option>`); }
+            const sSel = document.getElementById('sSub'); sSel.innerHTML = '';
+            const cSel = document.getElementById('compSub'); cSel.innerHTML = '<option value="all">Total Hours</option>';
+            subs.forEach(s => { 
+                sSel.innerHTML += `<option>${s}</option>`; 
+                cSel.innerHTML += `<option>${s}</option>`; 
+            });
 
-            // Render Tasks based on the Tasks-specific date field
             renderT(tDate, tDB); 
-            // Render others based on Master date
             renderS(mDate, sDB); 
             renderLog(mDate, dLogDB); 
-            updateChart(sDB);
+            updateChart();
         };
+
+        function setChartMode(m, el) {
+            cMode = m;
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('compUI').style.display = m === 'comp' ? 'block' : 'none';
+            updateChart();
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
+            let labels = [], data = [];
+
+            if(cMode === 'comp') {
+                const dA = document.getElementById('dateA').value;
+                const dB = document.getElementById('dateB').value;
+                const sub = document.getElementById('compSub').value;
+                labels = [dA || 'A', dB || 'B'];
+                let vA = 0, vB = 0;
+                if(dA) (sDB[dA]||[]).forEach(x => { if(sub==='all' || x.subject===sub) vA += x.hours; });
+                if(dB) (sDB[dB]||[]).forEach(x => { if(sub==='all' || x.subject===sub) vB += x.hours; });
+                data = [vA, vB];
+            } else {
+                let count = cMode === 'day' ? 7 : cMode === 'week' ? 4 : cMode === 'month' ? 12 : 5;
+                for(let i=count-1; i>=0; i--) {
+                    const d = new Date();
+                    if(cMode === 'day') d.setDate(d.getDate()-i);
+                    if(cMode === 'week') d.setDate(d.getDate()-(i*7));
+                    if(cMode === 'month') d.setMonth(d.getMonth()-i);
+                    if(cMode === 'year') d.setFullYear(d.getFullYear()-i);
+                    const s = d.toISOString().split('T')[0];
+                    labels.push(cMode === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : s);
+                    let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
+                    data.push(h);
+                }
+            }
+
+            if(window.chartO) window.chartO.destroy();
+            window.chartO = new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 10 }] },
+                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+            });
+        }
 
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
@@ -197,24 +258,22 @@
             localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d, true);
             document.getElementById('tIn').value = '';
         }
-
         function renderT(d, db) {
             const l = document.getElementById('tList'); l.innerHTML = '';
             (db[d] || []).forEach((t, i) => { 
                 l.innerHTML += `<div class="list-item">
                     <input type="checkbox" class="task-checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
                     <span class="task-label ${t.done?'motivation-line':''}">${t.text}</span>
-                    <span onclick="delT('${d}',${i})" style="color:#ef4444; font-size:0.6rem; cursor:pointer; font-weight:800;">DEL</span>
+                    <span onclick="delT('${d}',${i})" style="color:#ef4444; font-size:0.6rem; cursor:pointer; font-weight:800; margin-left:10px;">DEL</span>
                 </div>`; 
             });
         }
-
         function toggleT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d, true); }
         function delT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d].splice(i, 1); localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d, true); }
 
         function addS() {
             let d = document.getElementById('mainDate').value, h = parseFloat(document.getElementById('sHr').value), sub = document.getElementById('sSub').value;
-            let db = JSON.parse(localStorage.getItem('s_s')) || {};
+            if(!h) return; let db = JSON.parse(localStorage.getItem('s_s')) || {};
             if(!db[d]) db[d] = []; let ex = db[d].find(x => x.subject === sub);
             if(ex) ex.hours += h; else db[d].push({subject: sub, hours: h});
             localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(d, true);
@@ -227,7 +286,7 @@
 
         function addLog() {
             let d = document.getElementById('mainDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
-            let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
+            if(!s || !e || !a) return; let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
             if(!db[d]) db[d] = []; db[d].push({start: s, end: e, act: a});
             localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d, true);
             document.getElementById('logAct').value = '';
@@ -235,25 +294,6 @@
         function renderLog(d, db) {
             const l = document.getElementById('logList'); l.innerHTML = '';
             (db[d] || []).forEach(item => { l.innerHTML += `<div class="list-item"><b>${item.start}-${item.end}</b> <span style="margin-left:10px">${item.act}</span></div>`; });
-        }
-
-        function setChartMode(m, el) { cMode = m; document.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); updateChart(JSON.parse(localStorage.getItem('s_s')) || {}); }
-
-        function updateChart(sDB) {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            let labels = [], data = [];
-            let count = cMode === 'day' ? 7 : cMode === 'week' ? 4 : cMode === 'month' ? 12 : 5;
-            for(let i=count-1; i>=0; i--) {
-                const d = new Date();
-                if(cMode === 'day') d.setDate(d.getDate()-i);
-                if(cMode === 'month') d.setMonth(d.getMonth()-i);
-                const s = d.toISOString().split('T')[0];
-                labels.push(cMode === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : s);
-                let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
-                data.push(h);
-            }
-            if(window.chartO) window.chartO.destroy();
-            window.chartO = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 10 }] }, options: { maintainAspectRatio: false } });
         }
 
         document.getElementById('mainDate').valueAsDate = new Date();

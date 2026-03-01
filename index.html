@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SHIPON'S LIFE</title>
+<title>Shipon's Life</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
 
@@ -21,7 +21,7 @@
 
 <!-- HOME -->
 <section id="home" class="tab active">
-  <div class="glass-card">
+  <div class="card">
     <h3>Lifetime Study Hours</h3>
     <h1 id="lifetimeHours">0</h1>
   </div>
@@ -30,9 +30,9 @@
 <!-- TASKS -->
 <section id="tasks" class="tab">
   <h2>Tasks</h2>
-  <div class="input-row">
+  <div class="row">
     <input type="text" id="taskInput" placeholder="Add Task">
-    <button id="addTask">+</button>
+    <button id="addTask">Add</button>
   </div>
   <ul id="taskList"></ul>
 </section>
@@ -40,17 +40,17 @@
 <!-- STUDY -->
 <section id="study" class="tab">
   <h2>Study</h2>
-  <div class="input-row">
+  <div class="row">
     <input type="text" id="subjectInput" placeholder="Subject">
     <input type="number" id="hoursInput" placeholder="Hours" step="0.25">
-    <button id="addStudy">+</button>
+    <button id="addStudy">Add</button>
   </div>
   <ul id="studyList"></ul>
 </section>
 
 <!-- ANALYZE -->
 <section id="analyze" class="tab">
-  <h2>Analyze</h2>
+  <h2>Analyze Performance</h2>
 
   <div class="filter-row">
     <select id="timeRange">
@@ -67,10 +67,10 @@
 </main>
 
 <nav class="bottom-nav">
-  <button data-tab="home">🏠</button>
-  <button data-tab="tasks">✅</button>
-  <button data-tab="study">📚</button>
-  <button data-tab="analyze">📊</button>
+  <button data-tab="home">Home</button>
+  <button data-tab="tasks">Tasks</button>
+  <button data-tab="study">Study</button>
+  <button data-tab="analyze">Analyze</button>
 </nav>
 
 <script type="module" src="app.js"></script>

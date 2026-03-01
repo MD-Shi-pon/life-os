@@ -11,7 +11,6 @@ body {
   padding-bottom: 90px;
 }
 
-/* Header */
 .app-header {
   text-align: center;
   padding: 25px 15px;
@@ -20,16 +19,8 @@ body {
 .app-header h1 {
   font-size: 24px;
   font-weight: 800;
-  letter-spacing: 1px;
 }
 
-#todayDate {
-  font-size: 14px;
-  opacity: 0.7;
-  margin-top: 5px;
-}
-
-/* Tabs */
 .tab {
   display: none;
   animation: fadeIn 0.3s ease-in-out;
@@ -44,7 +35,6 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Card */
 .card {
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(12px);
@@ -56,11 +46,9 @@ body {
 
 .card h3 {
   font-size: 36px;
-  font-weight: 800;
   margin-top: 10px;
 }
 
-/* Inputs */
 .row {
   display: flex;
   gap: 10px;
@@ -72,16 +60,10 @@ input {
   padding: 14px;
   border-radius: 14px;
   border: none;
-  outline: none;
   background: rgba(255,255,255,0.08);
   color: white;
 }
 
-input::placeholder {
-  color: #94a3b8;
-}
-
-/* Buttons */
 button {
   min-height: 48px;
   padding: 0 18px;
@@ -96,10 +78,8 @@ button {
 
 button:hover {
   transform: scale(1.05);
-  box-shadow: 0 8px 25px rgba(16,185,129,0.4);
 }
 
-/* List */
 ul {
   list-style: none;
   padding: 0;
@@ -110,14 +90,9 @@ li {
   padding: 15px;
   margin-bottom: 12px;
   border-radius: 14px;
-  transition: 0.2s ease;
+  cursor: pointer;
 }
 
-li:hover {
-  background: rgba(255,255,255,0.12);
-}
-
-/* Completed */
 .completed {
   text-decoration: line-through;
   text-decoration-thickness: 4px;
@@ -125,7 +100,6 @@ li:hover {
   opacity: 0.6;
 }
 
-/* Bottom Nav */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -135,17 +109,36 @@ li:hover {
   display: flex;
   justify-content: space-around;
   padding: 15px 0;
-  border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-.bottom-nav button {
-  background: transparent;
-  color: #94a3b8;
-  font-weight: 600;
+/* Sync Card */
+.sync-card {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.bottom-nav button:hover {
-  color: white;
-  background: none;
-  transform: none;
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#syncDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: gray;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
 }

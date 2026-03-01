@@ -61,3 +61,22 @@
             <h1>Study</h1>
             <input type="date" id="studyDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--p); border: none; color: white; border-radius: 8px;">
         </div>
+        <div class="glass-card">
+            <select id="sSub"></select>
+            <input type="number" id="sHr" placeholder="Duration (Hours)" step="0.5">
+            <button onclick="window.addS()">SAVE PROGRESS</button>
+        </div>
+        <div id="sLog"></div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="window.nav('homeP', this)">Home</div>
+        <div class="nav-item" onclick="window.nav('statsP', this)">Stats</div>
+        <div class="nav-item" onclick="window.nav('tasksP', this)">Tasks</div>
+        <div class="nav-item" onclick="window.nav('dayLogP', this)">Today</div>
+        <div class="nav-item" onclick="window.nav('studyP', this)">Study</div>
+    </nav>
+
+    <script type="module" src="./app.js"></script>
+</body>
+</html>

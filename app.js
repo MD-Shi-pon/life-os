@@ -22,7 +22,7 @@ function today(){
   return new Date().toISOString().split("T")[0];
 }
 
-document.getElementById("todayDate").textContent = today();
+document.getElementById("todayDate").textContent=today();
 
 let tasks=[];
 let studies=[];
@@ -103,38 +103,56 @@ async function calculateLifetime(){
   document.getElementById("lifetimeHours").textContent=total.toFixed(1);
 }
 
-/* Analyze Chart */
+/* ===== ANALYZE SYSTEM ===== */
 let chart;
+
 document.getElementById("timeRange").onchange=generateChart;
 
 async function generateChart(){
+  const range=document.getElementById("timeRange").value;
   const snapshot=await getDocs(collection(db,"global_master/history/dates"));
-  let labels=[];
-  let values=[];
+
+  let map={};
 
   snapshot.forEach(doc=>{
-    let total=0;
     const data=doc.data();
+    let total=0;
     if(data.s_s){
       data.s_s.forEach(s=>total+=s.hours||0);
     }
-    labels.push(doc.id);
-    values.push(total);
+
+    const date=new Date(doc.id);
+
+    let key;
+    if(range==="daily"){
+      key=doc.id;
+    }else if(range==="weekly"){
+      const week=Math.ceil(date.getDate()/7);
+      key=`${date.getFullYear()}-W${week}`;
+    }else if(range==="monthly"){
+      key=`${date.getFullYear()}-${date.getMonth()+1}`;
+    }else{
+      key=`${date.getFullYear()}`;
+    }
+
+    if(!map[key])map[key]=0;
+    map[key]+=total;
   });
+
+  const labels=Object.keys(map).sort();
+  const values=labels.map(k=>map[k]);
 
   const ctx=document.getElementById("mainChart");
   if(chart)chart.destroy();
 
   chart=new Chart(ctx,{
-    type:'line',
+    type:'bar',
     data:{
       labels:labels,
       datasets:[{
         label:'Study Hours',
         data:values,
-        borderColor:'#007aff',
-        backgroundColor:'rgba(0,122,255,0.1)',
-        tension:0.4
+        backgroundColor:'#007aff'
       }]
     }
   });

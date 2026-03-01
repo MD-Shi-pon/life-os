@@ -3,123 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>SHIPON’S LIFE · Life OS</title>
+  <title>SHIPON'S LIFE</title>
 
   <!-- Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
-
 </head>
 <body>
 
-  <!-- ================= HEADER ================= -->
-  <header class="app-header glass">
-    <h1>SHIPON’S LIFE</h1>
-    <span id="todayDate">—</span>
-  </header>
+<header class="app-header">
+  <h1>SHIPON'S LIFE</h1>
+  <span id="todayDate"></span>
+</header>
 
-  <!-- ================= MAIN CONTENT ================= -->
-  <main id="app">
+<main>
 
-    <!-- ===== HOME TAB ===== -->
-    <section class="tab active" id="tab-home">
-      <h2>Lifetime Mastery</h2>
+  <!-- HOME -->
+  <section id="home" class="tab active">
+    <h2>Lifetime Mastery</h2>
+    <div class="card">
+      <span>Total Study Hours</span>
+      <h3 id="lifetimeHours">0</h3>
+    </div>
+  </section>
 
-      <div class="metric-card">
-        <span class="metric-label">Total Study Hours</span>
-        <span class="metric-value" id="lifetimeHours">0</span>
-      </div>
+  <!-- TASKS -->
+  <section id="tasks" class="tab">
+    <h2>Tasks</h2>
+    <input type="date" id="taskDate" />
+    <div class="row">
+      <input type="text" id="taskInput" placeholder="New Task" />
+      <button id="addTask">Add</button>
+    </div>
+    <ul id="taskList"></ul>
+  </section>
 
-      <canvas id="lifetimeChart"></canvas>
-    </section>
+  <!-- STUDY -->
+  <section id="study" class="tab">
+    <h2>Study</h2>
+    <div class="row">
+      <input type="text" id="subjectInput" placeholder="Subject" />
+      <input type="number" id="hoursInput" placeholder="Hours" step="0.25" />
+      <button id="addStudy">Add</button>
+    </div>
+    <ul id="studyList"></ul>
+  </section>
 
-    <!-- ===== STATS TAB ===== -->
-    <section class="tab" id="tab-stats">
-      <h2>Analytics</h2>
+</main>
 
-      <canvas id="weeklyChart"></canvas>
-      <canvas id="monthlyChart"></canvas>
-    </section>
+<nav class="bottom-nav">
+  <button data-tab="home">Home</button>
+  <button data-tab="tasks">Tasks</button>
+  <button data-tab="study">Study</button>
+</nav>
 
-    <!-- ===== TASK TAB ===== -->
-    <section class="tab" id="tab-tasks">
-      <h2>Tasks</h2>
-
-      <input type="date" id="taskDateSelector" />
-
-      <div class="input-row">
-        <input type="text" id="taskInput" placeholder="Add a task…" />
-        <button id="addTaskBtn">+</button>
-      </div>
-
-      <ul id="taskList"></ul>
-
-      <div class="progress-wrapper">
-        <div id="taskProgressBar"></div>
-      </div>
-    </section>
-
-    <!-- ===== TODAY TAB ===== -->
-    <section class="tab" id="tab-today">
-      <h2>Today Timeline</h2>
-
-      <div class="input-row">
-        <input type="time" id="logTime" />
-        <input type="text" id="logActivity" placeholder="Activity description" />
-        <button id="addLogBtn">+</button>
-      </div>
-
-      <ul id="timelineList" class="timeline"></ul>
-    </section>
-
-    <!-- ===== STUDY TAB ===== -->
-    <section class="tab" id="tab-study">
-      <h2>Study</h2>
-
-      <div class="input-row">
-        <select id="subjectSelect"></select>
-        <input type="number" id="studyHours" placeholder="Hours" step="0.25" />
-        <button id="addStudyBtn">+</button>
-      </div>
-
-      <ul id="studyList"></ul>
-
-      <canvas id="studyChart"></canvas>
-    </section>
-
-  </main>
-
-  <!-- ================= BOTTOM NAV ================= -->
-  <nav class="bottom-nav glass">
-    <button data-tab="home">🏠</button>
-    <button data-tab="stats">📊</button>
-    <button data-tab="tasks">✅</button>
-    <button data-tab="today">🕒</button>
-    <button data-tab="study">📚</button>
-  </nav>
-
-  <!-- ================= SCRIPTS ================= -->
-
-  <!-- Firebase (Config Only – Logic Must Be External) -->
-  <script>
-    const firebaseConfig = {
-      apiKey: "REPLACE_WITH_SECURE_KEY",
-      authDomain: "shipon-life-os.firebaseapp.com",
-      projectId: "shipon-life-os",
-      appId: "REPLACE_WITH_APP_ID"
-    };
-  </script>
-
-  <!-- Core Logic -->
-  <script src="app.js"></script>
+<script type="module" src="app.js"></script>
 
 </body>
 </html>

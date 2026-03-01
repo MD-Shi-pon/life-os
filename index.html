@@ -53,7 +53,6 @@
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         .m3-card { background: var(--surface); border-radius: 24px; padding: 22px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); }
-        .home-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         #mainDate { background: transparent; color: var(--p); border: 1px solid var(--p); padding: 8px 12px; border-radius: 12px; font-weight: 700; font-family: inherit; }
 
         .motivation-line { text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--s); opacity: 0.5; font-weight: 800; }
@@ -62,7 +61,9 @@
         input, select { width: 100%; padding: 16px; border-radius: 14px; border: 1px solid rgba(128,128,128,0.2); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; box-sizing: border-box; }
         
         .list-item { display: flex; align-items: center; padding: 16px; background: rgba(128,128,128,0.05); border-radius: 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.03); }
-        .chart-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; display: block; color: var(--p); }
+        .chart-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .c-tab { padding: 8px 16px; border-radius: 12px; border: 1px solid var(--p); font-size: 0.7rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
+        .c-tab.active { background: var(--p); color: white; }
     </style>
 </head>
 <body class="dark-mode">
@@ -76,26 +77,38 @@
             <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-weight: 800;">Lifetime Progress</small>
             <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0h</div>
         </div>
-        <div class="home-controls">
-            <span style="font-weight: 800; opacity: 0.7;">History Date</span>
-            <input type="date" id="mainDate" onchange="refresh()">
+        <div class="m3-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:800; opacity:0.7;">Archive Date</span>
+                <input type="date" id="mainDate" onchange="refresh()">
+            </div>
+            <button onclick="backupToCloud()" style="background:var(--s); margin-top:15px;">SYNC TO CLOUD</button>
         </div>
-        <button onclick="backupToCloud()" style="background:var(--s)">SYNC TO CLOUD</button>
     </div>
 
     <div id="statsP" class="page">
-        <h1>Productivity Engine</h1>
-        <div class="m3-card">
-            <span class="chart-label">Subject Distribution (Lifetime)</span>
-            <div style="height: 250px;"><canvas id="subjectChart"></canvas></div>
+        <h1>Analytics Engine</h1>
+        <div class="chart-tabs">
+            <div class="c-tab active" onclick="setMode('day', this)">Daily</div>
+            <div class="c-tab" onclick="setMode('month', this)">Monthly</div>
+            <div class="c-tab" onclick="setMode('year', this)">Yearly</div>
+            <div class="c-tab" onclick="setMode('compare', this)" style="border-color:var(--a); color:var(--a);">Comparison</div>
         </div>
-        <div class="m3-card">
-            <span class="chart-label">Hourly Activity (7-Day Average)</span>
-            <div style="height: 250px;"><canvas id="hourChart"></canvas></div>
+        
+        <div id="compareInputs" style="display:none;" class="m3-card">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <input type="date" id="compA" onchange="updateChart()">
+                <input type="date" id="compB" onchange="updateChart()">
+            </div>
+        </div>
+
+        <div class="m3-card" style="height: 350px;">
+            <canvas id="mainChart"></canvas>
         </div>
     </div>
 
     <div id="tasksP" class="page">
+        <h1>Priority Goals</h1>
         <div class="m3-card">
             <input type="text" id="tIn" placeholder="Commit to a goal...">
             <button onclick="addT()">COMMIT TASK</button>
@@ -104,6 +117,7 @@
     </div>
 
     <div id="studyP" class="page">
+        <h1>Deep Study</h1>
         <div class="m3-card">
             <select id="sSub"></select>
             <input type="number" id="sHr" placeholder="Log Hours" step="0.5">
@@ -118,28 +132,18 @@
         <div id="sLog"></div>
     </div>
 
-    <div id="vaultP" class="page">
-        <div class="m3-card">
-            <input type="text" id="lTitle" placeholder="Resource Name">
-            <input type="text" id="lUrl" placeholder="URL">
-            <button onclick="addL()" style="background: var(--s);">SAVE LINK</button>
-        </div>
-        <div id="lList"></div>
-    </div>
-
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="nav('homeP', this)">Home</div>
         <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
         <div class="nav-item" onclick="nav('tasksP', this)">Tasks</div>
         <div class="nav-item" onclick="nav('studyP', this)">Study</div>
-        <div class="nav-item" onclick="nav('vaultP', this)">Vault</div>
     </nav>
 
     <script>
         let tDB = JSON.parse(localStorage.getItem('s_t')) || {};
         let sDB = JSON.parse(localStorage.getItem('s_s')) || {};
-        let lDB = JSON.parse(localStorage.getItem('s_l')) || [];
         let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English (IELTS)", "Digital Marketing"];
+        let chartMode = 'day';
 
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
@@ -155,93 +159,90 @@
             Object.values(sDB).forEach(day => day.forEach(s => tL += s.hours));
             document.getElementById('lifeH').innerText = tL.toFixed(1) + "h";
 
-            // Subject Dropdown
             const sel = document.getElementById('sSub'); sel.innerHTML = '';
             subs.forEach(s => sel.innerHTML += `<option>${s}</option>`);
 
-            renderT(date); renderS(date); renderL(); renderSubManager(); updateStats();
-            
+            renderT(date); renderS(date); renderSubManager(); updateChart();
             localStorage.setItem('s_t', JSON.stringify(tDB));
             localStorage.setItem('s_s', JSON.stringify(sDB));
-            localStorage.setItem('s_l', JSON.stringify(lDB));
             localStorage.setItem('s_subs', JSON.stringify(subs));
         }
 
-        function addNewSub() {
-            const v = document.getElementById('newSub').value;
-            if(v && !subs.includes(v)) { subs.push(v); document.getElementById('newSub').value=''; refresh(); }
-        }
-
-        function removeSub(index) {
-            if(confirm("Remove this subject from your active list?")) {
-                subs.splice(index, 1);
-                refresh();
+        function checkPastDate() {
+            const today = new Date().toISOString().split('T')[0];
+            const selDate = document.getElementById('mainDate').value;
+            if (selDate < today) {
+                return confirm("⚠️ INTEGRITY WARNING: You are modifying a PAST date. This may distort your true history. Continue?");
             }
+            return true;
         }
 
-        function renderSubManager() {
-            const list = document.getElementById('subManageList'); list.innerHTML = '';
-            subs.forEach((s, i) => {
-                list.innerHTML += `<div class="list-item"><span>${s}</span><span onclick="removeSub(${i})" style="color:#ef4444; cursor:pointer; font-size:0.7rem; font-weight:800; margin-left:auto;">DELETE</span></div>`;
-            });
+        function setMode(m, el) {
+            chartMode = m;
+            document.querySelectorAll('.c-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('compareInputs').style.display = m === 'compare' ? 'block' : 'none';
+            updateChart();
         }
 
-        function addS() {
-            const d = document.getElementById('mainDate').value; 
-            const h = parseFloat(document.getElementById('sHr').value);
-            const sub = document.getElementById('sSub').value;
-            if(!h) return;
-            if(!sDB[d]) sDB[d] = [];
+        function updateChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            let labels = [], data = [], data2 = [];
 
-            const existing = sDB[d].find(s => s.subject === sub);
-            if(existing) { existing.hours += h; } 
-            else { sDB[d].push({subject: sub, hours: h}); }
-
-            document.getElementById('sHr').value = ''; 
-            refresh();
-        }
-
-        function updateStats() {
-            // Subject Chart (Donut)
-            const subCtx = document.getElementById('subjectChart').getContext('2d');
-            const subData = {};
-            Object.values(sDB).flat().forEach(s => {
-                subData[s.subject] = (subData[s.subject] || 0) + s.hours;
-            });
-
-            if(window.subO) window.subO.destroy();
-            window.subO = new Chart(subCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(subData),
-                    datasets: [{ data: Object.values(subData), backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'], borderWidth: 0 }]
-                },
-                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#f8fafc' } } } }
-            });
-
-            // Hour Chart (Bar) - Shows your 7-day trend
-            const hourCtx = document.getElementById('hourChart').getContext('2d');
-            const labels = []; const values = [];
-            for(let i=6; i>=0; i--) {
-                const d = new Date(); d.setDate(d.getDate()-i);
-                const s = d.toISOString().split('T')[0];
-                labels.push(d.toLocaleDateString([],{weekday:'short'}));
-                let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
-                values.push(h);
+            if (chartMode === 'compare') {
+                const dA = document.getElementById('compA').value;
+                const dB = document.getElementById('compB').value;
+                labels = [dA || 'Date A', dB || 'Date B'];
+                let hA = 0; if(dA) (sDB[dA]||[]).forEach(s => hA += s.hours);
+                let hB = 0; if(dB) (sDB[dB]||[]).forEach(s => hB += s.hours);
+                data = [hA, hB];
+            } else {
+                let count = chartMode === 'day' ? 7 : chartMode === 'month' ? 12 : 5;
+                for(let i=count-1; i>=0; i--) {
+                    const d = new Date();
+                    if(chartMode === 'day') d.setDate(d.getDate()-i);
+                    if(chartMode === 'month') d.setMonth(d.getMonth()-i);
+                    if(chartMode === 'year') d.setFullYear(d.getFullYear()-i);
+                    const s = d.toISOString().split('T')[0];
+                    labels.push(chartMode === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : (chartMode === 'month' ? d.toLocaleDateString([],{month:'short'}) : d.getFullYear()));
+                    let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
+                    data.push(h);
+                }
             }
 
-            if(window.hourO) window.hourO.destroy();
-            window.hourO = new Chart(hourCtx, {
+            if(window.chartO) window.chartO.destroy();
+            window.chartO = new Chart(ctx, {
                 type: 'bar',
-                data: { labels, datasets: [{ label: 'Hours', data: values, backgroundColor: '#6366f1', borderRadius: 8 }] },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } }
+                data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 8 }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
             });
         }
 
         function addT() {
+            if (!checkPastDate()) return;
             const d = document.getElementById('mainDate').value; const v = document.getElementById('tIn').value;
             if(!v) return; if(!tDB[d]) tDB[d] = [];
             tDB[d].push({text: v, done: false}); document.getElementById('tIn').value = ''; refresh();
+        }
+
+        function toggleT(d, i) {
+            if (!checkPastDate()) return;
+            tDB[d][i].done = !tDB[d][i].done; refresh();
+        }
+
+        function addS() {
+            if (!checkPastDate()) return;
+            const d = document.getElementById('mainDate').value; const h = parseFloat(document.getElementById('sHr').value);
+            const sub = document.getElementById('sSub').value;
+            if(!h) return;
+            if(!sDB[d]) sDB[d] = [];
+            const existing = sDB[d].find(s => s.subject === sub);
+            if(existing) existing.hours += h; else sDB[d].push({subject: sub, hours: h});
+            document.getElementById('sHr').value = ''; refresh();
+        }
+
+        function removeSub(i) {
+            if(confirm("Permanently remove this subject from focus?")) { subs.splice(i, 1); refresh(); }
         }
 
         function renderT(d) {
@@ -253,25 +254,21 @@
                 </div>`;
             });
         }
-        function toggleT(d, i) { tDB[d][i].done = !tDB[d][i].done; refresh(); }
 
         function renderS(d) {
             const l = document.getElementById('sLog'); l.innerHTML = '';
             (sDB[d] || []).forEach(s => l.innerHTML += `<div class="list-item"><b>${s.subject}</b>: ${s.hours}h</div>`);
         }
 
-        function addL() {
-            const t = document.getElementById('lTitle').value; const u = document.getElementById('lUrl').value;
-            if(t && u) { lDB.push({t, u}); document.getElementById('lTitle').value=''; document.getElementById('lUrl').value=''; refresh(); }
+        function renderSubManager() {
+            const l = document.getElementById('subManageList'); l.innerHTML = '';
+            subs.forEach((s, i) => { l.innerHTML += `<div class="list-item">${s} <span onclick="removeSub(${i})" style="color:#ef4444; margin-left:auto; cursor:pointer; font-size:0.7rem; font-weight:800;">DELETE</span></div>`; });
         }
-        function renderL() {
-            const l = document.getElementById('lList'); l.innerHTML = '';
-            lDB.forEach((link, i) => l.innerHTML += `<div class="list-item">
-                <a href="${link.u}" target="_blank" style="color:var(--s);text-decoration:none;font-weight:800;flex:1;">🔗 ${link.t}</a>
-                <span onclick="delL(${i})" style="color:#ef4444;font-size:0.7rem;cursor:pointer;">DELETE</span>
-            </div>`);
+
+        function addNewSub() {
+            const v = document.getElementById('newSub').value;
+            if(v && !subs.includes(v)) { subs.push(v); document.getElementById('newSub').value=''; refresh(); }
         }
-        function delL(i) { lDB.splice(i, 1); refresh(); }
 
         document.getElementById('mainDate').valueAsDate = new Date();
         window.onload = refresh;

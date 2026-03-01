@@ -34,8 +34,8 @@
           };
           try {
               await setDoc(doc(db, "users", "shipon", "history", date), data);
-              alert("✅ Cloud Sync Success");
-          } catch (e) { alert("Sync Error: " + e.message); }
+              alert("✅ System State Backed Up");
+          } catch (e) { alert("Error: " + e.message); }
       };
     </script>
 
@@ -43,7 +43,8 @@
         :root { --p: #6366f1; --s: #10b981; --bg: #0f172a; --surface: #1e293b; --text: #f8fafc; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; }
         
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: var(--surface); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
+        /* Fixed Alignment for Mobile */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--surface); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
         .nav-item { flex: 1; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
         .nav-item.active { color: var(--p); }
 
@@ -51,91 +52,100 @@
         .active-page { display: block; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .block-card { background: var(--surface); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
-        .section-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--p); margin-bottom: 15px; display: block; }
-        
-        button { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; margin: 5px 0; }
-        input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: inherit; margin: 8px 0; box-sizing: border-box; }
-        
-        .list-item { display: flex; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; }
-        .strikethrough { text-decoration: line-through; text-decoration-color: var(--s); text-decoration-thickness: 3px; opacity: 0.5; }
+        .m3-card { background: var(--surface); border-radius: 24px; padding: 22px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .home-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        #mainDate { background: transparent; color: var(--p); border: 1px solid var(--p); padding: 8px 12px; border-radius: 12px; font-weight: 700; font-family: inherit; }
 
-        .chip-group { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .chip { padding: 8px 16px; border-radius: 10px; background: rgba(128,128,128,0.2); font-size: 0.7rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
+        /* Perfect Motivational Alignment */
+        .list-item { display: flex; align-items: center; padding: 16px; background: rgba(128,128,128,0.05); border-radius: 18px; margin-bottom: 10px; box-sizing: border-box; }
+        .motivation-line { text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--s); opacity: 0.5; font-weight: 800; }
+
+        button { width: 100%; padding: 18px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; transition: 0.2s; }
+        input, select { width: 100%; padding: 16px; border-radius: 14px; border: 1px solid rgba(128,128,128,0.2); background: rgba(0,0,0,0.1); color: inherit; margin: 8px 0; box-sizing: border-box; }
+        
+        .chip-group { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 5px; }
+        .chip { padding: 8px 16px; border-radius: 12px; background: rgba(128,128,128,0.1); font-size: 0.7rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
         .chip.active { background: var(--p); color: white; }
     </style>
 </head>
-<body>
+<body class="dark-mode">
 
     <div id="homeP" class="page active-page">
-        <h2 style="margin:0">SHIPON'S LIFE</h2>
-        <div class="block-card" style="margin-top:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-weight:800; opacity:0.7;">System Date</span>
-                <input type="date" id="mainDate" onchange="refresh()" style="width:auto; margin:0; padding:8px;">
+        <h1 style="margin:0; font-weight:800; letter-spacing: -1.5px;">SHIPON'S LIFE</h1>
+        <div class="m3-card" style="text-align: center; border-left: 5px solid var(--p); margin-top: 20px;">
+            <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-weight: 800;">Lifetime Mastery</small>
+            <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0h</div>
+        </div>
+        <div class="home-controls">
+            <span style="font-weight: 800; opacity: 0.7;">System Date</span>
+            <input type="date" id="mainDate" onchange="refresh()">
+        </div>
+        <button onclick="backupToCloud()" style="background:var(--s)">SYNC ALL DATA</button>
+    </div>
+
+    <div id="statsP" class="page">
+        <h1>Analytics Engine</h1>
+        <div class="chip-group">
+            <div class="chip active" onclick="setChart('day', this)">Daily</div>
+            <div class="chip" onclick="setChart('week', this)">Weekly</div>
+            <div class="chip" onclick="setChart('month', this)">Monthly</div>
+            <div class="chip" onclick="setChart('year', this)">Yearly</div>
+            <div class="chip" onclick="setChart('comp', this)" style="border: 1px solid var(--s);">Comparison</div>
+        </div>
+        
+        <div id="compControls" style="display:none;" class="m3-card">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><small>Date A</small><input type="date" id="dateA" onchange="updateChart()"></div>
+                <div><small>Date B</small><input type="date" id="dateB" onchange="updateChart()"></div>
             </div>
-            <button onclick="backupToCloud()" style="background:var(--s); margin-top:15px;">Backup to Cloud</button>
+            <select id="compSub" onchange="updateChart()" style="margin-top:10px;">
+                <option value="total">Compare Total Hours</option>
+            </select>
         </div>
-        <div class="block-card">
-            <span class="section-title">Performance Score</span>
-            <div style="font-size: 3rem; font-weight: 900;" id="perfScore">0%</div>
-            <p style="font-size:0.7rem; opacity:0.6;">Weighted: (Tasks 50% + Study 50%)</p>
-        </div>
+
+        <div class="m3-card" style="height: 350px;"><canvas id="mainChart"></canvas></div>
     </div>
 
     <div id="tasksP" class="page">
-        <span class="section-title">Daily Tasks</span>
-        <div class="block-card">
-            <input type="text" id="tIn" placeholder="Enter focus goal...">
-            <button onclick="addT()">Commit Task</button>
+        <h1>Priority Goals</h1>
+        <div class="m3-card">
+            <input type="text" id="tIn" placeholder="Commit to a goal...">
+            <button onclick="addT()">LOG TASK</button>
         </div>
         <div id="tList"></div>
     </div>
 
     <div id="studyP" class="page">
-        <span class="section-title">Study Mastery</span>
-        <div class="block-card">
+        <h1>Study Center</h1>
+        <div class="m3-card">
             <select id="sSub"></select>
-            <input type="number" id="sHr" placeholder="Hours" step="0.5">
-            <button onclick="addS()">Log Progress</button>
+            <input type="number" id="sHr" placeholder="Hours (e.g. 1.5)" step="0.5">
+            <button onclick="addS()">SAVE PROGRESS</button>
+            <hr style="opacity: 0.1; margin: 20px 0;">
+            <input type="text" id="newSub" placeholder="New Field Name...">
+            <button onclick="addNewSub()" style="background:#475569">+ ADD SUBJECT</button>
         </div>
+        <h3>Manage Subjects</h3>
+        <div id="subManage"></div>
+        <h3>Daily Log</h3>
         <div id="sLog"></div>
-        <hr style="opacity:0.1; margin:20px 0;">
-        <span class="section-title">Subject Management</span>
-        <div class="block-card">
-            <input type="text" id="newSub" placeholder="New subject name...">
-            <button onclick="addNewSub()">Add New Subject</button>
-        </div>
-        <div id="subManageList"></div>
-    </div>
-
-    <div id="statsP" class="page">
-        <span class="section-title">Discipline Analytics</span>
-        <div class="chip-group">
-            <div class="chip active" onclick="setMode('day', this)">Daily</div>
-            <div class="chip" onclick="setMode('week', this)">Weekly</div>
-            <div class="chip" onclick="setMode('month', this)">Monthly</div>
-            <div class="chip" onclick="setMode('year', this)">Yearly</div>
-            <div class="chip" onclick="setMode('compare', this)" style="color:var(--a)">Comparison</div>
-        </div>
-        <div class="block-card" style="height: 300px;"><canvas id="mainChart"></canvas></div>
     </div>
 
     <div id="vaultP" class="page">
-        <span class="section-title">Resource Vault</span>
-        <div class="block-card">
-            <input type="text" id="lTitle" placeholder="Link Name">
-            <input type="text" id="lUrl" placeholder="https://...">
-            <button onclick="addL()" style="background:var(--s)">Save Link</button>
+        <h1>Link Vault</h1>
+        <div class="m3-card">
+            <input type="text" id="lTitle" placeholder="Title">
+            <input type="text" id="lUrl" placeholder="URL">
+            <button onclick="addL()" style="background:var(--s)">SAVE REFERENCE</button>
         </div>
         <div id="lList"></div>
     </div>
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="nav('homeP', this)">Home</div>
+        <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
         <div class="nav-item" onclick="nav('tasksP', this)">Tasks</div>
         <div class="nav-item" onclick="nav('studyP', this)">Study</div>
-        <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
         <div class="nav-item" onclick="nav('vaultP', this)">Vault</div>
     </nav>
 
@@ -144,7 +154,7 @@
         let sDB = JSON.parse(localStorage.getItem('s_s')) || {};
         let lDB = JSON.parse(localStorage.getItem('s_l')) || [];
         let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"];
-        let chartMode = 'day';
+        let cMode = 'day';
 
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
@@ -156,53 +166,63 @@
 
         function refresh() {
             const date = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
-            
-            // 1. Performance Calculation
-            const dT = tDB[date] || []; const dS = sDB[date] || [];
-            const tPct = dT.length ? (dT.filter(t => t.done).length / dT.length) * 100 : 0;
-            let sHrs = 0; dS.forEach(s => sHrs += s.hours);
-            const sPct = Math.min((sHrs / 4) * 100, 100);
-            document.getElementById('perfScore').innerText = Math.round((tPct * 0.5) + (sPct * 0.5)) + "%";
+            let tL = 0; 
+            Object.values(sDB).forEach(day => day.forEach(s => tL += s.hours));
+            document.getElementById('lifeH').innerText = tL.toFixed(1) + "h";
 
-            // 2. Dropdown Update
             const sel = document.getElementById('sSub'); sel.innerHTML = '';
-            subs.forEach(s => sel.innerHTML += `<option>${s}</option>`);
+            const cSel = document.getElementById('compSub'); cSel.innerHTML = '<option value="total">Compare Total Hours</option>';
+            subs.forEach(s => {
+                sel.innerHTML += `<option>${s}</option>`;
+                cSel.innerHTML += `<option>${s}</option>`;
+            });
 
-            renderT(date); renderS(date); renderL(); renderSubManager(); updateChart();
+            renderT(date); renderS(date); renderL(); renderSubM(); updateChart();
             localStorage.setItem('s_t', JSON.stringify(tDB));
             localStorage.setItem('s_s', JSON.stringify(sDB));
             localStorage.setItem('s_l', JSON.stringify(lDB));
             localStorage.setItem('s_subs', JSON.stringify(subs));
         }
 
-        function setMode(m, el) {
-            chartMode = m;
+        function setChart(m, el) {
+            cMode = m;
             document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
+            document.getElementById('compControls').style.display = m === 'comp' ? 'block' : 'none';
             updateChart();
         }
 
         function updateChart() {
             const ctx = document.getElementById('mainChart').getContext('2d');
             let labels = [], data = [];
-            let count = chartMode === 'day' ? 7 : chartMode === 'week' ? 4 : chartMode === 'month' ? 12 : 5;
             
-            for(let i=count-1; i>=0; i--) {
-                const d = new Date();
-                if(chartMode === 'day') d.setDate(d.getDate()-i);
-                if(chartMode === 'month') d.setMonth(d.getMonth()-i);
-                if(chartMode === 'year') d.setFullYear(d.getFullYear()-i);
-                const s = d.toISOString().split('T')[0];
-                labels.push(chartMode === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : (chartMode === 'month' ? d.toLocaleDateString([],{month:'short'}) : d.getFullYear()));
-                let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
-                data.push(h);
+            if(cMode === 'comp') {
+                const dA = document.getElementById('dateA').value;
+                const dB = document.getElementById('dateB').value;
+                const sub = document.getElementById('compSub').value;
+                labels = [dA || 'A', dB || 'B'];
+                let vA = 0, vB = 0;
+                if(dA) (sDB[dA]||[]).forEach(s => { if(sub==='total' || s.subject===sub) vA += s.hours; });
+                if(dB) (sDB[dB]||[]).forEach(s => { if(sub==='total' || s.subject===sub) vB += s.hours; });
+                data = [vA, vB];
+            } else {
+                let count = cMode === 'day' ? 7 : cMode === 'week' ? 4 : cMode === 'month' ? 12 : 5;
+                for(let i=count-1; i>=0; i--) {
+                    const d = new Date();
+                    if(cMode === 'day') d.setDate(d.getDate()-i);
+                    if(cMode === 'month') d.setMonth(d.getMonth()-i);
+                    if(cMode === 'year') d.setFullYear(d.getFullYear()-i);
+                    const s = d.toISOString().split('T')[0];
+                    labels.push(cMode === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : (cMode === 'month' ? d.toLocaleDateString([],{month:'short'}) : d.getFullYear()));
+                    let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
+                    data.push(h);
+                }
             }
-
             if(window.chartO) window.chartO.destroy();
             window.chartO = new Chart(ctx, {
                 type: 'bar',
                 data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 8 }] },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
             });
         }
 
@@ -216,19 +236,20 @@
             const l = document.getElementById('tList'); l.innerHTML = '';
             (tDB[d] || []).forEach((t, i) => {
                 l.innerHTML += `<div class="list-item">
-                    <input type="checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
-                    <span style="flex:1; margin-left:10px;" class="${t.done?'strikethrough':''}">${t.text}</span>
-                    <span onclick="delT('${d}',${i})" style="color:#ef4444; font-size:0.6rem;">DELETE</span>
+                    <input type="checkbox" style="width:22px; height:22px;" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
+                    <span style="flex:1; margin-left:15px; font-weight:700;" class="${t.done?'motivation-line':''}"> ${t.text}</span>
+                    <span onclick="delT('${d}',${i})" style="color:#ef4444; font-size:0.7rem; cursor:pointer; font-weight:800;">CLEAR</span>
                 </div>`;
             });
         }
         function toggleT(d, i) { tDB[d][i].done = !tDB[d][i].done; refresh(); }
-        function delT(d, i) { if(confirm("Clear this task?")) { tDB[d].splice(i, 1); refresh(); } }
+        function delT(d, i) { if(confirm("Clear task?")) { tDB[d].splice(i, 1); refresh(); } }
 
         function addS() {
             const d = document.getElementById('mainDate').value; const h = parseFloat(document.getElementById('sHr').value);
             const sub = document.getElementById('sSub').value;
-            if(!h) return; if(!sDB[d]) sDB[d] = [];
+            if(!h) return;
+            if(!sDB[d]) sDB[d] = [];
             const ex = sDB[d].find(s => s.subject === sub);
             if(ex) ex.hours += h; else sDB[d].push({subject: sub, hours: h});
             document.getElementById('sHr').value = ''; refresh();
@@ -239,11 +260,11 @@
             (sDB[d] || []).forEach(s => l.innerHTML += `<div class="list-item"><b>${s.subject}</b>: ${s.hours}h</div>`);
         }
 
-        function renderSubManager() {
-            const l = document.getElementById('subManageList'); l.innerHTML = '';
-            subs.forEach((s, i) => { l.innerHTML += `<div class="list-item"><span>${s}</span><span onclick="remSub(${i})" style="margin-left:auto; color:#ef4444; font-size:0.6rem;">REMOVE</span></div>`; });
+        function renderSubM() {
+            const l = document.getElementById('subManage'); l.innerHTML = '';
+            subs.forEach((s, i) => l.innerHTML += `<div class="list-item">${s} <span onclick="remSub(${i})" style="color:#ef4444; margin-left:auto; cursor:pointer; font-size:0.7rem; font-weight:800;">REMOVE</span></div>`);
         }
-        function remSub(i) { if(confirm("Delete this subject?")) { subs.splice(i, 1); refresh(); } }
+        function remSub(i) { if(confirm("Remove subject?")) { subs.splice(i, 1); refresh(); } }
         function addNewSub() { const v = document.getElementById('newSub').value; if(v && !subs.includes(v)) { subs.push(v); document.getElementById('newSub').value=''; refresh(); } }
 
         function addL() {
@@ -252,10 +273,7 @@
         }
         function renderL() {
             const l = document.getElementById('lList'); l.innerHTML = '';
-            lDB.forEach((link, i) => l.innerHTML += `<div class="list-item">
-                <a href="${link.u}" target="_blank" style="color:var(--s);text-decoration:none;font-weight:800;flex:1;">🔗 ${link.t}</a>
-                <span onclick="delL(${i})" style="color:#ef4444;font-size:0.6rem;">DELETE</span>
-            </div>`);
+            lDB.forEach((link, i) => l.innerHTML += `<div class="list-item"><a href="${link.u}" target="_blank" style="color:var(--s);text-decoration:none;font-weight:800;flex:1;">🔗 ${link.t}</a><span onclick="delL(${i})" style="color:#ef4444;font-size:0.7rem;cursor:pointer;font-weight:800;">DEL</span></div>`);
         }
         function delL(i) { lDB.splice(i, 1); refresh(); }
 

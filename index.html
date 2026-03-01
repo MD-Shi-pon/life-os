@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
 
@@ -40,11 +40,30 @@
 <!-- STUDY -->
 <section id="study" class="tab">
   <h2>Study</h2>
+
+  <!-- NEW DATE FIELD -->
   <div class="row">
-    <input type="text" id="subjectInput" placeholder="Subject">
+    <input type="date" id="studyDate">
+  </div>
+
+  <!-- NEW SUBJECT DROPDOWN -->
+  <div class="row">
+    <select id="subjectInput">
+      <option value="">Select Subject</option>
+      <option value="Marketing">Marketing</option>
+      <option value="IELTS">IELTS</option>
+      <option value="Grammar">Grammar</option>
+      <option value="Competitive Exam">Competitive Exam</option>
+      <option value="Programming">Programming</option>
+    </select>
+  </div>
+
+  <!-- HOURS + BUTTON -->
+  <div class="row">
     <input type="number" id="hoursInput" placeholder="Hours" step="0.25">
     <button id="addStudy">Add</button>
   </div>
+
   <ul id="studyList"></ul>
 </section>
 

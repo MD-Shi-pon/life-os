@@ -85,10 +85,10 @@ window.refresh = function() {
     renderT(tDate, tDB); 
     renderS(studyDate, sDB); 
     renderLog(logDate, dLogDB);
-    updateChart(sDB);
+    window.updateChart('weekly'); 
 };
 
-// ================= TASKS LOGIC (NEW CLEAN ALIGNMENT) =================
+// ================= TASKS LOGIC (RESTORED CLEAN ALIGNMENT) =================
 window.addT = () => {
     let d = document.getElementById('taskDate').value, v = document.getElementById('tIn').value;
     if(!v || v.trim() === "") return; 
@@ -131,7 +131,7 @@ window.delT = (d, i) => {
     window.refresh();
 };
 
-// ================= TODAY LOGIC (LOCKED - 12H) =================
+// ================= TODAY LOGIC (RESTORED 12H ALIGNMENT) =================
 window.addLog = () => {
     let d = document.getElementById('todayDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
     if (!s || !e || !a) return; 
@@ -168,7 +168,7 @@ window.delLog = (d, i) => {
     window.refresh();
 };
 
-// ================= STUDY LOGIC (LOCKED) =================
+// ================= STUDY LOGIC (RESTORED DYNAMIC MASTERY) =================
 window.addS = () => {
     let d = document.getElementById('studyDate').value;
     let h = parseFloat(document.getElementById('sHr').value);
@@ -181,6 +181,7 @@ window.addS = () => {
     localStorage.setItem('s_s', JSON.stringify(db)); 
     window.syncData(d); 
     document.getElementById('sHr').value = '';
+    window.refresh();
 };
 
 function renderS(d, db) {
@@ -197,26 +198,29 @@ window.delS = (d, i) => {
     db[d].splice(i, 1); 
     localStorage.setItem('s_s', JSON.stringify(db)); 
     window.syncData(d); 
+    window.refresh();
 };
 
-// ================= STATS CHART =================
-function updateChart(sDB) {
-    const canvas = document.getElementById('mainChart'); 
+// ================= STATS LOGIC (STABLE VERSION) =================
+window.updateChart = (type) => {
+    const canvas = document.getElementById('mainChart');
     if(!canvas) return;
+    const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
     let labels = [], data = [];
-    for(let i=6; i>=0; i--) {
-        const d = new Date(); d.setDate(d.getDate()-i);
+    for(let i = 6; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
         const s = d.toISOString().split('T')[0];
         labels.push(d.toLocaleDateString([],{weekday:'short'}));
-        let h = 0; (sDB[s]||[]).forEach(x => h += parseFloat(x.hours || 0));
+        let h = 0; (sDB[s] || []).forEach(x => h += parseFloat(x.hours || 0));
         data.push(h);
     }
     if(window.chartO) window.chartO.destroy();
     window.chartO = new Chart(canvas.getContext('2d'), {
-        type: 'bar', data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 8 }] },
-        options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        type: 'bar',
+        data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 8 }] },
+        options: { maintainAspectRatio: false }
     });
-}
+};
 
 // INIT
 document.getElementById('taskDate').valueAsDate = new Date();

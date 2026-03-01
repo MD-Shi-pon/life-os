@@ -8,13 +8,12 @@
 body{
   background:#f2f2f7;
   color:#000;
-  padding-bottom:80px;
+  padding-bottom:90px;
 }
 
 .header{
   text-align:center;
   padding:20px;
-  font-weight:600;
 }
 
 .tab{
@@ -26,15 +25,15 @@ body{
   display:block;
 }
 
-.glass-card{
+.card{
   background:white;
-  border-radius:20px;
   padding:25px;
-  box-shadow:0 8px 30px rgba(0,0,0,0.05);
+  border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.05);
   text-align:center;
 }
 
-.input-row{
+.row{
   display:flex;
   gap:10px;
   margin:15px 0;
@@ -77,17 +76,22 @@ li{
   opacity:0.6;
 }
 
-/* iPhone Bottom Nav */
+/* Bottom Navigation */
 .bottom-nav{
   position:fixed;
-  bottom:10px;
-  left:10px;
-  right:10px;
-  background:rgba(255,255,255,0.9);
-  backdrop-filter:blur(20px);
+  bottom:15px;
+  left:15px;
+  right:15px;
+  background:white;
   border-radius:30px;
   display:flex;
   justify-content:space-around;
-  padding:12px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+  padding:14px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.1);
+}
+
+.bottom-nav button{
+  background:transparent;
+  color:#007aff;
+  font-weight:600;
 }

@@ -33,7 +33,7 @@
     <div id="tasksP" class="page">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h1>Mission</h1>
-            <input type="date" id="taskDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--p); border: none; color: white; border-radius: 8px;">
+            <input type="date" id="taskDate" onchange="window.refresh()" class="date-chip">
         </div>
         <div class="glass-card">
             <input type="text" id="tIn" placeholder="New goal...">
@@ -45,7 +45,7 @@
     <div id="dayLogP" class="page">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h1>Today</h1>
-            <input type="date" id="todayDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--s); border: none; color: white; border-radius: 8px;">
+            <input type="date" id="todayDate" onchange="window.refresh()" class="date-chip s-bg">
         </div>
         <div class="glass-card">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
@@ -59,19 +59,18 @@
     <div id="studyP" class="page">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h1>Study</h1>
-            <input type="date" id="studyDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--p); border: none; color: white; border-radius: 8px;">
+            <input type="date" id="studyDate" onchange="window.refresh()" class="date-chip">
         </div>
         <div class="glass-card">
-            <select id="sSub"></select>
-            <input type="number" id="sHr" placeholder="Duration (Hours)" step="0.5">
+            <select id="sSub"></select> <input type="number" id="sHr" placeholder="Duration (Hours)" step="0.5">
             <button onclick="window.addS()">SAVE PROGRESS</button>
+            <hr style="opacity:0.1; margin:20px 0;">
+            <input type="text" id="newSubIn" placeholder="New Field (e.g. English)">
+            <button onclick="window.addNewSub()" style="background:#475569">+ ADD SUBJECT</button>
         </div>
-       <hr class="divider">
-<div class="glass-card">
-    <input type="text" id="newSubIn" placeholder="New Career Path...">
-    <button onclick="window.addNewSub()" style="background:#475569">+ ADD SUBJECT</button>
-</div>
-<div id="subManageList"></div> <div id="sLog"></div>
+        <div id="sLog"></div>
+        <h3 style="margin-top:20px;">Manage Fields</h3>
+        <div id="subManageList"></div>
     </div>
 
     <nav class="bottom-nav">

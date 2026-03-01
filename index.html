@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIPON'S LIFE | Ultimate</title>
+    <title>SHIPON'S LIFE | Final Mastery</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -75,15 +75,15 @@
         .active-page { display: block; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .m3-card { background: var(--surface); border-radius: 28px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .m3-card { background: var(--surface); border-radius: 28px; padding: 22px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         input, select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid var(--border); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; box-sizing: border-box; font-family: inherit; }
         button { width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; transition: 0.2s; }
         
-        /* Task & List Alignment */
+        /* List UI Styles */
         .list-item { display: flex; align-items: center; padding: 18px; background: rgba(255,255,255,0.03); border-radius: 20px; margin-bottom: 12px; border-left: 5px solid var(--p); text-align: left; }
-        .task-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: var(--s); }
-        .task-label { flex: 1; margin-left: 15px; font-weight: 700; font-size: 1rem; color: var(--text); }
+        .item-label { flex: 1; margin-left: 15px; font-weight: 700; font-size: 1rem; color: var(--text); }
         .motivation-line { text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--s); opacity: 0.4; font-style: italic; }
+        .del-text { color: #ef4444; font-size: 0.65rem; font-weight: 800; cursor: pointer; margin-left: 10px; }
 
         /* Stats Tab Specifics */
         .chip-group { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 5px; }
@@ -115,15 +115,13 @@
             <div class="chip" onclick="setChartMode('year', this)">Year</div>
             <div class="chip" onclick="setChartMode('comp', this)" style="border-color: var(--s);">Compare</div>
         </div>
-
         <div id="compUI" style="display:none;" class="m3-card">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div><small>Date A</small><input type="date" id="dateA" onchange="updateChart()"></div>
-                <div><small>Date B</small><input type="date" id="dateB" onchange="updateChart()"></div>
+                <input type="date" id="dateA" onchange="updateChart()">
+                <input type="date" id="dateB" onchange="updateChart()">
             </div>
             <select id="compSub" onchange="updateChart()" style="margin-top:10px;"></select>
         </div>
-
         <div class="m3-card" style="height: 350px;"><canvas id="mainChart"></canvas></div>
     </div>
 
@@ -151,13 +149,23 @@
     </div>
 
     <div id="studyP" class="page">
-        <h1>Study</h1>
+        <h1>Study Center</h1>
         <div class="m3-card">
+            <small style="font-weight: 800; opacity: 0.5;">Select Subject</small>
             <select id="sSub"></select>
-            <input type="number" id="sHr" placeholder="Hours" step="0.5">
-            <button onclick="addS()">SAVE PROGRESS</button>
+            <input type="number" id="sHr" placeholder="Study Hours (e.g. 1.5)" step="0.5">
+            <button onclick="addS()">SAVE SESSION</button>
         </div>
+
+        <h3 style="margin-top: 30px;">Daily Log</h3>
         <div id="sLog"></div>
+
+        <h3 style="margin-top: 30px;">Subject Management</h3>
+        <div class="m3-card">
+            <input type="text" id="newSubIn" placeholder="New Field (e.g. Content Writing)">
+            <button onclick="addNewSub()" style="background: var(--s);">+ ADD NEW FIELD</button>
+        </div>
+        <div id="subManageList"></div>
     </div>
 
     <nav class="bottom-nav">
@@ -175,19 +183,19 @@
         window.refresh = function() {
             const mDate = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
             const tDate = document.getElementById('taskDate').value;
-            
             const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
             const tDB = JSON.parse(localStorage.getItem('s_t')) || {};
             const dLogDB = JSON.parse(localStorage.getItem('s_dayLog')) || {};
             const subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"];
 
-            // Real Lifetime Mastery Logic
             let total = 0;
             Object.values(sDB).forEach(day => (day || []).forEach(e => total += parseFloat(e.hours || 0)));
             document.getElementById('lifeH').innerText = total.toFixed(1);
 
-            const sSel = document.getElementById('sSub'); sSel.innerHTML = '';
-            const cSel = document.getElementById('compSub'); cSel.innerHTML = '<option value="all">Total Hours</option>';
+            const sSel = document.getElementById('sSub'); 
+            const cSel = document.getElementById('compSub');
+            sSel.innerHTML = ''; 
+            cSel.innerHTML = '<option value="all">Total Hours</option>';
             subs.forEach(s => { 
                 sSel.innerHTML += `<option>${s}</option>`; 
                 cSel.innerHTML += `<option>${s}</option>`; 
@@ -196,26 +204,101 @@
             renderT(tDate, tDB); 
             renderS(mDate, sDB); 
             renderLog(mDate, dLogDB); 
+            renderSubM(subs);
             updateChart();
         };
 
-        function setChartMode(m, el) {
-            cMode = m;
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('compUI').style.display = m === 'comp' ? 'block' : 'none';
-            updateChart();
+        function nav(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+            document.getElementById(id).classList.add('active-page');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active'); window.refresh();
         }
 
+        // --- STUDY LOGIC ---
+        function addS() {
+            let d = document.getElementById('mainDate').value, h = parseFloat(document.getElementById('sHr').value), sub = document.getElementById('sSub').value;
+            if(!h) return; let db = JSON.parse(localStorage.getItem('s_s')) || {};
+            if(!db[d]) db[d] = [];
+            let ex = db[d].find(x => x.subject === sub);
+            if(ex) ex.hours += h; else db[d].push({subject: sub, hours: h});
+            localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(d, true);
+            document.getElementById('sHr').value = '';
+        }
+        function renderS(d, db) {
+            const l = document.getElementById('sLog'); l.innerHTML = '';
+            (db[d] || []).forEach((s, i) => { 
+                l.innerHTML += `<div class="list-item">
+                    <span class="item-label"><b>${s.subject}</b>: ${s.hours}h</span>
+                    <span onclick="delS('${d}',${i})" class="del-text">CLEAR</span>
+                </div>`; 
+            });
+        }
+        function delS(d, i) { let db = JSON.parse(localStorage.getItem('s_s')); db[d].splice(i, 1); localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(d, true); }
+
+        function addNewSub() { 
+            const v = document.getElementById('newSubIn').value; 
+            let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"];
+            if(v && !subs.includes(v)) { 
+                subs.push(v); 
+                localStorage.setItem('s_subs', JSON.stringify(subs)); 
+                document.getElementById('newSubIn').value = '';
+                window.syncData(document.getElementById('mainDate').value, true); 
+            } 
+        }
+        function renderSubM(subs) {
+            const l = document.getElementById('subManageList'); l.innerHTML = '';
+            subs.forEach((s, i) => { 
+                l.innerHTML += `<div class="list-item">
+                    <span class="item-label">${s}</span>
+                    <span onclick="remSub(${i})" class="del-text">REMOVE</span>
+                </div>`; 
+            });
+        }
+        function remSub(i) { let subs = JSON.parse(localStorage.getItem('s_subs')); subs.splice(i, 1); localStorage.setItem('s_subs', JSON.stringify(subs)); window.refresh(); }
+
+        // --- TASKS LOGIC ---
+        function addT() {
+            let d = document.getElementById('taskDate').value, v = document.getElementById('tIn').value;
+            if(!v) return; let db = JSON.parse(localStorage.getItem('s_t')) || {};
+            if(!db[d]) db[d] = []; db[d].push({text: v, done: false});
+            localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d, true);
+            document.getElementById('tIn').value = '';
+        }
+        function renderT(d, db) {
+            const l = document.getElementById('tList'); l.innerHTML = '';
+            (db[d] || []).forEach((t, i) => { 
+                l.innerHTML += `<div class="list-item">
+                    <input type="checkbox" style="width:22px; height:22px;" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
+                    <span class="item-label ${t.done?'motivation-line':''}">${t.text}</span>
+                    <span onclick="delT('${d}',${i})" class="del-text">DEL</span>
+                </div>`; 
+            });
+        }
+        function toggleT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d, true); }
+        function delT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d].splice(i, 1); localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d, true); }
+
+        // --- 24H LOGIC ---
+        function addLog() {
+            let d = document.getElementById('mainDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
+            if(!s || !e || !a) return; let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
+            if(!db[d]) db[d] = []; db[d].push({start: s, end: e, act: a});
+            localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d, true);
+            document.getElementById('logAct').value = '';
+        }
+        function renderLog(d, db) {
+            const l = document.getElementById('logList'); l.innerHTML = '';
+            (db[d] || []).forEach(item => { l.innerHTML += `<div class="list-item"><span style="font-weight:800; color:var(--p); font-size:0.8rem;">${item.start}-${item.end}</span><span class="item-label">${item.act}</span></div>`; });
+        }
+
+        // --- STATS LOGIC ---
+        function setChartMode(m, el) { cMode = m; document.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); document.getElementById('compUI').style.display = m === 'comp' ? 'block' : 'none'; updateChart(); }
         function updateChart() {
             const ctx = document.getElementById('mainChart').getContext('2d');
             const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
             let labels = [], data = [];
-
             if(cMode === 'comp') {
-                const dA = document.getElementById('dateA').value;
-                const dB = document.getElementById('dateB').value;
-                const sub = document.getElementById('compSub').value;
+                const dA = document.getElementById('dateA').value, dB = document.getElementById('dateB').value, sub = document.getElementById('compSub').value;
                 labels = [dA || 'A', dB || 'B'];
                 let vA = 0, vB = 0;
                 if(dA) (sDB[dA]||[]).forEach(x => { if(sub==='all' || x.subject===sub) vA += x.hours; });
@@ -235,65 +318,8 @@
                     data.push(h);
                 }
             }
-
             if(window.chartO) window.chartO.destroy();
-            window.chartO = new Chart(ctx, {
-                type: 'bar',
-                data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 10 }] },
-                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
-            });
-        }
-
-        function nav(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-            document.getElementById(id).classList.add('active-page');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active'); window.refresh();
-        }
-
-        function addT() {
-            let d = document.getElementById('taskDate').value, v = document.getElementById('tIn').value;
-            if(!v) return; let db = JSON.parse(localStorage.getItem('s_t')) || {};
-            if(!db[d]) db[d] = []; db[d].push({text: v, done: false});
-            localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d, true);
-            document.getElementById('tIn').value = '';
-        }
-        function renderT(d, db) {
-            const l = document.getElementById('tList'); l.innerHTML = '';
-            (db[d] || []).forEach((t, i) => { 
-                l.innerHTML += `<div class="list-item">
-                    <input type="checkbox" class="task-checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
-                    <span class="task-label ${t.done?'motivation-line':''}">${t.text}</span>
-                    <span onclick="delT('${d}',${i})" style="color:#ef4444; font-size:0.6rem; cursor:pointer; font-weight:800; margin-left:10px;">DEL</span>
-                </div>`; 
-            });
-        }
-        function toggleT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d, true); }
-        function delT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d].splice(i, 1); localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d, true); }
-
-        function addS() {
-            let d = document.getElementById('mainDate').value, h = parseFloat(document.getElementById('sHr').value), sub = document.getElementById('sSub').value;
-            if(!h) return; let db = JSON.parse(localStorage.getItem('s_s')) || {};
-            if(!db[d]) db[d] = []; let ex = db[d].find(x => x.subject === sub);
-            if(ex) ex.hours += h; else db[d].push({subject: sub, hours: h});
-            localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(d, true);
-            document.getElementById('sHr').value = '';
-        }
-        function renderS(d, db) {
-            const l = document.getElementById('sLog'); l.innerHTML = '';
-            (db[d] || []).forEach(s => l.innerHTML += `<div class="list-item"><b>${s.subject}</b>: ${s.hours}h</div>`);
-        }
-
-        function addLog() {
-            let d = document.getElementById('mainDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
-            if(!s || !e || !a) return; let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
-            if(!db[d]) db[d] = []; db[d].push({start: s, end: e, act: a});
-            localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d, true);
-            document.getElementById('logAct').value = '';
-        }
-        function renderLog(d, db) {
-            const l = document.getElementById('logList'); l.innerHTML = '';
-            (db[d] || []).forEach(item => { l.innerHTML += `<div class="list-item"><b>${item.start}-${item.end}</b> <span style="margin-left:10px">${item.act}</span></div>`; });
+            window.chartO = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Study Hours', data, backgroundColor: '#6366f1', borderRadius: 10 }] }, options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
         }
 
         document.getElementById('mainDate').valueAsDate = new Date();

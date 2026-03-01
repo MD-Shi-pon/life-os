@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIPON'S LIFE | Modern</title>
+    <title>SHIPON'S LIFE | Fixed Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -34,31 +34,19 @@
           };
           try {
               await setDoc(doc(db, "users", "shipon", "history", date), data);
-              alert("✅ Cloud Backup Successful");
+              alert("✅ Cloud Sync Success");
           } catch (e) { alert("Sync Error: " + e.message); }
       };
     </script>
 
     <style>
-        :root { 
-            --p: #6366f1; --s: #10b981; --bg: #0f172a; --surface: #1e293b; --text: #f8fafc;
-        }
-        .light-mode { 
-            --bg: #f8fafc; --surface: #ffffff; --text: #0f172a;
-        }
+        :root { --p: #6366f1; --s: #10b981; --bg: #0f172a; --surface: #1e293b; --text: #f8fafc; }
+        .light-mode { --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; }
 
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); 
-            min-height: 100vh; padding-bottom: 100px; transition: 0.3s;
-        }
-
-        /* Modern Bottom Nav */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--surface);
-            display: flex; justify-content: space-around; align-items: center;
-            border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000;
-        }
-        .nav-item { flex: 1; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 100px; transition: 0.3s; }
+        
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--surface); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.7rem; font-weight: 800; }
         .nav-item.active { color: var(--p); }
 
         .header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: baseline; }
@@ -66,20 +54,18 @@
         .active-page { display: block; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .m3-card { background: var(--surface); border-radius: 24px; padding: 22px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        
-        /* Home Tab Alignment: Date on Right */
+        .m3-card { background: var(--surface); border-radius: 24px; padding: 22px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); }
         .home-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         #mainDate { background: transparent; color: var(--p); border: 1px solid var(--p); padding: 8px 12px; border-radius: 12px; font-weight: 700; font-family: inherit; }
 
-        .motivation-line { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--s); opacity: 0.5; font-weight: 800; font-style: italic; }
+        /* THE MOTIVATION LINE: Only appears when checked */
+        .motivation-line { text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--s); opacity: 0.5; font-weight: 800; }
 
         button { width: 100%; padding: 18px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; transition: 0.2s; }
-        button:active { transform: scale(0.97); }
         input, select { width: 100%; padding: 16px; border-radius: 14px; border: 1px solid rgba(128,128,128,0.2); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; box-sizing: border-box; }
         
-        .chip-group { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding: 5px 0; }
-        .chip { padding: 8px 18px; border-radius: 12px; background: rgba(128,128,128,0.1); font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap; border: 1px solid transparent; }
+        .chip-group { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; }
+        .chip { padding: 8px 18px; border-radius: 12px; background: rgba(128,128,128,0.1); font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
         .chip.active { background: var(--p); color: white; }
 
         .list-item { display: flex; align-items: center; padding: 16px; background: rgba(128,128,128,0.05); border-radius: 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.03); }
@@ -98,7 +84,7 @@
             <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0h</div>
         </div>
         <div class="home-controls">
-            <span style="font-weight: 800; opacity: 0.7;">History View</span>
+            <span style="font-weight: 800; opacity: 0.7;">History Date</span>
             <input type="date" id="mainDate" onchange="refresh()">
         </div>
         <button onclick="backupToCloud()" style="background:var(--s)">SYNC TO CLOUD</button>
@@ -110,23 +96,35 @@
             <div class="chip" onclick="setChart('week', this)">Weekly</div>
             <div class="chip" onclick="setChart('month', this)">Monthly</div>
             <div class="chip" onclick="setChart('year', this)">Yearly</div>
-            <div class="chip" onclick="setChart('compare', this)" style="border-color: var(--s);">Comparison</div>
+            <div class="chip" onclick="setChart('compare', this)" style="border: 1px solid var(--s);">Date-wise Comparison</div>
         </div>
         <div class="m3-card" style="height: 350px;"><canvas id="mainChart"></canvas></div>
     </div>
 
     <div id="tasksP" class="page">
         <div class="m3-card">
-            <input type="text" id="tIn" placeholder="Enter priority task...">
+            <input type="text" id="tIn" placeholder="Enter daily focus goal...">
             <button onclick="addT()">COMMIT TASK</button>
         </div>
         <div id="tList"></div>
     </div>
 
+    <div id="studyP" class="page">
+        <div class="m3-card">
+            <select id="sSub">
+                <option>English (IELTS)</option>
+                <option>Digital Marketing</option>
+            </select>
+            <input type="number" id="sHr" placeholder="Log Study Hours (e.g. 1.5)" step="0.5">
+            <button onclick="addS()">SAVE HOURS</button>
+        </div>
+        <div id="sLog"></div>
+    </div>
+
     <div id="vaultP" class="page">
         <div class="m3-card">
-            <input type="text" id="lTitle" placeholder="Resource Name (e.g. IELTS Book)">
-            <input type="text" id="lUrl" placeholder="URL (https://...)">
+            <input type="text" id="lTitle" placeholder="Resource Name">
+            <input type="text" id="lUrl" placeholder="URL">
             <button onclick="addL()" style="background: var(--s);">SAVE LINK</button>
         </div>
         <div id="lList"></div>
@@ -136,6 +134,7 @@
         <div class="nav-item active" onclick="nav('homeP', this)">Home</div>
         <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
         <div class="nav-item" onclick="nav('tasksP', this)">Tasks</div>
+        <div class="nav-item" onclick="nav('studyP', this)">Study</div>
         <div class="nav-item" onclick="nav('vaultP', this)">Vault</div>
     </nav>
 
@@ -157,10 +156,15 @@
 
         function refresh() {
             const date = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
-            let tL = 0; Object.values(sDB).forEach(day => day.forEach(s => tL += s.hours));
+            let tL = 0; 
+            Object.values(sDB).forEach(day => day.forEach(s => tL += s.hours));
             document.getElementById('lifeH').innerText = tL.toFixed(1) + "h";
 
-            renderT(date); renderL(); updateChart();
+            renderT(date); 
+            renderS(date);
+            renderL(); 
+            updateChart();
+            
             localStorage.setItem('s_t', JSON.stringify(tDB));
             localStorage.setItem('s_s', JSON.stringify(sDB));
             localStorage.setItem('s_l', JSON.stringify(lDB));
@@ -178,9 +182,19 @@
             let labels = [], data = [], data2 = [];
             
             if(chartMode === 'compare') {
-                labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                data = [2, 5, 3, 6, 2, 0, 0]; // Sample logic for this week
-                data2 = [1, 4, 2, 5, 1, 2, 3]; // Sample logic for last week
+                // Fixed Date-wise Comparison Logic
+                for(let i=6; i>=0; i--) {
+                    const d1 = new Date(); d1.setDate(d1.getDate()-i);
+                    const d2 = new Date(); d2.setDate(d2.getDate()-(i+7));
+                    const s1 = d1.toISOString().split('T')[0];
+                    const s2 = d2.toISOString().split('T')[0];
+                    
+                    labels.push(d1.toLocaleDateString([],{month:'short', day:'numeric'}));
+                    let h1 = 0; (sDB[s1]||[]).forEach(x => h1+=x.hours);
+                    let h2 = 0; (sDB[s2]||[]).forEach(x => h2+=x.hours);
+                    data.push(h1);
+                    data2.push(h2);
+                }
             } else {
                 let count = chartMode === 'day' ? 7 : chartMode === 'week' ? 4 : chartMode === 'month' ? 12 : 5;
                 for(let i=count-1; i>=0; i--) {
@@ -200,11 +214,11 @@
                 data: { 
                     labels, 
                     datasets: [
-                        { label: 'Hours', data, backgroundColor: '#6366f1', borderColor: '#6366f1', borderRadius: 8, tension: 0.4 },
-                        ...(chartMode === 'compare' ? [{ label: 'Previous', data: data2, borderColor: '#94a3b8', borderDash: [5, 5], tension: 0.4 }] : [])
+                        { label: 'Current Week', data, backgroundColor: '#6366f1', borderColor: '#6366f1', tension: 0.4 },
+                        ...(chartMode === 'compare' ? [{ label: 'Previous Week', data: data2, borderColor: '#94a3b8', borderDash: [5, 5], tension: 0.4 }] : [])
                     ]
                 },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: chartMode === 'compare' } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+                options: { maintainAspectRatio: false, plugins: { legend: { display: chartMode === 'compare' } }, scales: { y: { beginAtZero: true } } }
             });
         }
 
@@ -223,7 +237,22 @@
                 </div>`;
             });
         }
-        function toggleT(d, i) { tDB[d][i].done = !taskDB[d][i].done; refresh(); }
+        function toggleT(d, i) { tDB[d][i].done = !tDB[d][i].done; refresh(); }
+
+        function addS() {
+            const d = document.getElementById('mainDate').value; 
+            const h = parseFloat(document.getElementById('sHr').value);
+            if(!h) return;
+            if(!sDB[d]) sDB[d] = [];
+            sDB[d].push({subject: document.getElementById('sSub').value, hours: h});
+            document.getElementById('sHr').value = ''; 
+            refresh();
+        }
+
+        function renderS(d) {
+            const l = document.getElementById('sLog'); l.innerHTML = '';
+            (sDB[d] || []).forEach(s => l.innerHTML += `<div class="list-item"><b>${s.subject}</b>: ${s.hours}h</div>`);
+        }
 
         function addL() {
             const t = document.getElementById('lTitle').value; const u = document.getElementById('lUrl').value;

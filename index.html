@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIPON'S LIFE | Fixed Pro</title>
+    <title>SHIPON'S LIFE | 5-Year Mastery</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -41,8 +41,6 @@
 
     <style>
         :root { --p: #6366f1; --s: #10b981; --bg: #0f172a; --surface: #1e293b; --text: #f8fafc; }
-        .light-mode { --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; }
-
         body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 100px; transition: 0.3s; }
         
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--surface); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
@@ -58,24 +56,19 @@
         .home-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         #mainDate { background: transparent; color: var(--p); border: 1px solid var(--p); padding: 8px 12px; border-radius: 12px; font-weight: 700; font-family: inherit; }
 
-        /* THE MOTIVATION LINE: Only appears when checked */
         .motivation-line { text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--s); opacity: 0.5; font-weight: 800; }
 
         button { width: 100%; padding: 18px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; transition: 0.2s; }
         input, select { width: 100%; padding: 16px; border-radius: 14px; border: 1px solid rgba(128,128,128,0.2); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; box-sizing: border-box; }
         
-        .chip-group { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; }
-        .chip { padding: 8px 18px; border-radius: 12px; background: rgba(128,128,128,0.1); font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
-        .chip.active { background: var(--p); color: white; }
-
         .list-item { display: flex; align-items: center; padding: 16px; background: rgba(128,128,128,0.05); border-radius: 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.03); }
+        .comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
     </style>
 </head>
 <body class="dark-mode">
 
     <div class="header">
         <h1 style="margin:0; font-weight:800; letter-spacing: -1.5px;">SHIPON'S LIFE</h1>
-        <div onclick="toggleMode()" style="cursor:pointer; font-size:1.2rem;">🌗</div>
     </div>
 
     <div id="homeP" class="page active-page">
@@ -90,15 +83,15 @@
         <button onclick="backupToCloud()" style="background:var(--s)">SYNC TO CLOUD</button>
     </div>
 
-    <div id="statsP" class="page">
-        <div class="chip-group">
-            <div class="chip active" onclick="setChart('day', this)">Daily</div>
-            <div class="chip" onclick="setChart('week', this)">Weekly</div>
-            <div class="chip" onclick="setChart('month', this)">Monthly</div>
-            <div class="chip" onclick="setChart('year', this)">Yearly</div>
-            <div class="chip" onclick="setChart('compare', this)" style="border: 1px solid var(--s);">Date-wise Comparison</div>
+    <div id="compareP" class="page">
+        <h1>Custom Comparison</h1>
+        <div class="m3-card">
+            <div class="comp-grid">
+                <div><small>Date A</small><input type="date" id="dateA" onchange="updateCompare()"></div>
+                <div><small>Date B</small><input type="date" id="dateB" onchange="updateCompare()"></div>
+            </div>
         </div>
-        <div class="m3-card" style="height: 350px;"><canvas id="mainChart"></canvas></div>
+        <div class="m3-card" style="height: 350px;"><canvas id="compChart"></canvas></div>
     </div>
 
     <div id="tasksP" class="page">
@@ -111,12 +104,12 @@
 
     <div id="studyP" class="page">
         <div class="m3-card">
-            <select id="sSub">
-                <option>English (IELTS)</option>
-                <option>Digital Marketing</option>
-            </select>
-            <input type="number" id="sHr" placeholder="Log Study Hours (e.g. 1.5)" step="0.5">
-            <button onclick="addS()">SAVE HOURS</button>
+            <select id="sSub"></select>
+            <input type="number" id="sHr" placeholder="Hours (e.g. 2.0)" step="0.5">
+            <button onclick="addS()">LOG HOURS</button>
+            <hr style="opacity: 0.1; margin: 20px 0;">
+            <input type="text" id="newSub" placeholder="New Subject Name...">
+            <button onclick="addNewSub()" style="background:#475569">+ ADD SUBJECT</button>
         </div>
         <div id="sLog"></div>
     </div>
@@ -132,7 +125,7 @@
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="nav('homeP', this)">Home</div>
-        <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
+        <div class="nav-item" onclick="nav('compareP', this)">Compare</div>
         <div class="nav-item" onclick="nav('tasksP', this)">Tasks</div>
         <div class="nav-item" onclick="nav('studyP', this)">Study</div>
         <div class="nav-item" onclick="nav('vaultP', this)">Vault</div>
@@ -142,7 +135,7 @@
         let tDB = JSON.parse(localStorage.getItem('s_t')) || {};
         let sDB = JSON.parse(localStorage.getItem('s_s')) || {};
         let lDB = JSON.parse(localStorage.getItem('s_l')) || [];
-        let chartMode = 'day';
+        let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English (IELTS)", "Digital Marketing"];
 
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
@@ -152,73 +145,63 @@
             refresh();
         }
 
-        function toggleMode() { document.body.classList.toggle('light-mode'); }
-
         function refresh() {
             const date = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
             let tL = 0; 
             Object.values(sDB).forEach(day => day.forEach(s => tL += s.hours));
             document.getElementById('lifeH').innerText = tL.toFixed(1) + "h";
 
+            const sel = document.getElementById('sSub'); sel.innerHTML = '';
+            subs.forEach(s => sel.innerHTML += `<option>${s}</option>`);
+
             renderT(date); 
             renderS(date);
             renderL(); 
-            updateChart();
+            updateCompare();
             
             localStorage.setItem('s_t', JSON.stringify(tDB));
             localStorage.setItem('s_s', JSON.stringify(sDB));
             localStorage.setItem('s_l', JSON.stringify(lDB));
+            localStorage.setItem('s_subs', JSON.stringify(subs));
         }
 
-        function setChart(m, el) {
-            chartMode = m;
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            updateChart();
+        function addNewSub() {
+            const v = document.getElementById('newSub').value;
+            if(v && !subs.includes(v)) { subs.push(v); document.getElementById('newSub').value=''; refresh(); }
         }
 
-        function updateChart() {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            let labels = [], data = [], data2 = [];
+        function addS() {
+            const d = document.getElementById('mainDate').value; 
+            const h = parseFloat(document.getElementById('sHr').value);
+            const sub = document.getElementById('sSub').value;
+            if(!h) return;
+            if(!sDB[d]) sDB[d] = [];
+
+            // Logic: Merge hours if subject already exists for this day
+            const existing = sDB[d].find(s => s.subject === sub);
+            if(existing) { existing.hours += h; } 
+            else { sDB[d].push({subject: sub, hours: h}); }
+
+            document.getElementById('sHr').value = ''; 
+            refresh();
+        }
+
+        function updateCompare() {
+            const dA = document.getElementById('dateA').value;
+            const dB = document.getElementById('dateB').value;
+            const ctx = document.getElementById('compChart').getContext('2d');
             
-            if(chartMode === 'compare') {
-                // Fixed Date-wise Comparison Logic
-                for(let i=6; i>=0; i--) {
-                    const d1 = new Date(); d1.setDate(d1.getDate()-i);
-                    const d2 = new Date(); d2.setDate(d2.getDate()-(i+7));
-                    const s1 = d1.toISOString().split('T')[0];
-                    const s2 = d2.toISOString().split('T')[0];
-                    
-                    labels.push(d1.toLocaleDateString([],{month:'short', day:'numeric'}));
-                    let h1 = 0; (sDB[s1]||[]).forEach(x => h1+=x.hours);
-                    let h2 = 0; (sDB[s2]||[]).forEach(x => h2+=x.hours);
-                    data.push(h1);
-                    data2.push(h2);
-                }
-            } else {
-                let count = chartMode === 'day' ? 7 : chartMode === 'week' ? 4 : chartMode === 'month' ? 12 : 5;
-                for(let i=count-1; i>=0; i--) {
-                    const d = new Date();
-                    if(chartMode === 'day') d.setDate(d.getDate()-i);
-                    if(chartMode === 'year') d.setFullYear(d.getFullYear()-i);
-                    const s = d.toISOString().split('T')[0];
-                    labels.push(chartMode === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : d.getFullYear());
-                    let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
-                    data.push(h);
-                }
-            }
+            let hA = 0; if(dA) (sDB[dA]||[]).forEach(s => hA += s.hours);
+            let hB = 0; if(dB) (sDB[dB]||[]).forEach(s => hB += s.hours);
 
-            if(window.chartO) window.chartO.destroy();
-            window.chartO = new Chart(ctx, {
-                type: chartMode === 'compare' ? 'line' : 'bar',
-                data: { 
-                    labels, 
-                    datasets: [
-                        { label: 'Current Week', data, backgroundColor: '#6366f1', borderColor: '#6366f1', tension: 0.4 },
-                        ...(chartMode === 'compare' ? [{ label: 'Previous Week', data: data2, borderColor: '#94a3b8', borderDash: [5, 5], tension: 0.4 }] : [])
-                    ]
+            if(window.compO) window.compO.destroy();
+            window.compO = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [dA || 'Date A', dB || 'Date B'],
+                    datasets: [{ label: 'Study Hours', data: [hA, hB], backgroundColor: ['#6366f1', '#10b981'] }]
                 },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: chartMode === 'compare' } }, scales: { y: { beginAtZero: true } } }
+                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
             });
         }
 
@@ -238,16 +221,6 @@
             });
         }
         function toggleT(d, i) { tDB[d][i].done = !tDB[d][i].done; refresh(); }
-
-        function addS() {
-            const d = document.getElementById('mainDate').value; 
-            const h = parseFloat(document.getElementById('sHr').value);
-            if(!h) return;
-            if(!sDB[d]) sDB[d] = [];
-            sDB[d].push({subject: document.getElementById('sSub').value, hours: h});
-            document.getElementById('sHr').value = ''; 
-            refresh();
-        }
 
         function renderS(d) {
             const l = document.getElementById('sLog'); l.innerHTML = '';

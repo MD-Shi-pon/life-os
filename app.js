@@ -85,7 +85,7 @@ window.refresh = function() {
     renderT(tDate, tDB); 
     renderS(studyDate, sDB); 
     renderLog(logDate, dLogDB);
-    window.updateChart('weekly'); // Default view
+    window.updateChart('weekly'); 
 };
 
 // ================= STATS ENGINE (NEW) =================
@@ -99,7 +99,8 @@ window.updateChart = (type) => {
     for(let i = count - 1; i >= 0; i--) {
         const d = new Date(); d.setDate(d.getDate() - i);
         const s = d.toISOString().split('T')[0];
-        labels.push(count > 30 ? d.toLocaleDateString([],{month:'short'}) : d.toLocaleDateString([],{day:'numeric', month:'short'}));
+        if(type === 'daily') labels.push(new Date().toLocaleTimeString([], {hour:'2-digit'}));
+        else labels.push(d.toLocaleDateString([],{day:'numeric', month:'short'}));
         let h = 0; (sDB[s] || []).forEach(x => h += parseFloat(x.hours || 0));
         data.push(h);
     }
@@ -144,17 +145,14 @@ window.addT = () => {
     let d = document.getElementById('taskDate').value, v = document.getElementById('tIn').value;
     if(!v) return; 
     let db = JSON.parse(localStorage.getItem('s_t')) || {};
-    if(!db[d]) db[d] = []; 
-    db[d].push({text: v, done: false});
-    localStorage.setItem('s_t', JSON.stringify(db)); 
-    window.syncData(d); 
-    document.getElementById('tIn').value='';
+    if(!db[d]) db[d] = []; db[d].push({text: v, done: false});
+    localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d); document.getElementById('tIn').value='';
     window.refresh();
 };
 function renderT(d, db) {
-    const l = document.getElementById('tList'); l.innerHTML = '';
+    const l = document.getElementById('tList'); if(!l) return; l.innerHTML = '';
     (db[d] || []).forEach((t, i) => { 
-        l.innerHTML += `<div class="list-item"><input type="checkbox" ${t.done?'checked':''} onchange="window.toggleT('${d}',${i})"><span class="item-label ${t.done?'motivation-line':''}">${t.text}</span><span onclick="window.delT('${d}',${i})" class="del-btn">DEL</span></div>`; 
+        l.innerHTML += `<div class="list-item"><input type="checkbox" ${t.done?'checked':''} onchange="window.toggleT('${d}',${i})" style="width:20px; height:20px; accent-color:var(--s);"><span class="item-label ${t.done?'motivation-line':''}">${t.text}</span><span onclick="window.delT('${d}',${i})" class="del-btn">DEL</span></div>`; 
     });
 }
 window.toggleT = (d, i) => { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d); window.refresh(); };
@@ -165,8 +163,7 @@ window.addLog = () => {
     let d = document.getElementById('todayDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
     if (!s || !e || !a) return; 
     let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
-    if (!db[d]) db[d] = []; 
-    db[d].push({start: s, end: e, act: a});
+    if (!db[d]) db[d] = []; db[d].push({start: s, end: e, act: a});
     localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d); 
     document.getElementById('logAct').value = ''; window.refresh();
 };
@@ -185,6 +182,7 @@ window.addS = () => {
     if(!h) return; let db = JSON.parse(localStorage.getItem('s_s')) || {};
     if(!db[d]) db[d] = []; db[d].push({ subject: sub, hours: h, time: time });
     localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(d); document.getElementById('sHr').value = '';
+    window.refresh();
 };
 function renderS(d, db) {
     const l = document.getElementById('sLog'); if(!l) return; l.innerHTML = '';

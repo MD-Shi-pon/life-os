@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHIPON's Life | Pro Analytics</title>
+    <title>SHIPON's Life | Elite Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -34,7 +34,7 @@
           };
           try {
               await setDoc(doc(db, "users", "shipon", "history", date), data);
-              alert("🚀 Data Securely Synced");
+              alert("🚀 SHIPON'S Data Synced to Cloud");
           } catch (e) { alert("Sync Error: " + e.message); }
       };
     </script>
@@ -42,87 +42,86 @@
     <style>
         :root { 
             --p: #6366f1; --s: #10b981; --a: #f59e0b; 
-            --bg: #020617; --card: rgba(15, 23, 42, 0.8); --text: #f8fafc;
+            --bg: #020617; --card: rgba(15, 23, 42, 0.9); --text: #f8fafc;
             --border: rgba(255, 255, 255, 0.1);
         }
         .light-mode { 
-            --bg: #f8fafc; --card: rgba(255, 255, 255, 0.9); --text: #0f172a;
+            --bg: #f8fafc; --card: rgba(255, 255, 255, 0.95); --text: #0f172a;
             --border: rgba(15, 23, 42, 0.1);
         }
 
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); 
-            min-height: 100vh; transition: 0.3s; padding-top: 80px;
+            min-height: 100vh; transition: 0.3s; padding-bottom: 20px;
         }
 
-        /* Pro Navigation Header */
-        header {
-            position: fixed; top: 0; width: 100%; height: 70px; background: var(--card);
-            backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 5%; box-sizing: border-box; z-index: 2000;
+        /* Pro Navigation Sidebar */
+        .sidebar {
+            position: fixed; left: -260px; top: 0; height: 100%; width: 250px; 
+            background: var(--card); backdrop-filter: blur(25px); border-right: 1px solid var(--border);
+            transition: 0.3s ease; z-index: 2000; padding-top: 80px;
         }
-        .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -1px; color: var(--p); }
-        .nav-group { display: flex; gap: 20px; }
-        .nav-btn { cursor: pointer; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; transition: 0.2s; }
-        .nav-btn.active { color: var(--text); border-bottom: 2px solid var(--p); padding-bottom: 5px; }
+        .sidebar.open { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
+        .nav-item { padding: 20px 30px; font-weight: 800; cursor: pointer; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-item.active { color: var(--text); background: rgba(99, 102, 241, 0.1); border-left: 5px solid var(--p); }
+        
+        .menu-toggle { position: fixed; top: 25px; left: 25px; z-index: 2100; font-size: 1.4rem; cursor: pointer; color: var(--p); font-weight: 900; }
+        .theme-btn { position: fixed; top: 22px; right: 25px; z-index: 2100; background: var(--p); color: white; border: none; padding: 10px 15px; border-radius: 12px; font-weight: 800; font-size: 0.7rem; cursor: pointer; }
 
-        .page { display: none; padding: 20px; max-width: 600px; margin: 0 auto; animation: fadeIn 0.4s ease; }
+        .page { display: none; padding: 100px 20px 40px; max-width: 550px; margin: 0 auto; animation: slideUp 0.4s ease; }
         .active-page { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .glass-card { background: var(--card); border-radius: 24px; padding: 25px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .glass-card { background: var(--card); border-radius: 30px; padding: 25px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
         
-        /* Motivational Strikethrough */
-        .completed-text { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--s); opacity: 0.5; font-style: italic; transition: 0.3s; }
+        /* Motivational Logic */
+        .strike { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--s); opacity: 0.4; filter: grayscale(1); }
 
-        .btn-p { background: var(--p); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; width: 100%; cursor: pointer; }
-        input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; outline: none; }
+        button { width: 100%; padding: 18px; margin: 10px 0; border-radius: 20px; border: none; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .btn-p { background: var(--p); color: white; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); }
+        input, select { width: 100%; padding: 16px; border-radius: 18px; border: 1px solid var(--border); background: rgba(128,128,128,0.05); color: inherit; margin: 10px 0; outline: none; box-sizing: border-box; }
         
-        /* Analytics Tabs */
-        .chart-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .c-tab { flex: 1; padding: 10px; font-size: 0.65rem; font-weight: 800; border-radius: 10px; border: 1px solid var(--border); text-align: center; cursor: pointer; color: #94a3b8; }
-        .c-tab.active { background: var(--p); color: white; border: none; }
+        .timer-val { font-size: 4rem; font-weight: 900; color: var(--a); margin: 15px 0; }
+        .item { padding: 18px; background: rgba(128,128,128,0.05); border-radius: 20px; margin-bottom: 12px; display: flex; align-items: center; border: 1px solid var(--border); transition: 0.3s; }
         
-        .timer-val { font-size: 3rem; font-weight: 900; color: var(--a); margin: 10px 0; }
-        .item { padding: 15px; background: rgba(128,128,128,0.05); border-radius: 15px; margin-bottom: 10px; display: flex; align-items: center; border-left: 5px solid var(--p); }
+        /* Analytics Toggles */
+        .chart-nav { display: flex; gap: 8px; margin-bottom: 15px; background: rgba(128,128,128,0.1); padding: 5px; border-radius: 15px; }
+        .c-btn { flex: 1; padding: 10px; font-size: 0.65rem; font-weight: 800; border-radius: 10px; cursor: pointer; text-align: center; color: #94a3b8; transition: 0.3s; }
+        .c-btn.active { background: var(--p); color: white; }
     </style>
 </head>
-<body>
+<body class="dark-mode">
 
-    <header>
-        <div class="logo">SHIPON'S LIFE</div>
-        <div class="nav-group">
-            <div class="nav-btn active" onclick="nav('homeP', this)">Home</div>
-            <div class="nav-btn" onclick="nav('statsP', this)">Stats</div>
-            <div class="nav-btn" onclick="nav('tasksP', this)">Tasks</div>
-            <div class="nav-btn" onclick="nav('studyP', this)">Study</div>
-        </div>
-        <div onclick="toggleMode()" style="cursor:pointer; font-size:1.2rem;">🌗</div>
-    </header>
+    <div class="menu-toggle" onclick="toggleMenu()">MENU</div>
+    <button class="theme-btn" onclick="toggleMode()">THEME</button>
+
+    <div class="sidebar" id="sidebar">
+        <div class="nav-item active" onclick="nav('homeP', this)">Dashboard</div>
+        <div class="nav-item" onclick="nav('statsP', this)">Analytics</div>
+        <div class="nav-item" onclick="nav('tasksP', this)">Tasks</div>
+        <div class="nav-item" onclick="nav('studyP', this)">Study</div>
+        <div class="nav-item" onclick="nav('vaultP', this)">Vault</div>
+    </div>
 
     <div id="homeP" class="page active-page">
-        <div class="glass-card" style="text-align: center; border-color: var(--a);">
-            <small style="text-transform: uppercase; letter-spacing: 2px; color: var(--a); font-weight: 800;">Lifetime Mastery</small>
-            <div style="font-size: 3.5rem; font-weight: 900;" id="lifeH">0.0h</div>
+        <h1 style="font-size: 2.8rem; letter-spacing: -2px; margin-bottom: 10px;">SHIPON'S Life</h1>
+        <div class="glass-card" style="text-align: center; border: 2px solid var(--a);">
+            <small style="text-transform: uppercase; letter-spacing: 3px; color: var(--a); font-weight: 800;">Lifetime Progress</small>
+            <div style="font-size: 4.5rem; font-weight: 900;" id="lifeH">0.0h</div>
         </div>
         <div class="glass-card">
             <input type="date" id="mainDate" onchange="refresh()">
-            <button onclick="backupToCloud()" class="btn-p" style="background:var(--s)">SYNC PROGRESS</button>
-        </div>
-        <div class="glass-card">
-            <h3 style="margin-top:0">Today's Focus</h3>
-            <div id="quickList"></div>
+            <button onclick="backupToCloud()" class="btn-p" style="background:var(--s)">SYNC TO CLOUD</button>
         </div>
     </div>
 
     <div id="statsP" class="page">
-        <h1>Performance Analytics</h1>
-        <div class="chart-tabs">
-            <div class="c-tab active" onclick="changeChart('day', this)">Daily</div>
-            <div class="c-tab" onclick="changeChart('week', this)">Weekly</div>
-            <div class="c-tab" onclick="changeChart('month', this)">Monthly</div>
-            <div class="c-tab" onclick="changeChart('year', this)">Yearly</div>
+        <h1>Analytics Engine</h1>
+        <div class="chart-nav">
+            <div class="c-btn active" onclick="setChart('day', this)">Daily</div>
+            <div class="c-btn" onclick="setChart('week', this)">Weekly</div>
+            <div class="c-btn" onclick="setChart('month', this)">Monthly</div>
+            <div class="c-btn" onclick="setChart('year', this)">Yearly</div>
         </div>
         <div class="glass-card" style="height: 350px;">
             <canvas id="mainChart"></canvas>
@@ -132,48 +131,61 @@
     <div id="tasksP" class="page">
         <h1>Focus Goals</h1>
         <div class="glass-card">
-            <input type="text" id="tIn" placeholder="Enter high-priority goal...">
-            <button onclick="addT()" class="btn-p">Log Goal</button>
+            <input type="text" id="tIn" placeholder="Commit to a goal...">
+            <button onclick="addT()" class="btn-p">Add Goal</button>
         </div>
         <div id="tList"></div>
     </div>
 
     <div id="studyP" class="page">
-        <h1>Deep Study Center</h1>
+        <h1>Deep Study</h1>
         <div class="glass-card" style="text-align: center;">
-            <input type="number" id="customTime" value="25" style="width: 50px; text-align: center; background: none; color: inherit; border: none; font-weight: 800;"> min
+            <input type="number" id="customTime" value="25" style="width: 50%; text-align: center; background: none; color: inherit; border: none; font-size: 1.5rem; font-weight: 800;">
             <div class="timer-val" id="timer">25:00</div>
             <div style="display: flex; gap: 10px;">
-                <button onclick="startTimer()" style="background:var(--a); color:black; font-weight:800; border-radius:12px; padding:10px; width:100%;">START</button>
-                <button onclick="resetTimer()" style="background:#475569; color:white; border-radius:12px; padding:10px; width:100%;">RESET</button>
+                <button onclick="startTimer()" style="background:var(--a); color: black;">Start Session</button>
+                <button onclick="resetTimer()" style="background:#475569; color: white;">Reset</button>
             </div>
         </div>
         <div class="glass-card">
             <select id="sSub"></select>
             <input type="number" id="sHr" placeholder="Manual Hours" step="0.5">
-            <button onclick="addS()" class="btn-p">Complete Session</button>
-            <hr style="opacity: 0.1; margin: 15px 0;">
-            <input type="text" id="newSubIn" placeholder="New Field (e.g. Graphic Design)">
-            <button onclick="addNewSub()" style="background:#475569; font-size:0.7rem;">+ ADD FIELD</button>
+            <button onclick="addS()" class="btn-p">Log Session</button>
+            <hr style="opacity: 0.1; margin: 20px 0;">
+            <input type="text" id="newSubIn" placeholder="New Field Name...">
+            <button onclick="addNewSub()" style="background:#475569; font-size: 0.8rem;">+ Add New Subject</button>
         </div>
+        <div id="sLog"></div>
+    </div>
+
+    <div id="vaultP" class="page">
+        <h1>Resource Vault</h1>
+        <div class="glass-card">
+            <input type="text" id="lTitle" placeholder="Link Name">
+            <input type="text" id="lUrl" placeholder="URL">
+            <button onclick="addL()" style="background:var(--a); color:black">Save Link</button>
+        </div>
+        <div id="lList"></div>
     </div>
 
     <script>
         let taskDB = JSON.parse(localStorage.getItem('s_t')) || {};
         let studyDB = JSON.parse(localStorage.getItem('s_s')) || {};
+        let linkDB = JSON.parse(localStorage.getItem('s_l')) || [];
         let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English (IELTS)", "Digital Marketing"];
-        let chartType = 'day';
+        let chartMode = 'day';
         let timerInt;
+
+        function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); }
+        function toggleMode() { document.body.classList.toggle('light-mode'); }
 
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.getElementById(id).classList.add('active-page');
-            document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
-            refresh();
+            toggleMenu(); refresh();
         }
-
-        function toggleMode() { document.body.classList.toggle('light-mode'); }
 
         function refresh() {
             const date = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
@@ -183,35 +195,60 @@
             const sel = document.getElementById('sSub'); sel.innerHTML = '';
             subs.forEach(s => sel.innerHTML += `<option>${s}</option>`);
 
-            renderT(date);
-            updateCharts();
+            renderT(date); renderS(date); renderL(); updateChart();
             localStorage.setItem('s_t', JSON.stringify(taskDB));
             localStorage.setItem('s_s', JSON.stringify(studyDB));
+            localStorage.setItem('s_l', JSON.stringify(linkDB));
             localStorage.setItem('s_subs', JSON.stringify(subs));
         }
 
+        function setChart(mode, el) {
+            chartMode = mode;
+            document.querySelectorAll('.c-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            updateChart();
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            let labels = [], data = [];
+            const count = chartMode === 'day' ? 7 : chartMode === 'week' ? 4 : chartMode === 'month' ? 6 : 5;
+
+            for(let i=count-1; i>=0; i--) {
+                const d = new Date();
+                if(chartMode === 'day') d.setDate(d.getDate()-i);
+                if(chartMode === 'week') d.setDate(d.getDate()-(i*7));
+                if(chartMode === 'month') d.setMonth(d.getMonth()-i);
+                
+                const s = d.toISOString().split('T')[0];
+                labels.push(chartMode === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : s);
+                let h = 0; (studyDB[s]||[]).forEach(x => h+=x.hours);
+                data.push(h);
+            }
+
+            if(window.chartO) window.chartO.destroy();
+            window.chartO = new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 10 }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+            });
+        }
+
         function addT() {
-            const d = document.getElementById('mainDate').value;
-            const v = document.getElementById('tIn').value;
-            if(!v) return;
-            if(!taskDB[d]) taskDB[d] = [];
-            taskDB[d].push({text: v, done: false});
-            document.getElementById('tIn').value = ''; refresh();
+            const d = document.getElementById('mainDate').value; const v = document.getElementById('tIn').value;
+            if(!v) return; if(!taskDB[d]) taskDB[d] = [];
+            taskDB[d].push({text: v, done: false}); document.getElementById('tIn').value = ''; refresh();
         }
 
         function renderT(d) {
             const l = document.getElementById('tList'); l.innerHTML = '';
-            const q = document.getElementById('quickList'); q.innerHTML = '';
             (taskDB[d] || []).forEach((t, i) => {
-                const html = `<div class="item">
-                    <input type="checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
-                    <span class="${t.done?'completed-text':''}">${t.text}</span>
+                l.innerHTML += `<div class="item">
+                    <input type="checkbox" style="width:22px; height:22px;" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
+                    <span class="${t.done?'strike':''}">${t.text}</span>
                 </div>`;
-                l.innerHTML += html;
-                if(!t.done) q.innerHTML += html;
             });
         }
-
         function toggleT(d, i) { taskDB[d][i].done = !taskDB[d][i].done; refresh(); }
 
         function addNewSub() {
@@ -220,50 +257,25 @@
         }
 
         function addS() {
-            const d = document.getElementById('mainDate').value;
-            const h = parseFloat(document.getElementById('sHr').value);
-            if(!h) return;
-            if(!studyDB[d]) studyDB[d] = [];
+            const d = document.getElementById('mainDate').value; const h = parseFloat(document.getElementById('sHr').value);
+            if(!h) return; if(!studyDB[d]) studyDB[d] = [];
             studyDB[d].push({subject: document.getElementById('sSub').value, hours: h});
             document.getElementById('sHr').value = ''; refresh();
         }
-
-        function changeChart(type, el) {
-            chartType = type;
-            document.querySelectorAll('.c-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            updateCharts();
+        function renderS(d) {
+            const l = document.getElementById('sLog'); l.innerHTML = '';
+            (studyDB[d] || []).forEach(s => l.innerHTML += `<div class="item"><b>${s.subject}</b> <span>${s.hours}h</span></div>`);
         }
 
-        function updateCharts() {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            let labels = [], data = [];
-            const count = chartType === 'day' ? 7 : chartType === 'week' ? 4 : chartType === 'month' ? 12 : 5;
-
-            for(let i=count-1; i>=0; i--) {
-                const d = new Date();
-                if(chartType === 'day') d.setDate(d.getDate()-i);
-                if(chartType === 'week') d.setDate(d.getDate()-(i*7));
-                
-                const s = d.toISOString().split('T')[0];
-                labels.push(chartType === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : s);
-                
-                let h = 0;
-                if(chartType === 'day') (studyDB[s]||[]).forEach(x => h+=x.hours);
-                else {
-                    // Logic for aggregation (weekly/monthly) would go here
-                    (studyDB[s]||[]).forEach(x => h+=x.hours);
-                }
-                data.push(h);
-            }
-
-            if(window.chartO) window.chartO.destroy();
-            window.chartO = new Chart(ctx, {
-                type: 'bar',
-                data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 8 }] },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
-            });
+        function addL() {
+            const t = document.getElementById('lTitle').value; const u = document.getElementById('lUrl').value;
+            if(t && u) { linkDB.push({t, u}); document.getElementById('lTitle').value=''; document.getElementById('lUrl').value=''; refresh(); }
         }
+        function renderL() {
+            const l = document.getElementById('lList'); l.innerHTML = '';
+            linkDB.forEach((link, i) => l.innerHTML += `<div class="item"><a href="${link.u}" target="_blank" style="color:var(--s);text-decoration:none;font-weight:800;">🔗 ${link.t}</a><span onclick="delL(${i})" style="color:#ef4444;margin-left:auto;cursor:pointer;">DEL</span></div>`);
+        }
+        function delL(i) { linkDB.splice(i, 1); refresh(); }
 
         function startTimer() {
             clearInterval(timerInt);
@@ -274,7 +286,6 @@
                 if(t-- <= 0) { clearInterval(timerInt); new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play(); alert("Focus Done!"); }
             }, 1000);
         }
-
         function resetTimer() { clearInterval(timerInt); document.getElementById('timer').innerText = "25:00"; }
 
         document.getElementById('mainDate').valueAsDate = new Date();

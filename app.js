@@ -13,16 +13,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ================= GLOBAL EXPORTS =================
+// --- GLOBAL EXPORTS (Ensures HTML can see the functions) ---
 window.toggleTheme = () => document.body.classList.toggle('light-mode');
+const f12 = (t) => { if(!t) return ""; let [h, m] = t.split(':'); let a = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return `${h}:${m} ${a}`; };
 
-const f12 = (t) => {
-    if(!t) return ""; let [h, m] = t.split(':');
-    let a = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
-    return `${h}:${m} ${a}`;
-};
-
-// ================= CLOUD SYNC =================
+// --- SYNC ---
 window.syncData = async (date) => {
     const payload = {
         tasks: JSON.parse(localStorage.getItem('s_t'))?.[date] || [],
@@ -30,8 +25,7 @@ window.syncData = async (date) => {
         dayLog: JSON.parse(localStorage.getItem('s_dayLog'))?.[date] || [],
         subs: JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"]
     };
-    try { await setDoc(doc(db, "global_master", "history", "dates", date), payload); } 
-    catch (e) { console.error("Cloud Error", e); }
+    await setDoc(doc(db, "global_master", "history", "dates", date), payload);
 };
 
 onSnapshot(collection(db, "global_master", "history", "dates"), (snap) => {
@@ -48,7 +42,7 @@ onSnapshot(collection(db, "global_master", "history", "dates"), (snap) => {
     window.refresh();
 });
 
-// ================= NAVIGATION =================
+// --- NAVIGATION ---
 window.nav = (id, el) => {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
     document.getElementById(id).classList.add('active-page');
@@ -63,7 +57,7 @@ window.switchStudyTab = (view) => {
     document.getElementById('tabManage').style.background = view === 'manage' ? 'var(--s)' : '#475569';
 };
 
-// ================= REFRESH ENGINE =================
+// --- REFRESH ENGINE ---
 window.refresh = () => {
     const d = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
     const sDB = JSON.parse(localStorage.getItem('s_s')) || {}, tDB = JSON.parse(localStorage.getItem('s_t')) || {};
@@ -85,8 +79,7 @@ window.refresh = () => {
     renderSubManage(subs);
 };
 
-// ================= MODULES =================
-
+// --- SUBJECT MANAGEMENT (THE FIX) ---
 window.addNewSubject = () => {
     const v = document.getElementById('newSubIn').value.trim();
     let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"];
@@ -94,8 +87,8 @@ window.addNewSubject = () => {
         subs.push(v);
         localStorage.setItem('s_subs', JSON.stringify(subs));
         document.getElementById('newSubIn').value = '';
-        window.syncData(new Date().toISOString().split('T')[0]);
-        window.refresh();
+        window.syncData(new Date().toISOString().split('T')[0]); // Push change to Cloud
+        window.refresh(); // Update the Log dropdown immediately
     }
 };
 
@@ -114,6 +107,7 @@ const renderSubManage = (subs) => {
     });
 };
 
+// --- REST OF MODULES ---
 window.addStudyEntry = () => {
     const d = document.getElementById('studyDate').value, h = parseFloat(document.getElementById('sHr').value), sub = document.getElementById('sSub').value;
     if(!h || !sub) return; let db = JSON.parse(localStorage.getItem('s_s')) || {};
@@ -158,7 +152,7 @@ const renderLog = (d, db) => {
 };
 window.delRoutineLog = (d, i) => { let db = JSON.parse(localStorage.getItem('s_dayLog')); db[d].splice(i, 1); localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d); window.refresh(); };
 
-// INITIALIZE
+// --- INITIALIZE ---
 const now = new Date().toISOString().split('T')[0];
 ['taskDate', 'todayDate', 'mainDate', 'studyDate'].forEach(id => document.getElementById(id).value = now);
 window.refresh();

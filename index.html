@@ -13,7 +13,6 @@
     <div class="theme-toggle" onclick="window.toggleTheme()">🌗</div>
 
     <main id="app-container">
-
         <section id="homeP" class="page active-page">
             <h1 class="glitch-text">LIFE OS</h1>
             <div class="glass-card main-stat">
@@ -33,15 +32,11 @@
                 <button onclick="window.updateChart('daily')">DAY</button>
                 <button onclick="window.updateChart('weekly')">WEEK</button>
                 <button onclick="window.updateChart('monthly')">MONTH</button>
-                <button onclick="window.updateChart('yearly')">YEAR</button>
             </div>
             <div class="glass-card chart-container"><canvas id="mainChart"></canvas></div>
             <div class="comparison-grid">
                 <button class="btn-p" onclick="window.compareSubjects()">📊 SUBJECT SPLIT</button>
-                <div class="glass-card date-comp">
-                    <div class="input-row"><input type="date" id="cDate1"><input type="date" id="cDate2"></div>
-                    <button class="btn-s" onclick="window.compareDates()">COMPARE DATES</button>
-                </div>
+                <button class="btn-s" onclick="window.compareDates()">COMPARE DATES</button>
             </div>
         </section>
 
@@ -86,11 +81,10 @@
                     <input type="text" id="newSubIn" placeholder="New Career Field...">
                     <button class="btn-s" onclick="window.addNewSub()">+ CREATE SUBJECT</button>
                 </div>
-                <h3 class="section-title">Current Fields</h3>
+                <h3 class="section-title">Career Mastery Fields</h3>
                 <div id="subManageList" class="scroll-list"></div>
             </div>
         </section>
-
     </main>
 
     <nav class="bottom-nav">

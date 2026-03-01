@@ -66,19 +66,29 @@
 
         <section id="studyP" class="page">
             <div class="header-row"><h1>Study</h1><input type="date" id="studyDate" onchange="window.refresh()"></div>
-            <div class="glass-card input-group">
-                <select id="sSub"></select>
-                <input type="number" id="sHr" placeholder="Hours" step="0.5">
-                <button onclick="window.addS()">SAVE PROGRESS</button>
-            </div>
-            <div id="sLog" class="scroll-list"></div>
             
-            <h2 class="section-title">Career Fields</h2>
-            <div class="glass-card input-group">
-                <input type="text" id="newSubIn" placeholder="New Field (e.g. English)">
-                <button class="btn-s" onclick="window.addNewSub()">+ ADD SUBJECT</button>
+            <div class="sub-nav-bar">
+                <button id="btnViewLog" onclick="window.setStudyView('log')" class="sub-nav-item active">LOG HOURS</button>
+                <button id="btnViewManage" onclick="window.setStudyView('manage')" class="sub-nav-item">MANAGE FIELDS</button>
             </div>
-            <div id="subManageList" class="scroll-list"></div>
+
+            <div id="studyViewLog">
+                <div class="glass-card input-group">
+                    <select id="sSub"></select>
+                    <input type="number" id="sHr" placeholder="Duration (Hours)" step="0.5">
+                    <button onclick="window.addS()">SAVE PROGRESS</button>
+                </div>
+                <div id="sLog" class="scroll-list"></div>
+            </div>
+
+            <div id="studyViewManage" style="display:none;">
+                <div class="glass-card input-group">
+                    <input type="text" id="newSubIn" placeholder="New Career Field...">
+                    <button class="btn-s" onclick="window.addNewSub()">+ CREATE SUBJECT</button>
+                </div>
+                <h3 class="section-title">Current Fields</h3>
+                <div id="subManageList" class="scroll-list"></div>
+            </div>
         </section>
 
     </main>

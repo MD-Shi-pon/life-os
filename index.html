@@ -12,84 +12,79 @@
 
     <div class="theme-toggle" onclick="window.toggleTheme()">🌗</div>
 
-    <main id="app-container">
+    <main id="app-container" style="padding: 20px; padding-bottom: 90px;">
+
         <section id="homeP" class="page active-page">
-            <h1 class="glitch-text">LIFE OS</h1>
-            <div class="glass-card main-stat">
-                <small id="homeDay"></small>
-                <div class="big-hour" id="lifeH">0.0</div>
-                <p>TOTAL MASTERY HOURS</p>
+            <h1 style="font-weight:900; letter-spacing:-2px;">LIFE OS</h1>
+            <div class="glass-card" style="text-align:center; border-left: 5px solid var(--p);">
+                <small id="homeDay" style="text-transform:uppercase; font-weight:800; color:var(--p);"></small>
+                <div style="font-size:4rem; font-weight:900;" id="lifeH">0.0</div>
+                <p style="opacity:0.6; font-size:0.8rem; font-weight:700;">TOTAL MASTERY HOURS</p>
             </div>
-            <div class="glass-card">
-                <input type="date" id="mainDate" onchange="window.refresh()">
-                <button class="btn-sync" onclick="window.syncCurrent()">🔄 FORCE CLOUD SYNC</button>
-            </div>
+            <input type="date" id="mainDate" onchange="window.refresh()">
         </section>
 
-        <section id="statsP" class="page">
-            <h1>Analytics</h1>
-            <div class="filter-row">
-                <button onclick="window.updateChart('daily')">DAY</button>
-                <button onclick="window.updateChart('weekly')">WEEK</button>
-                <button onclick="window.updateChart('monthly')">MONTH</button>
+        <section id="studyP" class="page">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h1>Study</h1>
+                <input type="date" id="studyDate" onchange="window.refresh()" style="width:auto; background:var(--p); border:none; padding:5px 10px; border-radius:8px; color:white;">
             </div>
-            <div class="glass-card chart-container"><canvas id="mainChart"></canvas></div>
-            <div class="comparison-grid">
-                <button class="btn-p" onclick="window.compareSubjects()">📊 SUBJECT SPLIT</button>
-                <button class="btn-s" onclick="window.compareDates()">COMPARE DATES</button>
+
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <button id="tabLog" onclick="window.switchStudyTab('log')" style="flex:1; font-size:0.7rem;">LOG HOURS</button>
+                <button id="tabManage" onclick="window.switchStudyTab('manage')" style="flex:1; font-size:0.7rem; background:#475569;">SUBJECTS</button>
+            </div>
+
+            <div id="viewLog">
+                <div class="glass-card">
+                    <select id="sSub" style="margin-bottom:10px;"></select>
+                    <input type="number" id="sHr" placeholder="Hours (e.g. 1.5)" step="0.5">
+                    <button onclick="window.addStudyEntry()" style="background:var(--p);">SAVE PROGRESS</button>
+                </div>
+                <div id="sLog"></div>
+            </div>
+
+            <div id="viewManage" style="display:none;">
+                <div class="glass-card">
+                    <input type="text" id="newSubIn" placeholder="New Field (e.g. English)">
+                    <button onclick="window.addNewSubject()" style="background:var(--s);">+ ADD TO LIST</button>
+                </div>
+                <h3 style="font-size:0.9rem; opacity:0.6; margin-bottom:10px;">EXISTING FIELDS</h3>
+                <div id="subManageList"></div>
             </div>
         </section>
 
         <section id="tasksP" class="page">
-            <div class="header-row"><h1>Mission</h1><input type="date" id="taskDate" onchange="window.refresh()"></div>
-            <div class="glass-card input-group">
-                <input type="text" id="tIn" placeholder="Enter objective...">
-                <button onclick="window.addT()">ADD MISSION</button>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h1>Mission</h1>
+                <input type="date" id="taskDate" onchange="window.refresh()" style="width:auto; background:var(--s); border:none; padding:5px 10px; border-radius:8px; color:white;">
             </div>
-            <div id="tList" class="scroll-list"></div>
+            <div class="glass-card">
+                <input type="text" id="tIn" placeholder="New Objective...">
+                <button onclick="window.addTask()" style="background:var(--s);">ADD MISSION</button>
+            </div>
+            <div id="tList"></div>
         </section>
 
         <section id="dayLogP" class="page">
-            <div class="header-row"><h1>Today</h1><input type="date" id="todayDate" onchange="window.refresh()"></div>
-            <div class="glass-card input-group">
-                <div class="time-row"><input type="time" id="startTime"><input type="time" id="endTime"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h1>Today</h1>
+                <input type="date" id="todayDate" onchange="window.refresh()" style="width:auto; background:var(--p); border:none; padding:5px 10px; border-radius:8px; color:white;">
+            </div>
+            <div class="glass-card">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <input type="time" id="startTime"><input type="time" id="endTime">
+                </div>
                 <input type="text" id="logAct" placeholder="What are you doing?">
-                <button onclick="window.addLog()">LOG ROUTINE</button>
+                <button onclick="window.addRoutineLog()">LOG ROUTINE</button>
             </div>
-            <div id="logList" class="scroll-list"></div>
+            <div id="logList"></div>
         </section>
 
-        <section id="studyP" class="page">
-            <div class="header-row"><h1>Study</h1><input type="date" id="studyDate" onchange="window.refresh()"></div>
-            
-            <div class="sub-nav-bar">
-                <button id="btnViewLog" onclick="window.setStudyView('log')" class="sub-nav-item active">LOG HOURS</button>
-                <button id="btnViewManage" onclick="window.setStudyView('manage')" class="sub-nav-item">MANAGE FIELDS</button>
-            </div>
-
-            <div id="studyViewLog">
-                <div class="glass-card input-group">
-                    <select id="sSub"></select>
-                    <input type="number" id="sHr" placeholder="Duration (Hours)" step="0.5">
-                    <button onclick="window.addS()">SAVE PROGRESS</button>
-                </div>
-                <div id="sLog" class="scroll-list"></div>
-            </div>
-
-            <div id="studyViewManage" style="display:none;">
-                <div class="glass-card input-group">
-                    <input type="text" id="newSubIn" placeholder="New Career Field...">
-                    <button class="btn-s" onclick="window.addNewSub()">+ CREATE SUBJECT</button>
-                </div>
-                <h3 class="section-title">Career Mastery Fields</h3>
-                <div id="subManageList" class="scroll-list"></div>
-            </div>
-        </section>
     </main>
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="window.nav('homeP', this)">Home</div>
-        <div class="nav-item" onclick="window.nav('statsP', this)">Stats</div>
         <div class="nav-item" onclick="window.nav('tasksP', this)">Tasks</div>
         <div class="nav-item" onclick="window.nav('dayLogP', this)">Today</div>
         <div class="nav-item" onclick="window.nav('studyP', this)">Study</div>

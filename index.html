@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIPON'S LIFE | Auto-Sync</title>
+    <title>SHIPON'S LIFE | Private Account</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
       import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyAskdYkHhoxKH52icAEeqYaq2XRrmCcdBs",
@@ -23,10 +24,35 @@
 
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+      const auth = getAuth(app);
+      const provider = new GoogleAuthProvider();
 
-      // SILENT AUTO-SYNC LOGIC
+      let currentUser = null;
+
+      // 1. AUTH LOGIC
+      window.login = () => signInWithPopup(auth, provider);
+      window.logout = () => signOut(auth);
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          currentUser = user;
+          document.getElementById('authScreen').style.display = 'none';
+          document.getElementById('appContent').style.display = 'block';
+          document.getElementById('userName').innerText = user.displayName;
+          syncToCloud(true); // Auto-sync on login
+        } else {
+          currentUser = null;
+          document.getElementById('authScreen').style.display = 'flex';
+          document.getElementById('appContent').style.display = 'none';
+        }
+      });
+
+      // 2. UNIVERSAL SYNC
       window.syncToCloud = async (silent = false) => {
+          if (!currentUser) return;
           const date = document.getElementById('mainDate').value;
+          const userPath = `users/${currentUser.uid}/history`;
+          
           const localData = {
               tasks: JSON.parse(localStorage.getItem('s_t'))?.[date] || [],
               study: JSON.parse(localStorage.getItem('s_s'))?.[date] || [],
@@ -35,11 +61,8 @@
           };
           
           try {
-              // 1. Push current state
-              await setDoc(doc(db, "users", "shipon", "history", date), localData);
-              
-              // 2. Pull global state to merge devices
-              const snap = await getDocs(collection(db, "users", "shipon", "history"));
+              await setDoc(doc(db, userPath, date), localData);
+              const snap = await getDocs(collection(db, userPath));
               let s_s = {}, s_t = {}, s_d = {};
               snap.forEach(d => {
                   const data = d.data();
@@ -53,112 +76,117 @@
               localStorage.setItem('s_dayLog', JSON.stringify(s_d));
               
               window.refresh();
-              if(!silent) alert("🚀 Devices Synchronized!");
-          } catch (e) { console.error("Sync Failed", e); }
+              if(!silent) alert("🚀 Account Synced!");
+          } catch (e) { console.error("Sync Error", e); }
       };
     </script>
 
     <style>
         :root { --p: #6366f1; --s: #10b981; --bg: #0f172a; --surface: #1e293b; --text: #f8fafc; --border: rgba(255, 255, 255, 0.1); }
         body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; }
+        
+        /* Auth Screen */
+        #authScreen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; padding: 20px; text-align: center; }
+        
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--surface); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-item { flex: 1; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
         .nav-item.active { color: var(--p); }
+
         .header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
         .page { display: none; padding: 0 20px; animation: fadeInUp 0.4s ease; }
         .active-page { display: block; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .m3-card { background: var(--surface); border-radius: 28px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        .motivation-line { text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--s); opacity: 0.4; font-weight: 800; }
+
+        .m3-card { background: var(--surface); border-radius: 28px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); }
         input, select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid var(--border); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; box-sizing: border-box; font-family: inherit; }
         button { width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; transition: 0.2s; }
         .list-item { display: flex; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 20px; margin-bottom: 10px; border: 1px solid var(--border); }
-        .del-btn { color: #ef4444; font-size: 0.7rem; font-weight: 800; cursor: pointer; margin-left: auto; }
+        .motivation-line { text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--s); opacity: 0.4; font-weight: 800; }
     </style>
 </head>
-<body class="dark-mode">
+<body>
 
-    <div class="header">
-        <h1 style="margin:0; font-weight:800; letter-spacing: -2px;">SHIPON'S LIFE</h1>
+    <div id="authScreen">
+        <h1 style="font-size: 2.5rem; letter-spacing: -2px;">SHIPON'S LIFE</h1>
+        <p style="opacity:0.7; margin-bottom: 30px;">Login to sync your laptop and phone</p>
+        <button onclick="login()" style="max-width: 300px; background: white; color: black;">Sign in with Google</button>
     </div>
 
-    <div id="homeP" class="page active-page">
-        <div class="m3-card" style="text-align: center; border-bottom: 5px solid var(--p);">
-            <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.7; font-weight: 800;">Universal Lifetime Mastery</small>
-            <div style="font-size: 4.5rem; font-weight: 900;" id="lifeH">0.0</div>
+    <div id="appContent" style="display:none;">
+        <div class="header">
+            <h1 style="margin:0; font-weight:800; font-size: 1.2rem;">SHIPON'S LIFE</h1>
+            <span id="userName" style="font-size: 0.7rem; font-weight: 800; opacity: 0.6;"></span>
         </div>
-        <div class="m3-card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-weight: 800; opacity: 0.7;">Active Date</span>
-                <input type="date" id="mainDate" onchange="window.refresh()" style="width: auto; border:none; color:var(--p); font-weight:800;">
+
+        <div id="homeP" class="page active-page">
+            <div class="m3-card" style="text-align: center; border-bottom: 5px solid var(--p);">
+                <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.7; font-weight: 800;">Lifetime Study Hours</small>
+                <div style="font-size: 4.5rem; font-weight: 900;" id="lifeH">0.0</div>
             </div>
-            <button onclick="window.syncToCloud()" style="background:var(--s); margin-top: 15px;">FORCE CLOUD SYNC</button>
-        </div>
-    </div>
-
-    <div id="statsP" class="page">
-        <h1>Analytics</h1>
-        <div class="m3-card" style="height: 350px;"><canvas id="mainChart"></canvas></div>
-        <div class="m3-card">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <input type="date" id="dateA" onchange="updateChart()">
-                <input type="date" id="dateB" onchange="updateChart()">
+            <div class="m3-card">
+                <input type="date" id="mainDate" onchange="window.refresh()" style="border:none; color:var(--p); font-weight:800;">
+                <button onclick="window.syncToCloud()" style="background:var(--s); margin-top: 15px;">🔄 FORCE SYNC</button>
+                <button onclick="logout()" style="background:transparent; color:#ef4444; font-size:0.7rem; margin-top:10px;">Logout</button>
             </div>
-            <select id="compSub" onchange="updateChart()" style="margin-top:10px;"></select>
         </div>
-    </div>
 
-    <div id="tasksP" class="page">
-        <h1>Daily Tasks</h1>
-        <div class="m3-card">
-            <input type="text" id="tIn" placeholder="Enter task...">
-            <button onclick="addT()">ADD TASK</button>
-        </div>
-        <div id="tList"></div>
-    </div>
-
-    <div id="dayLogP" class="page">
-        <h1>24H Routine</h1>
-        <div class="m3-card">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <input type="time" id="startTime">
-                <input type="time" id="endTime">
+        <div id="statsP" class="page">
+            <div class="m3-card" style="height: 350px;"><canvas id="mainChart"></canvas></div>
+            <div class="m3-card">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <input type="date" id="dateA" onchange="updateChart()">
+                    <input type="date" id="dateB" onchange="updateChart()">
+                </div>
             </div>
-            <input type="text" id="logAct" placeholder="Activity...">
-            <button onclick="addLog()">LOG TIME</button>
         </div>
-        <div id="logList" class="m3-card"></div>
-    </div>
 
-    <div id="studyP" class="page">
-        <h1>Study Center</h1>
-        <div class="m3-card">
-            <select id="sSub"></select>
-            <input type="number" id="sHr" placeholder="Duration (Hours)" step="0.5">
-            <button onclick="addS()">SAVE PROGRESS</button>
-            <hr style="opacity: 0.1; margin: 20px 0;">
-            <input type="text" id="newSub" placeholder="New Course...">
-            <button onclick="addNewSub()" style="background:#475569">+ ADD SUBJECT</button>
+        <div id="tasksP" class="page">
+            <div class="m3-card">
+                <input type="text" id="tIn" placeholder="Enter daily task...">
+                <button onclick="addT()">ADD TASK</button>
+            </div>
+            <div id="tList"></div>
         </div>
-        <div id="sLog"></div>
-        <h3>Manage Fields</h3>
-        <div id="subManage"></div>
-    </div>
 
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="nav('homeP', this)">Home</div>
-        <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
-        <div class="nav-item" onclick="nav('tasksP', this)">Tasks</div>
-        <div class="nav-item" onclick="nav('dayLogP', this)">24H</div>
-        <div class="nav-item" onclick="nav('studyP', this)">Study</div>
-    </nav>
+        <div id="dayLogP" class="page">
+            <div class="m3-card">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <input type="time" id="startTime"><input type="time" id="endTime">
+                </div>
+                <input type="text" id="logAct" placeholder="Activity...">
+                <button onclick="addLog()">LOG TIME</button>
+            </div>
+            <div id="logList" class="m3-card"></div>
+        </div>
+
+        <div id="studyP" class="page">
+            <div class="m3-card">
+                <select id="sSub"></select>
+                <input type="number" id="sHr" placeholder="Duration (Hours)" step="0.5">
+                <button onclick="addS()">SAVE PROGRESS</button>
+                <hr style="opacity: 0.1; margin: 20px 0;">
+                <input type="text" id="newSub" placeholder="New Field...">
+                <button onclick="addNewSub()" style="background:#475569">+ ADD SUBJECT</button>
+            </div>
+            <div id="sLog"></div>
+        </div>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="nav('homeP', this)">Home</div>
+            <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
+            <div class="nav-item" onclick="nav('tasksP', this)">Tasks</div>
+            <div class="nav-item" onclick="nav('dayLogP', this)">24H</div>
+            <div class="nav-item" onclick="nav('studyP', this)">Study</div>
+        </nav>
+    </div>
 
     <script>
+        // Shared logic functions
         window.refresh = function() {
             const date = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
             const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
             const tDB = JSON.parse(localStorage.getItem('s_t')) || {};
-            const lDB = JSON.parse(localStorage.getItem('s_dayLog')) || {};
+            const dLogDB = JSON.parse(localStorage.getItem('s_dayLog')) || {};
             const subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"];
 
             let total = 0;
@@ -166,10 +194,9 @@
             document.getElementById('lifeH').innerText = total.toFixed(1);
 
             const sel = document.getElementById('sSub'); sel.innerHTML = '';
-            const cSel = document.getElementById('compSub'); cSel.innerHTML = '<option value="all">Compare All</option>';
-            subs.forEach(s => { sel.innerHTML += `<option>${s}</option>`; cSel.innerHTML += `<option>${s}</option>`; });
+            subs.forEach(s => sel.innerHTML += `<option>${s}</option>`);
 
-            renderT(date, tDB); renderS(date, sDB); renderLog(date, lDB); renderSubM(subs); updateChart(sDB);
+            renderT(date, tDB); renderS(date, sDB); renderLog(date, dLogDB); updateChart(sDB);
         };
 
         function nav(id, el) {
@@ -180,11 +207,10 @@
             window.refresh();
         }
 
-        // AUTO-SYNC TRIGGER: Used after every addition
         function triggerSync() { window.syncToCloud(true); }
 
         function addT() {
-            const d = document.getElementById('mainDate').value; const v = document.getElementById('tIn').value;
+            let d = document.getElementById('mainDate').value; let v = document.getElementById('tIn').value;
             let db = JSON.parse(localStorage.getItem('s_t')) || {};
             if(!db[d]) db[d] = []; db[d].push({text: v, done: false});
             localStorage.setItem('s_t', JSON.stringify(db)); triggerSync();
@@ -198,49 +224,40 @@
         function toggleT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); triggerSync(); }
 
         function addS() {
-            const d = document.getElementById('mainDate').value; const h = parseFloat(document.getElementById('sHr').value);
-            const sub = document.getElementById('sSub').value;
-            let db = JSON.parse(localStorage.getItem('s_s')) || {};
-            if(!db[d]) db[d] = []; let ex = db[d].find(x => x.subject === sub);
-            if(ex) ex.hours += h; else db[d].push({subject: sub, hours: h});
-            localStorage.setItem('s_s', JSON.stringify(db)); triggerSync();
+            let d = document.getElementById('mainDate').value; let h = parseFloat(document.getElementById('sHr').value);
+            let sDB = JSON.parse(localStorage.getItem('s_s')) || {}; let sub = document.getElementById('sSub').value;
+            if(!sDB[d]) sDB[d] = []; let ex = sDB[d].find(x => x.subject === sub);
+            if(ex) ex.hours += h; else sDB[d].push({subject: sub, hours: h});
+            localStorage.setItem('s_s', JSON.stringify(sDB)); triggerSync();
         }
         function renderS(d, db) {
             const l = document.getElementById('sLog'); l.innerHTML = '';
-            (db[d] || []).forEach((s, i) => l.innerHTML += `<div class="list-item"><b>${s.subject}</b>: ${s.hours}h <span onclick="delS('${d}',${i})" class="del-btn">DEL</span></div>`);
+            (db[d] || []).forEach(s => l.innerHTML += `<div class="list-item"><b>${s.subject}</b>: ${s.hours}h</div>`);
         }
-        function delS(d, i) { let db = JSON.parse(localStorage.getItem('s_s')); db[d].splice(i, 1); localStorage.setItem('s_s', JSON.stringify(db)); triggerSync(); }
 
         function addLog() {
-            const d = document.getElementById('mainDate').value; const s = document.getElementById('startTime').value;
-            const e = document.getElementById('endTime').value; const a = document.getElementById('logAct').value;
+            let d = document.getElementById('mainDate').value; let s = document.getElementById('startTime').value;
+            let e = document.getElementById('endTime').value; let a = document.getElementById('logAct').value;
             let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
             if(!db[d]) db[d] = []; db[d].push({start: s, end: e, act: a});
             localStorage.setItem('s_dayLog', JSON.stringify(db)); triggerSync();
         }
         function renderLog(d, db) {
             const l = document.getElementById('logList'); l.innerHTML = '';
-            (db[d] || []).forEach(item => l.innerHTML += `<div class="log-entry"><div style="font-weight:800; color:var(--p); min-width:90px;">${item.start}-${item.end}</div><div>${item.act}</div></div>`);
+            (db[d] || []).forEach(item => { l.innerHTML += `<div class="list-item"><b>${item.start}-${item.end}</b> <span style="margin-left:10px">${item.act}</span></div>`; });
         }
 
-        function renderSubM(subs) {
-            const l = document.getElementById('subManage'); l.innerHTML = '';
-            subs.forEach((s, i) => l.innerHTML += `<div class="list-item">${s} <span onclick="remSub(${i})" class="del-btn">REMOVE</span></div>`);
-        }
-        function remSub(i) { let subs = JSON.parse(localStorage.getItem('s_subs')); subs.splice(i, 1); localStorage.setItem('s_subs', JSON.stringify(subs)); triggerSync(); }
         function addNewSub() { const v = document.getElementById('newSub').value; let subs = JSON.parse(localStorage.getItem('s_subs')) || []; if(v && !subs.includes(v)) { subs.push(v); localStorage.setItem('s_subs', JSON.stringify(subs)); triggerSync(); } }
 
         function updateChart(sDB) {
             const ctx = document.getElementById('mainChart').getContext('2d');
             const dA = document.getElementById('dateA').value; const dB = document.getElementById('dateB').value;
-            const sub = document.getElementById('compSub').value;
             let labels = [], data = [];
             if(dA && dB) {
                 labels = [dA, dB];
-                let vA = 0, vB = 0;
-                (sDB[dA]||[]).forEach(x => { if(sub==='all' || x.subject===sub) vA += x.hours; });
-                (sDB[dB]||[]).forEach(x => { if(sub==='all' || x.subject===sub) vB += x.hours; });
-                data = [vA, vB];
+                let hA = 0; (sDB[dA]||[]).forEach(s => hA += s.hours);
+                let hB = 0; (sDB[dB]||[]).forEach(s => hB += s.hours);
+                data = [hA, hB];
             } else {
                 for(let i=6; i>=0; i--) {
                     const d = new Date(); d.setDate(d.getDate()-i);
@@ -256,8 +273,6 @@
 
         document.getElementById('mainDate').valueAsDate = new Date();
         window.refresh();
-        // Initial silent sync on load to pull from other devices
-        setTimeout(() => window.syncToCloud(true), 1000);
     </script>
 </body>
 </html>

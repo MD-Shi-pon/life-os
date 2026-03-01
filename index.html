@@ -11,7 +11,7 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
       import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-      // Your verified config from Firebase
+      // Firebase Configuration
       const firebaseConfig = {
         apiKey: "AIzaSyAskdYkHhoxKH52icAEeqYaq2XRrmCcdBs",
         authDomain: "shipon-life-os.firebaseapp.com",
@@ -56,62 +56,75 @@
         .card { background: var(--card); padding: 20px; border-radius: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
         h1 { font-weight: 800; font-size: 1.5rem; margin-bottom: 15px; }
         input, select, button { width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px; border: 1.5px solid #e2e8f0; font-size: 1rem; box-sizing: border-box; outline: none; }
-        button { background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer; }
-        .btn-sync { background: var(--success); }
+        button { background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        button:active { transform: scale(0.98); }
+        .btn-sync { background: var(--success); margin-top: 10px; }
         
         .score-display { text-align: center; background: linear-gradient(135deg, #4f46e5, #818cf8); color: white; padding: 20px; border-radius: 24px; margin-bottom: 15px; }
         .item { display: flex; align-items: center; padding: 12px; background: #f9fafb; border-radius: 15px; margin-bottom: 8px; border: 1px solid #f1f5f9; }
         .item span { flex: 1; margin-left: 10px; font-weight: 600; }
         .completed { text-decoration: line-through; opacity: 0.5; }
         .del-btn { color: #ef4444; font-weight: 700; font-size: 0.8rem; cursor: pointer; margin-left: auto; }
+        
+        /* Lifetime Card Styling */
+        .lifetime-card { background: #0f172a; color: white; text-align: center; padding: 25px; border-radius: 24px; margin-bottom: 15px; border: 2px solid #334155; }
     </style>
 </head>
 <body>
 
     <div id="homePage" class="page active-page">
         <h1>Dashboard</h1>
-        <input type="date" id="mainDate" onchange="refreshUI()">
-        <button class="btn-sync" onclick="backupToCloud()">Sync to Cloud</button>
+        
+        <div class="lifetime-card">
+            <small style="opacity: 0.7; text-transform: uppercase; letter-spacing: 1px;">Lifetime Study Hours</small>
+            <div style="font-size: 3rem; font-weight: 800; color: #fbbf24; margin-top: 5px;" id="lifetimeHours">0.0h</div>
+        </div>
+
+        <div class="card">
+            <small>Select Date</small>
+            <input type="date" id="mainDate" onchange="refreshUI()">
+            <button class="btn-sync" onclick="backupToCloud()">Sync to Cloud</button>
+        </div>
 
         <div class="score-display">
-            <small>Performance Score</small>
-            <div style="font-size: 3rem; font-weight: 800;" id="perfScore">0</div>
+            <small>Today's Performance Score</small>
+            <div style="font-size: 3.5rem; font-weight: 800;" id="perfScore">0</div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="card" style="margin:0"><small>Tasks</small><div id="homeTask" style="font-size:1.5rem; font-weight:800;">0%</div></div>
-            <div class="card" style="margin:0"><small>Study</small><div id="homeStudy" style="font-size:1.5rem; font-weight:800; color:var(--accent)">0.0h</div></div>
+            <div class="card" style="margin:0"><small>Daily Tasks</small><div id="homeTask" style="font-size:1.5rem; font-weight:800;">0%</div></div>
+            <div class="card" style="margin:0"><small>Today's Study</small><div id="homeStudy" style="font-size:1.5rem; font-weight:800; color:var(--accent)">0.0h</div></div>
         </div>
         <div class="card"><canvas id="myChart" style="height:180px;"></canvas></div>
     </div>
 
     <div id="tasksPage" class="page">
-        <h1>Tasks</h1>
+        <h1>Daily Tasks</h1>
         <div class="card">
-            <input type="text" id="taskInput" placeholder="New goal...">
+            <input type="text" id="taskInput" placeholder="Enter a goal for today...">
             <button onclick="addTask()">Add Task</button>
         </div>
         <div id="taskList"></div>
     </div>
 
     <div id="studyPage" class="page">
-        <h1>Study</h1>
+        <h1>Study Log</h1>
         <div class="card">
-            <div style="display:flex; gap:5px">
+            <div style="display:flex; gap:8px">
                 <select id="subSelect" style="flex:2"></select>
-                <button onclick="addNewSubject()" style="flex:1; font-size:0.7rem">+ New</button>
+                <button onclick="addNewSubject()" style="flex:1; font-size:0.75rem; background:#64748b">+ Subject</button>
             </div>
-            <input type="number" id="hrInput" placeholder="Hours" step="0.5">
-            <button style="background:var(--accent)" onclick="addStudy()">Log Time</button>
+            <input type="number" id="hrInput" placeholder="Enter hours (e.g. 1.5)" step="0.5">
+            <button style="background:var(--accent)" onclick="addStudy()">Log Hours</button>
         </div>
         <div id="studyLog"></div>
     </div>
 
     <div id="vaultPage" class="page">
-        <h1>Vault</h1>
+        <h1>Link Vault</h1>
         <div class="card">
-            <input type="text" id="linkTitle" placeholder="Title">
-            <input type="text" id="linkURL" placeholder="URL">
+            <input type="text" id="linkTitle" placeholder="Resource Name (e.g. Marketing Course)">
+            <input type="text" id="linkURL" placeholder="https://...">
             <button style="background:#6366f1" onclick="addLink()">Save Link</button>
         </div>
         <div id="linkList"></div>
@@ -145,16 +158,27 @@
             const dayT = taskDB[date] || [];
             const dayS = studyDB[date] || [];
 
+            // Task Progress
             const done = dayT.filter(t => t.done).length;
             const tPct = dayT.length ? (done/dayT.length)*100 : 0;
             document.getElementById('homeTask').innerText = Math.round(tPct) + "%";
 
-            let h = 0; dayS.forEach(s => h += s.hours);
-            document.getElementById('homeStudy').innerText = h.toFixed(1) + "h";
+            // Today's Study Total
+            let hToday = 0; dayS.forEach(s => hToday += s.hours);
+            document.getElementById('homeStudy').innerText = hToday.toFixed(1) + "h";
 
-            const sPct = Math.min((h / 4) * 100, 100);
-            document.getElementById('perfScore').innerText = Math.round((tPct * 0.5) + (sPct * 0.5));
+            // Calculate Lifetime Total
+            let totalLife = 0;
+            Object.values(studyDB).forEach(day => {
+                day.forEach(session => totalLife += session.hours);
+            });
+            document.getElementById('lifetimeHours').innerText = totalLife.toFixed(1) + "h";
 
+            // Performance Score (Tasks 50% + Study 50% based on 4hr goal)
+            const sScore = Math.min((hToday / 4) * 100, 100);
+            document.getElementById('perfScore').innerText = Math.round((tPct * 0.5) + (sScore * 0.5));
+
+            // Subjects Dropdown
             const sel = document.getElementById('subSelect');
             sel.innerHTML = ''; subjects.forEach(s => sel.innerHTML += `<option>${s}</option>`);
 
@@ -163,6 +187,7 @@
             renderLinks();
             updateChart();
 
+            // Save Local
             localStorage.setItem('shipon_tasks', JSON.stringify(taskDB));
             localStorage.setItem('shipon_study', JSON.stringify(studyDB));
             localStorage.setItem('shipon_links', JSON.stringify(linkDB));
@@ -192,11 +217,16 @@
         function addLink() {
             const t = document.getElementById('linkTitle').value;
             const u = document.getElementById('linkURL').value;
-            if(t && u) { linkDB.push({title: t, url: u}); refreshUI(); }
+            if(t && u) { 
+                linkDB.push({title: t, url: u}); 
+                document.getElementById('linkTitle').value = '';
+                document.getElementById('linkURL').value = '';
+                refreshUI(); 
+            }
         }
 
         function addNewSubject() {
-            const s = prompt("New Subject:");
+            const s = prompt("Enter new subject name:");
             if(s && !subjects.includes(s)) { subjects.push(s); refreshUI(); }
         }
 
@@ -222,7 +252,9 @@
         function renderLinks() {
             const l = document.getElementById('linkList'); l.innerHTML = '';
             linkDB.forEach(link => {
-                l.innerHTML += `<div class="card"><a href="${link.url}" target="_blank" style="text-decoration:none; color:var(--primary); font-weight:700;">${link.title}</a></div>`;
+                l.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                    <a href="${link.url}" target="_blank" style="text-decoration:none; color:var(--primary); font-weight:700;">${link.title}</a>
+                </div>`;
             });
         }
 
@@ -237,7 +269,11 @@
                 data.push(h);
             }
             if(chart) chart.destroy();
-            chart = new Chart(ctx, { type:'line', data:{ labels, datasets:[{label:'Hours', data, borderColor:'#4f46e5', tension:0.4, fill:true, backgroundColor:'rgba(79, 70, 229, 0.05)'}] }, options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}} });
+            chart = new Chart(ctx, { 
+                type:'line', 
+                data:{ labels, datasets:[{label:'Hours', data, borderColor:'#4f46e5', tension:0.4, fill:true, backgroundColor:'rgba(79, 70, 229, 0.05)'}] }, 
+                options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}} 
+            });
         }
 
         window.onload = refreshUI;

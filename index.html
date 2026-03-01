@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIPON'S LIFE | Final Mastery</title>
+    <title>SHIPON'S LIFE | Timeline</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -75,17 +75,15 @@
         .active-page { display: block; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .m3-card { background: var(--surface); border-radius: 28px; padding: 22px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .m3-card { background: var(--surface); border-radius: 28px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         input, select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid var(--border); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; box-sizing: border-box; font-family: inherit; }
         button { width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; transition: 0.2s; }
         
-        /* List UI Styles */
         .list-item { display: flex; align-items: center; padding: 18px; background: rgba(255,255,255,0.03); border-radius: 20px; margin-bottom: 12px; border-left: 5px solid var(--p); text-align: left; }
         .item-label { flex: 1; margin-left: 15px; font-weight: 700; font-size: 1rem; color: var(--text); }
         .motivation-line { text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--s); opacity: 0.4; font-style: italic; }
         .del-text { color: #ef4444; font-size: 0.65rem; font-weight: 800; cursor: pointer; margin-left: 10px; }
 
-        /* Stats Tab Specifics */
         .chip-group { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 5px; }
         .chip { padding: 8px 16px; border-radius: 10px; background: rgba(128,128,128,0.1); font-size: 0.7rem; font-weight: 800; cursor: pointer; white-space: nowrap; border: 1px solid var(--border); }
         .chip.active { background: var(--p); color: white; }
@@ -96,18 +94,19 @@
     <div id="homeP" class="page active-page">
         <h1 style="margin:0; font-weight:800; letter-spacing: -2px;">SHIPON'S LIFE</h1>
         <div class="m3-card" style="text-align: center; border-left: 5px solid var(--p); margin-top: 20px;">
-            <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-weight: 800;">Lifetime Mastery</small>
+            <small id="dayNameLabel" style="text-transform: uppercase; letter-spacing: 2px; color: var(--p); font-weight: 800;"></small>
             <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0</div>
+            <small style="opacity: 0.6; font-weight: 700;">Total Mastery Hours</small>
         </div>
         <div class="m3-card">
-            <small style="font-weight: 800; opacity: 0.5;">Master System Date</small>
+            <small style="font-weight: 800; opacity: 0.5;">Master Date Selector</small>
             <input type="date" id="mainDate" onchange="window.refresh()">
-            <button onclick="window.syncData(document.getElementById('mainDate').value)" style="background:var(--s); margin-top: 15px;">🔄 SYNC ALL DEVICES</button>
+            <button onclick="window.syncData(document.getElementById('mainDate').value)" style="background:var(--s); margin-top: 15px;">🔄 SYNC ACROSS DEVICES</button>
         </div>
     </div>
 
     <div id="statsP" class="page">
-        <h1>Analytics Engine</h1>
+        <h1>Analytics</h1>
         <div class="chip-group">
             <div class="chip active" onclick="setChartMode('day', this)">Day</div>
             <div class="chip" onclick="setChartMode('week', this)">Week</div>
@@ -122,49 +121,46 @@
             </div>
             <select id="compSub" onchange="updateChart()" style="margin-top:10px;"></select>
         </div>
-        <div class="m3-card" style="height: 350px;"><canvas id="mainChart"></canvas></div>
+        <div class="m3-card" style="height: 300px;"><canvas id="mainChart"></canvas></div>
     </div>
 
     <div id="tasksP" class="page">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h1 style="margin:0;">Goals</h1>
+            <h1 style="margin:0;">Mission</h1>
             <input type="date" id="taskDate" onchange="window.refresh()" style="width: auto; padding: 8px; font-size: 0.8rem; background: var(--p); border:none; color:white; border-radius: 10px;">
         </div>
         <div class="m3-card">
-            <input type="text" id="tIn" placeholder="Mission for this date...">
-            <button onclick="addT()">COMMIT TASK</button>
+            <input type="text" id="tIn" placeholder="Enter objective...">
+            <button onclick="addT()">COMMIT</button>
         </div>
         <div id="tList"></div>
     </div>
 
     <div id="dayLogP" class="page">
-        <h1>24H Routine</h1>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h1>Today</h1>
+            <small id="logDayDisplay" style="font-weight:800; color:var(--s);"></small>
+        </div>
         <div class="m3-card">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <input type="time" id="startTime"><input type="time" id="endTime">
+                <div><small>Start</small><input type="time" id="startTime"></div>
+                <div><small>End</small><input type="time" id="endTime"></div>
             </div>
-            <input type="text" id="logAct" placeholder="Activity..."><button onclick="addLog()">LOG</button>
+            <input type="text" id="logAct" placeholder="What are you doing?">
+            <button onclick="addLog()">UPDATE TIMELINE</button>
         </div>
         <div id="logList"></div>
     </div>
 
     <div id="studyP" class="page">
-        <h1>Study Center</h1>
+        <h1>Study</h1>
         <div class="m3-card">
-            <small style="font-weight: 800; opacity: 0.5;">Select Subject</small>
             <select id="sSub"></select>
-            <input type="number" id="sHr" placeholder="Study Hours (e.g. 1.5)" step="0.5">
-            <button onclick="addS()">SAVE SESSION</button>
+            <input type="number" id="sHr" placeholder="Hours (e.g. 2.0)" step="0.5">
+            <button onclick="addS()">SAVE PROGRESS</button>
         </div>
-
-        <h3 style="margin-top: 30px;">Daily Log</h3>
         <div id="sLog"></div>
-
-        <h3 style="margin-top: 30px;">Subject Management</h3>
-        <div class="m3-card">
-            <input type="text" id="newSubIn" placeholder="New Field (e.g. Content Writing)">
-            <button onclick="addNewSub()" style="background: var(--s);">+ ADD NEW FIELD</button>
-        </div>
+        <h3>Fields</h3>
         <div id="subManageList"></div>
     </div>
 
@@ -172,7 +168,7 @@
         <div class="nav-item active" onclick="nav('homeP', this)">Home</div>
         <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
         <div class="nav-item" onclick="nav('tasksP', this)">Tasks</div>
-        <div class="nav-item" onclick="nav('dayLogP', this)">24H</div>
+        <div class="nav-item" onclick="nav('dayLogP', this)">Today</div>
         <div class="nav-item" onclick="nav('studyP', this)">Study</div>
     </nav>
 
@@ -180,9 +176,23 @@
         let cMode = 'day';
         document.getElementById('taskDate').valueAsDate = new Date();
 
+        function formatTo12H(time24) {
+            if (!time24) return "";
+            let [hours, minutes] = time24.split(':');
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            return `${hours}:${minutes} ${ampm}`;
+        }
+
         window.refresh = function() {
             const mDate = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
             const tDate = document.getElementById('taskDate').value;
+            
+            const dateObj = new Date(mDate);
+            const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+            document.getElementById('dayNameLabel').innerText = dayName;
+            document.getElementById('logDayDisplay').innerText = dayName;
+
             const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
             const tDB = JSON.parse(localStorage.getItem('s_t')) || {};
             const dLogDB = JSON.parse(localStorage.getItem('s_dayLog')) || {};
@@ -194,12 +204,14 @@
 
             const sSel = document.getElementById('sSub'); 
             const cSel = document.getElementById('compSub');
-            sSel.innerHTML = ''; 
-            cSel.innerHTML = '<option value="all">Total Hours</option>';
-            subs.forEach(s => { 
-                sSel.innerHTML += `<option>${s}</option>`; 
-                cSel.innerHTML += `<option>${s}</option>`; 
-            });
+            if(sSel) {
+                sSel.innerHTML = ''; 
+                cSel.innerHTML = '<option value="all">Total Hours</option>';
+                subs.forEach(s => { 
+                    sSel.innerHTML += `<option>${s}</option>`; 
+                    cSel.innerHTML += `<option>${s}</option>`; 
+                });
+            }
 
             renderT(tDate, tDB); 
             renderS(mDate, sDB); 
@@ -215,7 +227,7 @@
             el.classList.add('active'); window.refresh();
         }
 
-        // --- STUDY LOGIC ---
+        // --- STUDY ---
         function addS() {
             let d = document.getElementById('mainDate').value, h = parseFloat(document.getElementById('sHr').value), sub = document.getElementById('sSub').value;
             if(!h) return; let db = JSON.parse(localStorage.getItem('s_s')) || {};
@@ -223,41 +235,19 @@
             let ex = db[d].find(x => x.subject === sub);
             if(ex) ex.hours += h; else db[d].push({subject: sub, hours: h});
             localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(d, true);
-            document.getElementById('sHr').value = '';
         }
         function renderS(d, db) {
             const l = document.getElementById('sLog'); l.innerHTML = '';
-            (db[d] || []).forEach((s, i) => { 
-                l.innerHTML += `<div class="list-item">
-                    <span class="item-label"><b>${s.subject}</b>: ${s.hours}h</span>
-                    <span onclick="delS('${d}',${i})" class="del-text">CLEAR</span>
-                </div>`; 
-            });
+            (db[d] || []).forEach((s, i) => { l.innerHTML += `<div class="list-item"><span class="item-label"><b>${s.subject}</b>: ${s.hours}h</span><span onclick="delS('${d}',${i})" class="del-text">CLEAR</span></div>`; });
         }
         function delS(d, i) { let db = JSON.parse(localStorage.getItem('s_s')); db[d].splice(i, 1); localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(d, true); }
-
-        function addNewSub() { 
-            const v = document.getElementById('newSubIn').value; 
-            let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"];
-            if(v && !subs.includes(v)) { 
-                subs.push(v); 
-                localStorage.setItem('s_subs', JSON.stringify(subs)); 
-                document.getElementById('newSubIn').value = '';
-                window.syncData(document.getElementById('mainDate').value, true); 
-            } 
-        }
         function renderSubM(subs) {
-            const l = document.getElementById('subManageList'); l.innerHTML = '';
-            subs.forEach((s, i) => { 
-                l.innerHTML += `<div class="list-item">
-                    <span class="item-label">${s}</span>
-                    <span onclick="remSub(${i})" class="del-text">REMOVE</span>
-                </div>`; 
-            });
+            const l = document.getElementById('subManageList'); if(!l) return; l.innerHTML = '';
+            subs.forEach((s, i) => { l.innerHTML += `<div class="list-item"><span class="item-label">${s}</span><span onclick="remSub(${i})" class="del-text">REMOVE</span></div>`; });
         }
         function remSub(i) { let subs = JSON.parse(localStorage.getItem('s_subs')); subs.splice(i, 1); localStorage.setItem('s_subs', JSON.stringify(subs)); window.refresh(); }
 
-        // --- TASKS LOGIC ---
+        // --- TASKS ---
         function addT() {
             let d = document.getElementById('taskDate').value, v = document.getElementById('tIn').value;
             if(!v) return; let db = JSON.parse(localStorage.getItem('s_t')) || {};
@@ -267,18 +257,12 @@
         }
         function renderT(d, db) {
             const l = document.getElementById('tList'); l.innerHTML = '';
-            (db[d] || []).forEach((t, i) => { 
-                l.innerHTML += `<div class="list-item">
-                    <input type="checkbox" style="width:22px; height:22px;" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
-                    <span class="item-label ${t.done?'motivation-line':''}">${t.text}</span>
-                    <span onclick="delT('${d}',${i})" class="del-text">DEL</span>
-                </div>`; 
-            });
+            (db[d] || []).forEach((t, i) => { l.innerHTML += `<div class="list-item"><input type="checkbox" style="width:22px; height:22px;" ${t.done?'checked':''} onchange="toggleT('${d}',${i})"><span class="item-label ${t.done?'motivation-line':''}">${t.text}</span><span onclick="delT('${d}',${i})" class="del-text">DEL</span></div>`; });
         }
         function toggleT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d, true); }
         function delT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d].splice(i, 1); localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d, true); }
 
-        // --- 24H LOGIC ---
+        // --- TODAY (12H) ---
         function addLog() {
             let d = document.getElementById('mainDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
             if(!s || !e || !a) return; let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
@@ -288,10 +272,16 @@
         }
         function renderLog(d, db) {
             const l = document.getElementById('logList'); l.innerHTML = '';
-            (db[d] || []).forEach(item => { l.innerHTML += `<div class="list-item"><span style="font-weight:800; color:var(--p); font-size:0.8rem;">${item.start}-${item.end}</span><span class="item-label">${item.act}</span></div>`; });
+            (db[d] || []).forEach((item, i) => { 
+                l.innerHTML += `<div class="list-item">
+                    <span style="font-weight:800; color:var(--p); font-size:0.75rem; min-width:110px;">${formatTo12H(item.start)} — ${formatTo12H(item.end)}</span>
+                    <span class="item-label">${item.act}</span>
+                    <span onclick="delLog('${d}',${i})" class="del-text">DEL</span>
+                </div>`; 
+            });
         }
+        function delLog(d, i) { let db = JSON.parse(localStorage.getItem('s_dayLog')); db[d].splice(i, 1); localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d, true); }
 
-        // --- STATS LOGIC ---
         function setChartMode(m, el) { cMode = m; document.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); document.getElementById('compUI').style.display = m === 'comp' ? 'block' : 'none'; updateChart(); }
         function updateChart() {
             const ctx = document.getElementById('mainChart').getContext('2d');
@@ -309,9 +299,9 @@
                 for(let i=count-1; i>=0; i--) {
                     const d = new Date();
                     if(cMode === 'day') d.setDate(d.getDate()-i);
-                    if(cMode === 'week') d.setDate(d.getDate()-(i*7));
-                    if(cMode === 'month') d.setMonth(d.getMonth()-i);
-                    if(cMode === 'year') d.setFullYear(d.getFullYear()-i);
+                    else if(cMode === 'week') d.setDate(d.getDate()-(i*7));
+                    else if(cMode === 'month') d.setMonth(d.getMonth()-i);
+                    else if(cMode === 'year') d.setFullYear(d.getFullYear()-i);
                     const s = d.toISOString().split('T')[0];
                     labels.push(cMode === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : s);
                     let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
@@ -319,7 +309,7 @@
                 }
             }
             if(window.chartO) window.chartO.destroy();
-            window.chartO = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Study Hours', data, backgroundColor: '#6366f1', borderRadius: 10 }] }, options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
+            window.chartO = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 10 }] }, options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
         }
 
         document.getElementById('mainDate').valueAsDate = new Date();

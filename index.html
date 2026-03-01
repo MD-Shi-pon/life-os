@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIPON'S LIFE | Global Sync</title>
+    <title>SHIPON'S LIFE | Master Stats</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -24,7 +24,6 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
-      // GLOBAL SYNC METHOD (No Login Needed)
       window.syncData = async (silent = false) => {
           const date = document.getElementById('mainDate').value;
           const localData = {
@@ -33,12 +32,8 @@
               dayLog: JSON.parse(localStorage.getItem('s_dayLog'))?.[date] || [],
               subs: JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"]
           };
-          
           try {
-              // 1. Push current date data to Global Cloud
               await setDoc(doc(db, "global_master", "history", "dates", date), localData);
-              
-              // 2. Pull ALL history to sync Laptop/Mobile
               const snap = await getDocs(collection(db, "global_master", "history", "dates"));
               let s_s = {}, s_t = {}, s_d = {};
               snap.forEach(d => {
@@ -47,17 +42,14 @@
                   s_t[d.id] = data.tasks || [];
                   s_d[d.id] = data.dayLog || [];
               });
-              
               localStorage.setItem('s_s', JSON.stringify(s_s));
               localStorage.setItem('s_t', JSON.stringify(s_t));
               localStorage.setItem('s_dayLog', JSON.stringify(s_d));
-              
               window.refresh();
-              if(!silent) alert("🚀 All Devices Synchronized!");
+              if(!silent) alert("🚀 Global Sync Complete!");
           } catch (e) { console.error("Sync Failed", e); }
       };
 
-      // Listen for cloud changes (Live Update)
       onSnapshot(collection(db, "global_master", "history", "dates"), (snap) => {
           let s_s = {}, s_t = {}, s_d = {};
           snap.forEach(d => {
@@ -79,45 +71,58 @@
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--surface); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-item { flex: 1; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
         .nav-item.active { color: var(--p); }
-        .header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
-        .page { display: none; padding: 0 20px; animation: fadeInUp 0.4s ease; }
+        .page { display: none; padding: 25px; max-width: 500px; margin: 0 auto; animation: fadeInUp 0.4s ease; }
         .active-page { display: block; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .m3-card { background: var(--surface); border-radius: 28px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        .motivation-line { text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--s); opacity: 0.4; font-weight: 800; }
-        input, select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid var(--border); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; box-sizing: border-box; font-family: inherit; }
-        button { width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; transition: 0.2s; }
-        .list-item { display: flex; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 20px; margin-bottom: 10px; border: 1px solid var(--border); }
-        .del-btn { color: #ef4444; font-size: 0.7rem; font-weight: 800; cursor: pointer; margin-left: auto; }
+        .m3-card { background: var(--surface); border-radius: 28px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); }
+        input, select { width: 100%; padding: 14px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: inherit; margin: 8px 0; box-sizing: border-box; }
+        button { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; margin-top: 8px; }
+        .list-item { display: flex; align-items: center; padding: 14px; background: rgba(128,128,128,0.05); border-radius: 18px; margin-bottom: 8px; }
+        .motivation-line { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--s); opacity: 0.4; font-weight: 800; }
+        
+        /* Stats Specific */
+        .chip-group { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 5px; }
+        .chip { padding: 8px 16px; border-radius: 10px; background: rgba(128,128,128,0.1); font-size: 0.7rem; font-weight: 800; cursor: pointer; white-space: nowrap; border: 1px solid var(--border); }
+        .chip.active { background: var(--p); color: white; }
     </style>
 </head>
-<body class="dark-mode">
-
-    <div class="header">
-        <h1 style="margin:0; font-weight:800; letter-spacing: -2px;">SHIPON'S LIFE</h1>
-    </div>
+<body>
 
     <div id="homeP" class="page active-page">
-        <div class="m3-card" style="text-align: center; border-bottom: 5px solid var(--p);">
-            <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.7; font-weight: 800;">Universal Lifetime Mastery</small>
-            <div style="font-size: 4.5rem; font-weight: 900;" id="lifeH">0.0</div>
+        <h1 style="margin:0; font-weight:800; letter-spacing: -2px;">SHIPON'S LIFE</h1>
+        <div class="m3-card" style="text-align: center; border-left: 5px solid var(--p); margin-top: 20px;">
+            <small style="text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-weight: 800;">Lifetime Progress</small>
+            <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0</div>
         </div>
         <div class="m3-card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-weight: 800; opacity: 0.7;">System Date</span>
-                <input type="date" id="mainDate" onchange="window.refresh()" style="width: auto; border:none; color:var(--p); font-weight:800;">
-            </div>
+            <input type="date" id="mainDate" onchange="window.refresh()">
             <button onclick="window.syncData()" style="background:var(--s); margin-top: 15px;">🔄 SYNC ALL DEVICES</button>
         </div>
     </div>
 
     <div id="statsP" class="page">
-        <h1>Analytics</h1>
+        <h1>Analytics Engine</h1>
+        <div class="chip-group">
+            <div class="chip active" onclick="setChartMode('day', this)">Day</div>
+            <div class="chip" onclick="setChartMode('week', this)">Week</div>
+            <div class="chip" onclick="setChartMode('month', this)">Month</div>
+            <div class="chip" onclick="setChartMode('year', this)">Year</div>
+            <div class="chip" onclick="setChartMode('comp', this)" style="border-color: var(--s);">Compare</div>
+        </div>
+
+        <div id="compUI" style="display:none;" class="m3-card">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <input type="date" id="dateA" onchange="updateChart()">
+                <input type="date" id="dateB" onchange="updateChart()">
+            </div>
+            <select id="compSub" onchange="updateChart()" style="margin-top:10px;"></select>
+        </div>
+
         <div class="m3-card" style="height: 350px;"><canvas id="mainChart"></canvas></div>
     </div>
 
     <div id="tasksP" class="page">
-        <h1>Daily Tasks</h1>
+        <h1>Tasks</h1>
         <div class="m3-card"><input type="text" id="tIn" placeholder="Enter task..."><button onclick="addT()">ADD</button></div>
         <div id="tList"></div>
     </div>
@@ -125,21 +130,14 @@
     <div id="dayLogP" class="page">
         <h1>24H Routine</h1>
         <div class="m3-card">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <input type="time" id="startTime"><input type="time" id="endTime">
-            </div>
-            <input type="text" id="logAct" placeholder="Activity..."><button onclick="addLog()">LOG</button>
+            <input type="time" id="startTime"><input type="time" id="endTime"><input type="text" id="logAct" placeholder="Activity..."><button onclick="addLog()">LOG</button>
         </div>
-        <div id="logList" class="m3-card"></div>
+        <div id="logList"></div>
     </div>
 
     <div id="studyP" class="page">
-        <h1>Study Center</h1>
-        <div class="m3-card">
-            <select id="sSub"></select>
-            <input type="number" id="sHr" placeholder="Duration (Hours)" step="0.5">
-            <button onclick="addS()">SAVE PROGRESS</button>
-        </div>
+        <h1>Study</h1>
+        <div class="m3-card"><select id="sSub"></select><input type="number" id="sHr" placeholder="Hours"><button onclick="addS()">SAVE</button></div>
         <div id="sLog"></div>
     </div>
 
@@ -152,6 +150,7 @@
     </nav>
 
     <script>
+        let cMode = 'day';
         window.refresh = function() {
             const date = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
             const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
@@ -160,42 +159,89 @@
             const subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"];
 
             let total = 0;
-            Object.values(sDB).forEach(day => (day || []).forEach(entry => total += parseFloat(entry.hours || 0)));
+            Object.values(sDB).forEach(day => (day || []).forEach(e => total += parseFloat(e.hours || 0)));
             document.getElementById('lifeH').innerText = total.toFixed(1);
 
-            const sel = document.getElementById('sSub'); if(sel) { sel.innerHTML = ''; subs.forEach(s => sel.innerHTML += `<option>${s}</option>`); }
+            const sSel = document.getElementById('sSub'); sSel.innerHTML = '';
+            const cSel = document.getElementById('compSub'); cSel.innerHTML = '<option value="all">Compare All Subjects</option>';
+            subs.forEach(s => { 
+                sSel.innerHTML += `<option>${s}</option>`; 
+                cSel.innerHTML += `<option>${s}</option>`; 
+            });
 
-            renderT(date, tDB); renderS(date, sDB); renderLog(date, dLogDB); updateChart(sDB);
+            renderT(date, tDB); renderS(date, sDB); renderLog(date, dLogDB); updateChart();
         };
+
+        function setChartMode(m, el) {
+            cMode = m;
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('compUI').style.display = m === 'comp' ? 'block' : 'none';
+            updateChart();
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
+            let labels = [], data = [];
+
+            if(cMode === 'comp') {
+                const dA = document.getElementById('dateA').value;
+                const dB = document.getElementById('dateB').value;
+                const sub = document.getElementById('compSub').value;
+                labels = [dA || 'A', dB || 'B'];
+                let vA = 0, vB = 0;
+                if(dA) (sDB[dA]||[]).forEach(x => { if(sub==='all' || x.subject===sub) vA += x.hours; });
+                if(dB) (sDB[dB]||[]).forEach(x => { if(sub==='all' || x.subject===sub) vB += x.hours; });
+                data = [vA, vB];
+            } else {
+                let count = cMode === 'day' ? 7 : cMode === 'week' ? 4 : cMode === 'month' ? 12 : 5;
+                for(let i=count-1; i>=0; i--) {
+                    const d = new Date();
+                    if(cMode === 'day') d.setDate(d.getDate()-i);
+                    if(cMode === 'week') d.setDate(d.getDate()-(i*7));
+                    if(cMode === 'month') d.setMonth(d.getMonth()-i);
+                    if(cMode === 'year') d.setFullYear(d.getFullYear()-i);
+                    const s = d.toISOString().split('T')[0];
+                    labels.push(cMode === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : s);
+                    let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
+                    data.push(h);
+                }
+            }
+
+            if(window.chartO) window.chartO.destroy();
+            window.chartO = new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 10 }] },
+                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+            });
+        }
 
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.getElementById(id).classList.add('active-page');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-            window.refresh();
+            el.classList.add('active'); window.refresh();
         }
 
-        function trigger() { window.syncData(true); }
-
         function addT() {
-            let d = document.getElementById('mainDate').value; let v = document.getElementById('tIn').value;
+            let d = document.getElementById('mainDate').value, v = document.getElementById('tIn').value;
             let db = JSON.parse(localStorage.getItem('s_t')) || {};
             if(!db[d]) db[d] = []; db[d].push({text: v, done: false});
-            localStorage.setItem('s_t', JSON.stringify(db)); trigger();
+            localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(true);
         }
         function renderT(d, db) {
             const l = document.getElementById('tList'); l.innerHTML = '';
-            (db[d] || []).forEach((t, i) => { l.innerHTML += `<div class="list-item"><input type="checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})"><span style="flex:1; margin-left:15px; font-weight:700;" class="${t.done?'motivation-line':''}"> ${t.text}</span></div>`; });
+            (db[d] || []).forEach((t, i) => { l.innerHTML += `<div class="list-item"><input type="checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})"><span style="flex:1; margin-left:15px; font-weight:700;" class="${t.done?'motivation-line':''}">${t.text}</span></div>`; });
         }
-        function toggleT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); trigger(); }
+        function toggleT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(true); }
 
         function addS() {
-            let d = document.getElementById('mainDate').value; let h = parseFloat(document.getElementById('sHr').value);
-            let sDB = JSON.parse(localStorage.getItem('s_s')) || {}; let sub = document.getElementById('sSub').value;
-            if(!sDB[d]) sDB[d] = []; let ex = sDB[d].find(x => x.subject === sub);
-            if(ex) ex.hours += h; else sDB[d].push({subject: sub, hours: h});
-            localStorage.setItem('s_s', JSON.stringify(sDB)); trigger();
+            let d = document.getElementById('mainDate').value, h = parseFloat(document.getElementById('sHr').value), sub = document.getElementById('sSub').value;
+            let db = JSON.parse(localStorage.getItem('s_s')) || {};
+            if(!db[d]) db[d] = []; let ex = db[d].find(x => x.subject === sub);
+            if(ex) ex.hours += h; else db[d].push({subject: sub, hours: h});
+            localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(true);
         }
         function renderS(d, db) {
             const l = document.getElementById('sLog'); l.innerHTML = '';
@@ -203,29 +249,14 @@
         }
 
         function addLog() {
-            let d = document.getElementById('mainDate').value; let s = document.getElementById('startTime').value;
-            let e = document.getElementById('endTime').value; let a = document.getElementById('logAct').value;
+            let d = document.getElementById('mainDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
             let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
             if(!db[d]) db[d] = []; db[d].push({start: s, end: e, act: a});
-            localStorage.setItem('s_dayLog', JSON.stringify(db)); trigger();
+            localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(true);
         }
         function renderLog(d, db) {
             const l = document.getElementById('logList'); l.innerHTML = '';
             (db[d] || []).forEach(item => { l.innerHTML += `<div class="list-item"><b>${item.start}-${item.end}</b> <span style="margin-left:10px">${item.act}</span></div>`; });
-        }
-
-        function updateChart(sDB) {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            let labels = [], data = [];
-            for(let i=6; i>=0; i--) {
-                const d = new Date(); d.setDate(d.getDate()-i);
-                const s = d.toISOString().split('T')[0];
-                labels.push(d.toLocaleDateString([],{weekday:'short'}));
-                let h = 0; (sDB[s]||[]).forEach(x => h+=x.hours);
-                data.push(h);
-            }
-            if(window.chartO) window.chartO.destroy();
-            window.chartO = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 10 }] }, options: { maintainAspectRatio: false } });
         }
 
         document.getElementById('mainDate').valueAsDate = new Date();

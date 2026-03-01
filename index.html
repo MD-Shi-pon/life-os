@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHIPON's Life | Unlimited</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>SHIPON's Life | Pro Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script type="module">
@@ -34,227 +34,249 @@
           };
           try {
               await setDoc(doc(db, "users", "shipon", "history", date), data);
-              alert("🚀 SHIPON's Data Synced");
+              alert("🚀 Data Securely Synced");
           } catch (e) { alert("Sync Error: " + e.message); }
       };
     </script>
 
     <style>
-        :root { --p: #6366f1; --s: #10b981; --a: #f59e0b; --bg: #020617; --glass: rgba(15, 23, 42, 0.85); --text: #f8fafc; --border: rgba(255, 255, 255, 0.1); }
-        .light-mode { --bg: #ffffff; --glass: rgba(241, 245, 249, 0.9); --text: #0f172a; --border: rgba(15, 23, 42, 0.1); }
+        :root { 
+            --p: #6366f1; --s: #10b981; --a: #f59e0b; 
+            --bg: #020617; --card: rgba(15, 23, 42, 0.8); --text: #f8fafc;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        .light-mode { 
+            --bg: #f8fafc; --card: rgba(255, 255, 255, 0.9); --text: #0f172a;
+            --border: rgba(15, 23, 42, 0.1);
+        }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); min-height: 100vh; transition: 0.4s; overflow-x: hidden; }
-        
-        .sidebar { position: fixed; left: -260px; top: 0; height: 100%; width: 250px; background: var(--glass); backdrop-filter: blur(25px); border-right: 1px solid var(--border); transition: 0.3s ease-out; z-index: 2000; padding-top: 80px; }
-        .sidebar.open { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.3); }
-        .nav-item { padding: 20px 30px; font-weight: 800; cursor: pointer; color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-item.active { color: var(--text); border-left: 5px solid var(--p); background: rgba(99, 102, 241, 0.1); }
-        
-        .menu-toggle { position: fixed; top: 25px; left: 25px; z-index: 2100; font-size: 1.4rem; cursor: pointer; color: var(--p); font-weight: 900; }
-        .btn-mode { position: fixed; top: 22px; right: 25px; width: auto; padding: 10px 20px; background: var(--p); color: white; z-index: 2100; font-size: 0.75rem; border-radius: 15px; border:none; font-weight:800; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); 
+            min-height: 100vh; transition: 0.3s; padding-top: 80px;
+        }
 
-        .page { display: none; padding: 100px 25px 40px; max-width: 480px; margin: 0 auto; animation: fadeIn 0.4s ease; }
+        /* Pro Navigation Header */
+        header {
+            position: fixed; top: 0; width: 100%; height: 70px; background: var(--card);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 5%; box-sizing: border-box; z-index: 2000;
+        }
+        .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -1px; color: var(--p); }
+        .nav-group { display: flex; gap: 20px; }
+        .nav-btn { cursor: pointer; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; transition: 0.2s; }
+        .nav-btn.active { color: var(--text); border-bottom: 2px solid var(--p); padding-bottom: 5px; }
+
+        .page { display: none; padding: 20px; max-width: 600px; margin: 0 auto; animation: fadeIn 0.4s ease; }
         .active-page { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .glass-card { background: var(--glass); border-radius: 35px; padding: 25px; margin-bottom: 22px; border: 1px solid var(--border); }
-        .locked { opacity: 0.25; pointer-events: none; filter: grayscale(1); }
-
-        button { width: 100%; padding: 18px; margin: 10px 0; border-radius: 22px; border: none; font-weight: 800; cursor: pointer; transition: 0.3s; }
-        .btn-p { background: var(--p); color: white; }
+        .glass-card { background: var(--card); border-radius: 24px; padding: 25px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         
-        input, select { width: 100%; padding: 16px; border-radius: 20px; border: 1px solid var(--border); background: rgba(128,128,128,0.05); color: inherit; margin: 10px 0; outline: none; box-sizing: border-box; }
-        .item { padding: 18px; background: rgba(128,128,128,0.08); border-radius: 22px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); }
-        .timer-val { font-size: 4rem; font-weight: 900; color: var(--a); margin: 15px 0; }
+        /* Motivational Strikethrough */
+        .completed-text { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--s); opacity: 0.5; font-style: italic; transition: 0.3s; }
+
+        .btn-p { background: var(--p); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; width: 100%; cursor: pointer; }
+        input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; outline: none; }
+        
+        /* Analytics Tabs */
+        .chart-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .c-tab { flex: 1; padding: 10px; font-size: 0.65rem; font-weight: 800; border-radius: 10px; border: 1px solid var(--border); text-align: center; cursor: pointer; color: #94a3b8; }
+        .c-tab.active { background: var(--p); color: white; border: none; }
+        
+        .timer-val { font-size: 3rem; font-weight: 900; color: var(--a); margin: 10px 0; }
+        .item { padding: 15px; background: rgba(128,128,128,0.05); border-radius: 15px; margin-bottom: 10px; display: flex; align-items: center; border-left: 5px solid var(--p); }
     </style>
 </head>
-<body class="dark-mode">
+<body>
 
-    <div class="menu-toggle" onclick="toggleMenu()">MENU</div>
-    <button class="btn-mode" onclick="toggleDayNight()">THEME</button>
-
-    <div class="sidebar" id="sidebar">
-        <div class="nav-item active" onclick="nav('homeP', this)">DASHBOARD</div>
-        <div class="nav-item" onclick="nav('tasksP', this)">PRIORITY TASKS</div>
-        <div class="nav-item" onclick="nav('studyP', this)">DEEP STUDY</div>
-        <div class="nav-item" onclick="nav('vaultP', this)">LINK VAULT</div>
-    </div>
+    <header>
+        <div class="logo">SHIPON'S LIFE</div>
+        <div class="nav-group">
+            <div class="nav-btn active" onclick="nav('homeP', this)">Home</div>
+            <div class="nav-btn" onclick="nav('statsP', this)">Stats</div>
+            <div class="nav-btn" onclick="nav('tasksP', this)">Tasks</div>
+            <div class="nav-btn" onclick="nav('studyP', this)">Study</div>
+        </div>
+        <div onclick="toggleMode()" style="cursor:pointer; font-size:1.2rem;">🌗</div>
+    </header>
 
     <div id="homeP" class="page active-page">
-        <h1 style="font-size: 2.8rem; letter-spacing: -2px;">SHIPON's Life</h1>
-        <div class="glass-card" style="text-align: center; border: 2px solid var(--a);">
-            <small style="text-transform: uppercase; letter-spacing: 3px; color: var(--a); font-weight: 800;">TOTAL MASTERY</small>
-            <div style="font-size: 4.5rem; font-weight: 900;" id="lifeH">0.0h</div>
+        <div class="glass-card" style="text-align: center; border-color: var(--a);">
+            <small style="text-transform: uppercase; letter-spacing: 2px; color: var(--a); font-weight: 800;">Lifetime Mastery</small>
+            <div style="font-size: 3.5rem; font-weight: 900;" id="lifeH">0.0h</div>
         </div>
         <div class="glass-card">
             <input type="date" id="mainDate" onchange="refresh()">
-            <button onclick="backupToCloud()" class="btn-p" style="background:var(--s)">SYNC TO CLOUD</button>
-            <div style="height:150px; margin-top:20px"><canvas id="myChart"></canvas></div>
+            <button onclick="backupToCloud()" class="btn-p" style="background:var(--s)">SYNC PROGRESS</button>
+        </div>
+        <div class="glass-card">
+            <h3 style="margin-top:0">Today's Focus</h3>
+            <div id="quickList"></div>
+        </div>
+    </div>
+
+    <div id="statsP" class="page">
+        <h1>Performance Analytics</h1>
+        <div class="chart-tabs">
+            <div class="c-tab active" onclick="changeChart('day', this)">Daily</div>
+            <div class="c-tab" onclick="changeChart('week', this)">Weekly</div>
+            <div class="c-tab" onclick="changeChart('month', this)">Monthly</div>
+            <div class="c-tab" onclick="changeChart('year', this)">Yearly</div>
+        </div>
+        <div class="glass-card" style="height: 350px;">
+            <canvas id="mainChart"></canvas>
         </div>
     </div>
 
     <div id="tasksP" class="page">
-        <h1>Priority Tasks</h1>
-        <div id="taskLockArea" class="glass-card">
-            <input type="text" id="tIn" placeholder="Daily focus goal...">
-            <button onclick="addT()" class="btn-p">COMMIT GOAL</button>
+        <h1>Focus Goals</h1>
+        <div class="glass-card">
+            <input type="text" id="tIn" placeholder="Enter high-priority goal...">
+            <button onclick="addT()" class="btn-p">Log Goal</button>
         </div>
         <div id="tList"></div>
     </div>
 
     <div id="studyP" class="page">
-        <h1>Deep Study</h1>
+        <h1>Deep Study Center</h1>
         <div class="glass-card" style="text-align: center;">
-            <input type="number" id="customTime" value="25" style="width: 40%; text-align: center; font-size: 1.5rem; font-weight: 800; border: none; background: none; color:inherit;">
+            <input type="number" id="customTime" value="25" style="width: 50px; text-align: center; background: none; color: inherit; border: none; font-weight: 800;"> min
             <div class="timer-val" id="timer">25:00</div>
-            <div style="display: flex; gap: 12px;">
-                <button onclick="startTimer()" style="background:var(--a); color: #000;">START</button>
-                <button onclick="resetTimer()" style="background:#475569; color: #fff;">RESET</button>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="startTimer()" style="background:var(--a); color:black; font-weight:800; border-radius:12px; padding:10px; width:100%;">START</button>
+                <button onclick="resetTimer()" style="background:#475569; color:white; border-radius:12px; padding:10px; width:100%;">RESET</button>
             </div>
         </div>
-        
-        <div id="studyLockArea" class="glass-card">
-            <label style="font-size: 0.7rem; font-weight: 800; opacity: 0.6;">SELECT SUBJECT</label>
-            <select id="sSub"></select>
-            
-            <input type="number" id="sHr" placeholder="Manual Hours Log" step="0.5">
-            <button onclick="addS()" class="btn-p">LOG PROGRESS</button>
-            
-            <hr style="opacity: 0.1; margin: 20px 0;">
-            <label style="font-size: 0.7rem; font-weight: 800; opacity: 0.6;">MANAGE LIST</label>
-            <input type="text" id="newSubInput" placeholder="New Subject Name...">
-            <button onclick="addNewSub()" style="background: #475569; font-size: 0.8rem;">+ ADD TO LIST</button>
-        </div>
-        <div id="sLog"></div>
-    </div>
-
-    <div id="vaultP" class="page">
-        <h1>Link Vault</h1>
         <div class="glass-card">
-            <input type="text" id="lTitle" placeholder="Resource Name">
-            <input type="text" id="lUrl" placeholder="https://...">
-            <button onclick="addL()" style="background:var(--a); color:#000">SAVE RESOURCE</button>
+            <select id="sSub"></select>
+            <input type="number" id="sHr" placeholder="Manual Hours" step="0.5">
+            <button onclick="addS()" class="btn-p">Complete Session</button>
+            <hr style="opacity: 0.1; margin: 15px 0;">
+            <input type="text" id="newSubIn" placeholder="New Field (e.g. Graphic Design)">
+            <button onclick="addNewSub()" style="background:#475569; font-size:0.7rem;">+ ADD FIELD</button>
         </div>
-        <div id="lList"></div>
     </div>
 
     <script>
         let taskDB = JSON.parse(localStorage.getItem('s_t')) || {};
         let studyDB = JSON.parse(localStorage.getItem('s_s')) || {};
-        let linkDB = JSON.parse(localStorage.getItem('s_l')) || [];
-        let subList = JSON.parse(localStorage.getItem('s_subs')) || ["English (IELTS)", "Digital Marketing"];
-        let tInt;
-
-        function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); }
-        function toggleDayNight() { document.body.classList.toggle('light-mode'); }
+        let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English (IELTS)", "Digital Marketing"];
+        let chartType = 'day';
+        let timerInt;
 
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.getElementById(id).classList.add('active-page');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
-            toggleMenu(); refresh();
+            refresh();
         }
 
+        function toggleMode() { document.body.classList.toggle('light-mode'); }
+
         function refresh() {
-            const today = new Date().toISOString().split('T')[0];
-            const selDate = document.getElementById('mainDate').value;
-            const isPast = selDate < today;
-
-            const locks = [document.getElementById('taskLockArea'), document.getElementById('studyLockArea')];
-            locks.forEach(l => isPast ? l.classList.add('locked') : l.classList.remove('locked'));
-
+            const date = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
             let tL = 0; Object.values(studyDB).forEach(day => day.forEach(s => tL += s.hours));
             document.getElementById('lifeH').innerText = tL.toFixed(1) + "h";
 
-            // Update Subject Dropdown
             const sel = document.getElementById('sSub'); sel.innerHTML = '';
-            subList.forEach(s => sel.innerHTML += `<option>${s}</option>`);
+            subs.forEach(s => sel.innerHTML += `<option>${s}</option>`);
 
-            renderT(selDate, isPast); renderS(selDate); renderL(); updateChart();
-            localStorage.setItem('s_t', JSON.stringify(taskDB)); 
-            localStorage.setItem('s_s', JSON.stringify(studyDB)); 
-            localStorage.setItem('s_l', JSON.stringify(linkDB));
-            localStorage.setItem('s_subs', JSON.stringify(subList));
+            renderT(date);
+            updateCharts();
+            localStorage.setItem('s_t', JSON.stringify(taskDB));
+            localStorage.setItem('s_s', JSON.stringify(studyDB));
+            localStorage.setItem('s_subs', JSON.stringify(subs));
         }
-
-        function addNewSub() {
-            const val = document.getElementById('newSubInput').value;
-            if(val && !subList.includes(val)) {
-                subList.push(val);
-                document.getElementById('newSubInput').value = '';
-                refresh();
-                alert("✅ Added: " + val);
-            }
-        }
-
-        function startTimer() {
-            clearInterval(tInt);
-            let time = (parseInt(document.getElementById('customTime').value) || 25) * 60;
-            tInt = setInterval(() => {
-                let m = Math.floor(time / 60); let s = time % 60;
-                document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-                if (time-- <= 0) {
-                    clearInterval(tInt);
-                    new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play();
-                    alert("Focus session complete!");
-                }
-            }, 1000);
-        }
-
-        function resetTimer() { clearInterval(tInt); document.getElementById('timer').innerText = document.getElementById('customTime').value + ":00"; }
 
         function addT() {
-            const d = document.getElementById('mainDate').value; const v = document.getElementById('tIn').value;
-            if(!v) return; if(!taskDB[d]) taskDB[d] = [];
-            taskDB[d].push({text: v, done: false}); document.getElementById('tIn').value = ''; refresh();
+            const d = document.getElementById('mainDate').value;
+            const v = document.getElementById('tIn').value;
+            if(!v) return;
+            if(!taskDB[d]) taskDB[d] = [];
+            taskDB[d].push({text: v, done: false});
+            document.getElementById('tIn').value = ''; refresh();
         }
 
-        function renderT(d, isPast) {
+        function renderT(d) {
             const l = document.getElementById('tList'); l.innerHTML = '';
+            const q = document.getElementById('quickList'); q.innerHTML = '';
             (taskDB[d] || []).forEach((t, i) => {
-                l.innerHTML += `<div class="item"><input type="checkbox" style="width:22px; height:22px;" ${t.done?'checked':''} ${isPast?'disabled':''} onchange="toggleT('${d}',${i})"><span style="flex:1; margin-left:15px; font-weight:700;" class="${t.done?'completed':''}">${t.text}</span></div>`;
+                const html = `<div class="item">
+                    <input type="checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
+                    <span class="${t.done?'completed-text':''}">${t.text}</span>
+                </div>`;
+                l.innerHTML += html;
+                if(!t.done) q.innerHTML += html;
             });
         }
+
         function toggleT(d, i) { taskDB[d][i].done = !taskDB[d][i].done; refresh(); }
 
+        function addNewSub() {
+            const v = document.getElementById('newSubIn').value;
+            if(v && !subs.includes(v)) { subs.push(v); document.getElementById('newSubIn').value=''; refresh(); }
+        }
+
         function addS() {
-            const d = document.getElementById('mainDate').value; const h = parseFloat(document.getElementById('sHr').value);
-            if(!h) return; if(!studyDB[d]) studyDB[d] = [];
+            const d = document.getElementById('mainDate').value;
+            const h = parseFloat(document.getElementById('sHr').value);
+            if(!h) return;
+            if(!studyDB[d]) studyDB[d] = [];
             studyDB[d].push({subject: document.getElementById('sSub').value, hours: h});
             document.getElementById('sHr').value = ''; refresh();
         }
-        function renderS(d) {
-            const l = document.getElementById('sLog'); l.innerHTML = '';
-            (studyDB[d] || []).forEach(s => l.innerHTML += `<div class="item"><b>${s.subject}</b> <span>${s.hours}h</span></div>`);
+
+        function changeChart(type, el) {
+            chartType = type;
+            document.querySelectorAll('.c-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            updateCharts();
         }
 
-        function addL() {
-            const t = document.getElementById('lTitle').value; const u = document.getElementById('lUrl').value;
-            if(t && u) { linkDB.push({t, u}); document.getElementById('lTitle').value=''; document.getElementById('lUrl').value=''; refresh(); }
-        }
-        function renderL() {
-            const l = document.getElementById('lList'); l.innerHTML = '';
-            linkDB.forEach((link, i) => l.innerHTML += `<div class="item"><a href="${link.u}" target="_blank" style="color:var(--s);text-decoration:none;font-weight:800;">🔗 ${link.t}</a><span style="color:#ef4444;cursor:pointer;font-size:0.75rem;font-weight:800;" onclick="delL(${i})">DELETE</span></div>`);
-        }
-        function delL(i) { linkDB.splice(i, 1); refresh(); }
+        function updateCharts() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            let labels = [], data = [];
+            const count = chartType === 'day' ? 7 : chartType === 'week' ? 4 : chartType === 'month' ? 12 : 5;
 
-        function updateChart() {
-            const ctx = document.getElementById('myChart').getContext('2d');
-            const labels = []; const data = [];
-            for(let i=6; i>=0; i--) {
-                const d = new Date(); d.setDate(d.getDate()-i);
+            for(let i=count-1; i>=0; i--) {
+                const d = new Date();
+                if(chartType === 'day') d.setDate(d.getDate()-i);
+                if(chartType === 'week') d.setDate(d.getDate()-(i*7));
+                
                 const s = d.toISOString().split('T')[0];
-                labels.push(d.toLocaleDateString([],{weekday:'short'}));
-                let h = 0; (studyDB[s]||[]).forEach(x => h+=x.hours);
+                labels.push(chartType === 'day' ? d.toLocaleDateString([],{weekday:'short'}) : s);
+                
+                let h = 0;
+                if(chartType === 'day') (studyDB[s]||[]).forEach(x => h+=x.hours);
+                else {
+                    // Logic for aggregation (weekly/monthly) would go here
+                    (studyDB[s]||[]).forEach(x => h+=x.hours);
+                }
                 data.push(h);
             }
+
             if(window.chartO) window.chartO.destroy();
-            window.chartO = new Chart(ctx, { 
-                type:'line', data:{ labels, datasets:[{label:'Hours', data, borderColor:'#6366f1', tension:0.4, fill:true, backgroundColor:'rgba(99, 102, 241, 0.1)'}] }, 
-                options:{responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{y:{display:false}, x:{ticks:{color:'#64748b', font:{weight:'800'}}, grid:{display:false}}}} 
+            window.chartO = new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 8 }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
             });
         }
+
+        function startTimer() {
+            clearInterval(timerInt);
+            let t = (parseInt(document.getElementById('customTime').value) || 25) * 60;
+            timerInt = setInterval(() => {
+                let m = Math.floor(t/60), s = t%60;
+                document.getElementById('timer').innerText = `${m}:${s<10?'0':''}${s}`;
+                if(t-- <= 0) { clearInterval(timerInt); new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play(); alert("Focus Done!"); }
+            }, 1000);
+        }
+
+        function resetTimer() { clearInterval(timerInt); document.getElementById('timer').innerText = "25:00"; }
+
         document.getElementById('mainDate').valueAsDate = new Date();
         window.onload = refresh;
     </script>

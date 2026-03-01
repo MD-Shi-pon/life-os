@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIPON'S LIFE | Master Stats</title>
+    <title>SHIPON'S LIFE | Tasks Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -74,11 +74,28 @@
         .page { display: none; padding: 25px; max-width: 500px; margin: 0 auto; animation: fadeInUp 0.4s ease; }
         .active-page { display: block; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
         .m3-card { background: var(--surface); border-radius: 28px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); }
         input, select { width: 100%; padding: 14px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: inherit; margin: 8px 0; box-sizing: border-box; }
         button { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; margin-top: 8px; }
-        .list-item { display: flex; align-items: center; padding: 14px; background: rgba(128,128,128,0.05); border-radius: 18px; margin-bottom: 8px; }
-        .motivation-line { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--s); opacity: 0.4; font-weight: 800; }
+        
+        /* Catchy Task List (Left Aligned) */
+        .task-list-container { margin-top: 10px; }
+        .list-item { 
+            display: flex; 
+            align-items: center; 
+            padding: 18px; 
+            background: rgba(255,255,255,0.03); 
+            border-radius: 20px; 
+            margin-bottom: 12px; 
+            border-left: 5px solid var(--p); 
+            text-align: left;
+            transition: 0.2s;
+        }
+        .list-item:active { transform: scale(0.98); }
+        .task-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: var(--s); }
+        .task-label { flex: 1; margin-left: 15px; font-weight: 700; font-size: 1rem; color: var(--text); }
+        .motivation-line { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--s); opacity: 0.4; font-style: italic; }
         
         /* Stats Specific */
         .chip-group { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 5px; }
@@ -95,6 +112,7 @@
             <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0</div>
         </div>
         <div class="m3-card">
+            <small style="font-weight: 800; opacity: 0.5;">Master System Date</small>
             <input type="date" id="mainDate" onchange="window.refresh()">
             <button onclick="window.syncData()" style="background:var(--s); margin-top: 15px;">🔄 SYNC ALL DEVICES</button>
         </div>
@@ -109,7 +127,6 @@
             <div class="chip" onclick="setChartMode('year', this)">Year</div>
             <div class="chip" onclick="setChartMode('comp', this)" style="border-color: var(--s);">Compare</div>
         </div>
-
         <div id="compUI" style="display:none;" class="m3-card">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <input type="date" id="dateA" onchange="updateChart()">
@@ -117,27 +134,39 @@
             </div>
             <select id="compSub" onchange="updateChart()" style="margin-top:10px;"></select>
         </div>
-
         <div class="m3-card" style="height: 350px;"><canvas id="mainChart"></canvas></div>
     </div>
 
     <div id="tasksP" class="page">
-        <h1>Tasks</h1>
-        <div class="m3-card"><input type="text" id="tIn" placeholder="Enter task..."><button onclick="addT()">ADD</button></div>
-        <div id="tList"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h1>Focus Goals</h1>
+            <input type="date" id="taskDate" onchange="refresh()" style="width: auto; padding: 5px 10px; font-size: 0.8rem; height: auto; margin: 0; background: var(--p); border: none;">
+        </div>
+        <div class="m3-card">
+            <input type="text" id="tIn" placeholder="What is the mission?">
+            <button onclick="addT()">COMMIT TASK</button>
+        </div>
+        <div id="tList" class="task-list-container"></div>
     </div>
 
     <div id="dayLogP" class="page">
         <h1>24H Routine</h1>
         <div class="m3-card">
-            <input type="time" id="startTime"><input type="time" id="endTime"><input type="text" id="logAct" placeholder="Activity..."><button onclick="addLog()">LOG</button>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <input type="time" id="startTime"><input type="time" id="endTime">
+            </div>
+            <input type="text" id="logAct" placeholder="Activity..."><button onclick="addLog()">LOG</button>
         </div>
         <div id="logList"></div>
     </div>
 
     <div id="studyP" class="page">
         <h1>Study</h1>
-        <div class="m3-card"><select id="sSub"></select><input type="number" id="sHr" placeholder="Hours"><button onclick="addS()">SAVE</button></div>
+        <div class="m3-card">
+            <select id="sSub"></select>
+            <input type="number" id="sHr" placeholder="Hours" step="0.5">
+            <button onclick="addS()">SAVE PROGRESS</button>
+        </div>
         <div id="sLog"></div>
     </div>
 
@@ -151,8 +180,15 @@
 
     <script>
         let cMode = 'day';
+        
+        // Sync Task Date with Main Date initially
+        document.getElementById('taskDate').value = new Date().toISOString().split('T')[0];
+
         window.refresh = function() {
-            const date = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
+            // Priority: If on Tasks Tab, use taskDate. Otherwise use mainDate.
+            const tDate = document.getElementById('taskDate').value;
+            const mDate = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
+            
             const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
             const tDB = JSON.parse(localStorage.getItem('s_t')) || {};
             const dLogDB = JSON.parse(localStorage.getItem('s_dayLog')) || {};
@@ -169,7 +205,11 @@
                 cSel.innerHTML += `<option>${s}</option>`; 
             });
 
-            renderT(date, tDB); renderS(date, sDB); renderLog(date, dLogDB); updateChart();
+            // Home and Study use Master Date, Tasks uses its own Date Field
+            renderT(tDate, tDB); 
+            renderS(mDate, sDB); 
+            renderLog(mDate, dLogDB); 
+            updateChart();
         };
 
         function setChartMode(m, el) {
@@ -225,16 +265,24 @@
         }
 
         function addT() {
-            let d = document.getElementById('mainDate').value, v = document.getElementById('tIn').value;
+            let d = document.getElementById('taskDate').value, v = document.getElementById('tIn').value;
             let db = JSON.parse(localStorage.getItem('s_t')) || {};
             if(!db[d]) db[d] = []; db[d].push({text: v, done: false});
             localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(true);
+            document.getElementById('tIn').value = '';
         }
         function renderT(d, db) {
             const l = document.getElementById('tList'); l.innerHTML = '';
-            (db[d] || []).forEach((t, i) => { l.innerHTML += `<div class="list-item"><input type="checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})"><span style="flex:1; margin-left:15px; font-weight:700;" class="${t.done?'motivation-line':''}">${t.text}</span></div>`; });
+            (db[d] || []).forEach((t, i) => { 
+                l.innerHTML += `<div class="list-item">
+                    <input type="checkbox" class="task-checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
+                    <span class="task-label ${t.done?'motivation-line':''}">${t.text}</span>
+                    <span onclick="delT('${d}',${i})" style="color:#ef4444; font-size:0.6rem; cursor:pointer; font-weight:800; margin-left:10px;">DEL</span>
+                </div>`; 
+            });
         }
         function toggleT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(true); }
+        function delT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d].splice(i, 1); localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(true); }
 
         function addS() {
             let d = document.getElementById('mainDate').value, h = parseFloat(document.getElementById('sHr').value), sub = document.getElementById('sSub').value;
@@ -242,6 +290,7 @@
             if(!db[d]) db[d] = []; let ex = db[d].find(x => x.subject === sub);
             if(ex) ex.hours += h; else db[d].push({subject: sub, hours: h});
             localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(true);
+            document.getElementById('sHr').value = '';
         }
         function renderS(d, db) {
             const l = document.getElementById('sLog'); l.innerHTML = '';
@@ -253,6 +302,7 @@
             let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
             if(!db[d]) db[d] = []; db[d].push({start: s, end: e, act: a});
             localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(true);
+            document.getElementById('logAct').value = '';
         }
         function renderLog(d, db) {
             const l = document.getElementById('logList'); l.innerHTML = '';

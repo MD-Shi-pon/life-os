@@ -85,10 +85,10 @@ window.refresh = function() {
     renderT(tDate, tDB); 
     renderS(studyDate, sDB); 
     renderLog(logDate, dLogDB);
-    window.updateChart('weekly'); 
+    updateChart(sDB);
 };
 
-// ================= TASKS LOGIC (RESTORED - DO NOT ALTER) =================
+// ================= TASKS LOGIC (NEW CLEAN ALIGNMENT) =================
 window.addT = () => {
     let d = document.getElementById('taskDate').value, v = document.getElementById('tIn').value;
     if(!v || v.trim() === "") return; 
@@ -131,7 +131,7 @@ window.delT = (d, i) => {
     window.refresh();
 };
 
-// ================= TODAY LOGIC (RESTORED - 12H - DO NOT ALTER) =================
+// ================= TODAY LOGIC (LOCKED - 12H) =================
 window.addLog = () => {
     let d = document.getElementById('todayDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
     if (!s || !e || !a) return; 
@@ -168,7 +168,7 @@ window.delLog = (d, i) => {
     window.refresh();
 };
 
-// ================= STUDY LOGIC (RESTORED - DO NOT ALTER) =================
+// ================= STUDY LOGIC (LOCKED) =================
 window.addS = () => {
     let d = document.getElementById('studyDate').value;
     let h = parseFloat(document.getElementById('sHr').value);
@@ -181,7 +181,6 @@ window.addS = () => {
     localStorage.setItem('s_s', JSON.stringify(db)); 
     window.syncData(d); 
     document.getElementById('sHr').value = '';
-    window.refresh();
 };
 
 function renderS(d, db) {
@@ -198,60 +197,26 @@ window.delS = (d, i) => {
     db[d].splice(i, 1); 
     localStorage.setItem('s_s', JSON.stringify(db)); 
     window.syncData(d); 
-    window.refresh();
 };
 
-// ================= STATS ENGINE (NEW ANALYTICS) =================
-window.updateChart = (type) => {
-    const canvas = document.getElementById('mainChart');
+// ================= STATS CHART =================
+function updateChart(sDB) {
+    const canvas = document.getElementById('mainChart'); 
     if(!canvas) return;
-    const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
     let labels = [], data = [];
-    let count = type === 'daily' ? 1 : type === 'weekly' ? 7 : type === 'monthly' ? 30 : 365;
-
-    for(let i = count - 1; i >= 0; i--) {
-        const d = new Date(); d.setDate(d.getDate() - i);
+    for(let i=6; i>=0; i--) {
+        const d = new Date(); d.setDate(d.getDate()-i);
         const s = d.toISOString().split('T')[0];
-        if(type === 'daily') labels.push(new Date().toLocaleTimeString([], {hour:'2-digit'}));
-        else labels.push(d.toLocaleDateString([],{day:'numeric', month:'short'}));
-        let h = 0; (sDB[s] || []).forEach(x => h += parseFloat(x.hours || 0));
+        labels.push(d.toLocaleDateString([],{weekday:'short'}));
+        let h = 0; (sDB[s]||[]).forEach(x => h += parseFloat(x.hours || 0));
         data.push(h);
     }
-
     if(window.chartO) window.chartO.destroy();
     window.chartO = new Chart(canvas.getContext('2d'), {
-        type: 'line',
-        data: { labels, datasets: [{ label: 'Hours', data, borderColor: '#6366f1', tension: 0.3, fill: true, backgroundColor: 'rgba(99, 102, 241, 0.1)' }] },
-        options: { maintainAspectRatio: false }
+        type: 'bar', data: { labels, datasets: [{ label: 'Hours', data, backgroundColor: '#6366f1', borderRadius: 8 }] },
+        options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
     });
-};
-
-window.compareSubjects = () => {
-    const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
-    const subTotals = {};
-    Object.values(sDB).forEach(day => day.forEach(e => subTotals[e.subject] = (subTotals[e.subject] || 0) + parseFloat(e.hours)));
-    
-    if(window.chartO) window.chartO.destroy();
-    window.chartO = new Chart(document.getElementById('mainChart').getContext('2d'), {
-        type: 'doughnut',
-        data: { labels: Object.keys(subTotals), datasets: [{ data: Object.values(subTotals), backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444'] }] },
-        options: { maintainAspectRatio: false }
-    });
-};
-
-window.compareDates = () => {
-    const d1 = document.getElementById('compDate1').value;
-    const d2 = document.getElementById('compDate2').value;
-    const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
-    const getH = (date) => { let t = 0; (sDB[date] || []).forEach(e => t += parseFloat(e.hours)); return t; };
-
-    if(window.chartO) window.chartO.destroy();
-    window.chartO = new Chart(document.getElementById('mainChart').getContext('2d'), {
-        type: 'bar',
-        data: { labels: [d1, d2], datasets: [{ label: 'Hours', data: [getH(d1), getH(d2)], backgroundColor: ['#6366f1', '#10b981'] }] },
-        options: { maintainAspectRatio: false }
-    });
-};
+}
 
 // INIT
 document.getElementById('taskDate').valueAsDate = new Date();

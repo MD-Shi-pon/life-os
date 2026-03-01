@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life OS | Shipon Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+      // Your verified config from Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyAskdYkHhoxKH52icAEeqYaq2XRrmCcdBs",
+        authDomain: "shipon-life-os.firebaseapp.com",
+        projectId: "shipon-life-os",
+        storageBucket: "shipon-life-os.firebasestorage.app",
+        messagingSenderId: "957123699373",
+        appId: "1:957123699373:web:b3c579ad5c2604cf6b5c24",
+        measurementId: "G-F5HDLWS5WC"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      window.backupToCloud = async () => {
+          const date = document.getElementById('mainDate').value;
+          const data = {
+              tasks: JSON.parse(localStorage.getItem('shipon_tasks'))?.[date] || [],
+              study: JSON.parse(localStorage.getItem('shipon_study'))?.[date] || [],
+              links: JSON.parse(localStorage.getItem('shipon_links')) || [],
+              subjects: JSON.parse(localStorage.getItem('shipon_subjects')) || ["English", "Marketing"],
+              syncTime: new Date()
+          };
+          
+          try {
+              await setDoc(doc(db, "users", "shipon", "history", date), data);
+              alert("✅ Cloud Sync Successful");
+          } catch (e) { alert("❌ Sync Error: " + e.message); }
+      };
+    </script>
+
+    <style>
+        :root { --primary: #4f46e5; --accent: #f59e0b; --success: #10b981; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 100px; }
+        .page { display: none; padding: 20px; max-width: 500px; margin: 0 auto; animation: fadeIn 0.3s ease; }
+        .active-page { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; background: #0f172a; display: flex; justify-content: space-around; padding: 10px; border-radius: 20px; z-index: 1000; }
+        .nav-item { cursor: pointer; color: #94a3b8; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 10px; border-radius: 12px; transition: 0.3s; }
+        .nav-item.active { color: #fff; background: var(--primary); }
+
+        .card { background: var(--card); padding: 20px; border-radius: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        h1 { font-weight: 800; font-size: 1.5rem; margin-bottom: 15px; }
+        input, select, button { width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px; border: 1.5px solid #e2e8f0; font-size: 1rem; box-sizing: border-box; outline: none; }
+        button { background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer; }
+        .btn-sync { background: var(--success); }
+        
+        .score-display { text-align: center; background: linear-gradient(135deg, #4f46e5, #818cf8); color: white; padding: 20px; border-radius: 24px; margin-bottom: 15px; }
+        .item { display: flex; align-items: center; padding: 12px; background: #f9fafb; border-radius: 15px; margin-bottom: 8px; border: 1px solid #f1f5f9; }
+        .item span { flex: 1; margin-left: 10px; font-weight: 600; }
+        .completed { text-decoration: line-through; opacity: 0.5; }
+        .del-btn { color: #ef4444; font-weight: 700; font-size: 0.8rem; cursor: pointer; margin-left: auto; }
+    </style>
+</head>
+<body>
+
+    <div id="homePage" class="page active-page">
+        <h1>Dashboard</h1>
+        <input type="date" id="mainDate" onchange="refreshUI()">
+        <button class="btn-sync" onclick="backupToCloud()">Sync to Cloud</button>
+
+        <div class="score-display">
+            <small>Performance Score</small>
+            <div style="font-size: 3rem; font-weight: 800;" id="perfScore">0</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="card" style="margin:0"><small>Tasks</small><div id="homeTask" style="font-size:1.5rem; font-weight:800;">0%</div></div>
+            <div class="card" style="margin:0"><small>Study</small><div id="homeStudy" style="font-size:1.5rem; font-weight:800; color:var(--accent)">0.0h</div></div>
+        </div>
+        <div class="card"><canvas id="myChart" style="height:180px;"></canvas></div>
+    </div>
+
+    <div id="tasksPage" class="page">
+        <h1>Tasks</h1>
+        <div class="card">
+            <input type="text" id="taskInput" placeholder="New goal...">
+            <button onclick="addTask()">Add Task</button>
+        </div>
+        <div id="taskList"></div>
+    </div>
+
+    <div id="studyPage" class="page">
+        <h1>Study</h1>
+        <div class="card">
+            <div style="display:flex; gap:5px">
+                <select id="subSelect" style="flex:2"></select>
+                <button onclick="addNewSubject()" style="flex:1; font-size:0.7rem">+ New</button>
+            </div>
+            <input type="number" id="hrInput" placeholder="Hours" step="0.5">
+            <button style="background:var(--accent)" onclick="addStudy()">Log Time</button>
+        </div>
+        <div id="studyLog"></div>
+    </div>
+
+    <div id="vaultPage" class="page">
+        <h1>Vault</h1>
+        <div class="card">
+            <input type="text" id="linkTitle" placeholder="Title">
+            <input type="text" id="linkURL" placeholder="URL">
+            <button style="background:#6366f1" onclick="addLink()">Save Link</button>
+        </div>
+        <div id="linkList"></div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" id="navHome" onclick="nav('homePage')">Home</div>
+        <div class="nav-item" id="navTasks" onclick="nav('tasksPage')">Tasks</div>
+        <div class="nav-item" id="navStudy" onclick="nav('studyPage')">Study</div>
+        <div class="nav-item" id="navVault" onclick="nav('vaultPage')">Vault</div>
+    </div>
+
+    <script>
+        document.getElementById('mainDate').valueAsDate = new Date();
+        let taskDB = JSON.parse(localStorage.getItem('shipon_tasks')) || {};
+        let studyDB = JSON.parse(localStorage.getItem('shipon_study')) || {};
+        let linkDB = JSON.parse(localStorage.getItem('shipon_links')) || [];
+        let subjects = JSON.parse(localStorage.getItem('shipon_subjects')) || ["English", "Marketing"];
+        let chart = null;
+
+        function nav(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+            document.getElementById(id).classList.add('active-page');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('nav' + id.replace('Page','')).classList.add('active');
+            refreshUI();
+        }
+
+        function refreshUI() {
+            const date = document.getElementById('mainDate').value;
+            const dayT = taskDB[date] || [];
+            const dayS = studyDB[date] || [];
+
+            const done = dayT.filter(t => t.done).length;
+            const tPct = dayT.length ? (done/dayT.length)*100 : 0;
+            document.getElementById('homeTask').innerText = Math.round(tPct) + "%";
+
+            let h = 0; dayS.forEach(s => h += s.hours);
+            document.getElementById('homeStudy').innerText = h.toFixed(1) + "h";
+
+            const sPct = Math.min((h / 4) * 100, 100);
+            document.getElementById('perfScore').innerText = Math.round((tPct * 0.5) + (sPct * 0.5));
+
+            const sel = document.getElementById('subSelect');
+            sel.innerHTML = ''; subjects.forEach(s => sel.innerHTML += `<option>${s}</option>`);
+
+            renderTasks(date);
+            renderStudy(date);
+            renderLinks();
+            updateChart();
+
+            localStorage.setItem('shipon_tasks', JSON.stringify(taskDB));
+            localStorage.setItem('shipon_study', JSON.stringify(studyDB));
+            localStorage.setItem('shipon_links', JSON.stringify(linkDB));
+            localStorage.setItem('shipon_subjects', JSON.stringify(subjects));
+        }
+
+        function addTask() {
+            const d = document.getElementById('mainDate').value;
+            const v = document.getElementById('taskInput').value;
+            if(!v) return;
+            if(!taskDB[d]) taskDB[d] = [];
+            taskDB[d].push({text: v, done: false});
+            document.getElementById('taskInput').value = '';
+            refreshUI();
+        }
+
+        function addStudy() {
+            const d = document.getElementById('mainDate').value;
+            const h = parseFloat(document.getElementById('hrInput').value);
+            if(!h) return;
+            if(!studyDB[d]) studyDB[d] = [];
+            studyDB[d].push({subject: document.getElementById('subSelect').value, hours: h});
+            document.getElementById('hrInput').value = '';
+            refreshUI();
+        }
+
+        function addLink() {
+            const t = document.getElementById('linkTitle').value;
+            const u = document.getElementById('linkURL').value;
+            if(t && u) { linkDB.push({title: t, url: u}); refreshUI(); }
+        }
+
+        function addNewSubject() {
+            const s = prompt("New Subject:");
+            if(s && !subjects.includes(s)) { subjects.push(s); refreshUI(); }
+        }
+
+        function renderTasks(d) {
+            const l = document.getElementById('taskList'); l.innerHTML = '';
+            (taskDB[d] || []).forEach((t, i) => {
+                l.innerHTML += `<div class="item">
+                    <input type="checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})">
+                    <span class="${t.done?'completed':''}">${t.text}</span>
+                    <div class="del-btn" onclick="deleteT('${d}',${i})">REMOVE</div>
+                </div>`;
+            });
+        }
+
+        function toggleT(d, i) { taskDB[d][i].done = !taskDB[d][i].done; refreshUI(); }
+        function deleteT(d, i) { taskDB[d].splice(i, 1); refreshUI(); }
+
+        function renderStudy(d) {
+            const l = document.getElementById('studyLog'); l.innerHTML = '';
+            (studyDB[d] || []).forEach(s => l.innerHTML += `<div class="item"><b>${s.subject}</b>: ${s.hours}h</div>`);
+        }
+
+        function renderLinks() {
+            const l = document.getElementById('linkList'); l.innerHTML = '';
+            linkDB.forEach(link => {
+                l.innerHTML += `<div class="card"><a href="${link.url}" target="_blank" style="text-decoration:none; color:var(--primary); font-weight:700;">${link.title}</a></div>`;
+            });
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const labels = []; const data = [];
+            for(let i=6; i>=0; i--) {
+                const d = new Date(); d.setDate(d.getDate()-i);
+                const s = d.toISOString().split('T')[0];
+                labels.push(d.toLocaleDateString([],{weekday:'short'}));
+                let h = 0; (studyDB[s]||[]).forEach(x => h+=x.hours);
+                data.push(h);
+            }
+            if(chart) chart.destroy();
+            chart = new Chart(ctx, { type:'line', data:{ labels, datasets:[{label:'Hours', data, borderColor:'#4f46e5', tension:0.4, fill:true, backgroundColor:'rgba(79, 70, 229, 0.05)'}] }, options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}} });
+        }
+
+        window.onload = refreshUI;
+    </script>
+</body>
+</html>

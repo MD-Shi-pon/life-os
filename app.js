@@ -88,7 +88,120 @@ window.refresh = function() {
     window.updateChart('weekly'); 
 };
 
-// ================= STATS ENGINE (NEW) =================
+// ================= TASKS LOGIC (RESTORED - DO NOT ALTER) =================
+window.addT = () => {
+    let d = document.getElementById('taskDate').value, v = document.getElementById('tIn').value;
+    if(!v || v.trim() === "") return; 
+    let db = JSON.parse(localStorage.getItem('s_t')) || {};
+    if(!db[d]) db[d] = []; 
+    db[d].push({text: v, done: false});
+    localStorage.setItem('s_t', JSON.stringify(db)); 
+    window.syncData(d); 
+    document.getElementById('tIn').value='';
+    window.refresh();
+};
+
+function renderT(d, db) {
+    const l = document.getElementById('tList'); 
+    if(!l) return;
+    l.innerHTML = '';
+    (db[d] || []).forEach((t, i) => { 
+        l.innerHTML += `
+            <div class="list-item">
+                <input type="checkbox" ${t.done?'checked':''} onchange="window.toggleT('${d}',${i})" style="width:20px; height:20px; accent-color:var(--s);">
+                <span class="item-label ${t.done?'motivation-line':''}">${t.text}</span>
+                <span onclick="window.delT('${d}',${i})" class="del-btn">DEL</span>
+            </div>`; 
+    });
+}
+
+window.toggleT = (d, i) => { 
+    let db = JSON.parse(localStorage.getItem('s_t')); 
+    db[d][i].done = !db[d][i].done; 
+    localStorage.setItem('s_t', JSON.stringify(db)); 
+    window.syncData(d); 
+    window.refresh();
+};
+
+window.delT = (d, i) => { 
+    let db = JSON.parse(localStorage.getItem('s_t')); 
+    db[d].splice(i, 1); 
+    localStorage.setItem('s_t', JSON.stringify(db)); 
+    window.syncData(d); 
+    window.refresh();
+};
+
+// ================= TODAY LOGIC (RESTORED - 12H - DO NOT ALTER) =================
+window.addLog = () => {
+    let d = document.getElementById('todayDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
+    if (!s || !e || !a) return; 
+    let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
+    if (!db[d]) db[d] = []; 
+    db[d].push({start: s, end: e, act: a});
+    localStorage.setItem('s_dayLog', JSON.stringify(db)); 
+    window.syncData(d); 
+    document.getElementById('logAct').value = '';
+    window.refresh();
+};
+
+function renderLog(d, db) {
+    const l = document.getElementById('logList'); 
+    if(!l) return;
+    l.innerHTML = '';
+    (db[d] || []).forEach((item, i) => { 
+        l.innerHTML += `
+            <div class="list-item">
+                <span style="font-weight:800; color:var(--p); font-size:0.75rem; min-width:115px; text-align:left;">
+                    ${format12(item.start)} — ${format12(item.end)}
+                </span>
+                <span class="item-label">${item.act}</span>
+                <span onclick="window.delLog('${d}',${i})" class="del-btn">DEL</span>
+            </div>`; 
+    });
+}
+
+window.delLog = (d, i) => { 
+    let db = JSON.parse(localStorage.getItem('s_dayLog')); 
+    db[d].splice(i, 1); 
+    localStorage.setItem('s_dayLog', JSON.stringify(db)); 
+    window.syncData(d); 
+    window.refresh();
+};
+
+// ================= STUDY LOGIC (RESTORED - DO NOT ALTER) =================
+window.addS = () => {
+    let d = document.getElementById('studyDate').value;
+    let h = parseFloat(document.getElementById('sHr').value);
+    let sub = document.getElementById('sSub').value;
+    let time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if(!h) return; 
+    let db = JSON.parse(localStorage.getItem('s_s')) || {};
+    if(!db[d]) db[d] = []; 
+    db[d].push({ subject: sub, hours: h, time: time });
+    localStorage.setItem('s_s', JSON.stringify(db)); 
+    window.syncData(d); 
+    document.getElementById('sHr').value = '';
+    window.refresh();
+};
+
+function renderS(d, db) {
+    const l = document.getElementById('sLog'); 
+    if(!l) return;
+    l.innerHTML = '';
+    (db[d] || []).forEach((s, i) => { 
+        l.innerHTML += `<div class="list-item"><span class="item-label"><small>${s.time}</small> <b>${s.subject}</b>: ${s.hours}h</span><span onclick="window.delS('${d}',${i})" class="del-btn">DEL</span></div>`; 
+    });
+}
+
+window.delS = (d, i) => { 
+    let db = JSON.parse(localStorage.getItem('s_s')); 
+    db[d].splice(i, 1); 
+    localStorage.setItem('s_s', JSON.stringify(db)); 
+    window.syncData(d); 
+    window.refresh();
+};
+
+// ================= STATS ENGINE (NEW ANALYTICS) =================
 window.updateChart = (type) => {
     const canvas = document.getElementById('mainChart');
     if(!canvas) return;
@@ -139,56 +252,6 @@ window.compareDates = () => {
         options: { maintainAspectRatio: false }
     });
 };
-
-// ================= TASKS LOGIC (LOCKED) =================
-window.addT = () => {
-    let d = document.getElementById('taskDate').value, v = document.getElementById('tIn').value;
-    if(!v) return; 
-    let db = JSON.parse(localStorage.getItem('s_t')) || {};
-    if(!db[d]) db[d] = []; db[d].push({text: v, done: false});
-    localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d); document.getElementById('tIn').value='';
-    window.refresh();
-};
-function renderT(d, db) {
-    const l = document.getElementById('tList'); if(!l) return; l.innerHTML = '';
-    (db[d] || []).forEach((t, i) => { 
-        l.innerHTML += `<div class="list-item"><input type="checkbox" ${t.done?'checked':''} onchange="window.toggleT('${d}',${i})" style="width:20px; height:20px; accent-color:var(--s);"><span class="item-label ${t.done?'motivation-line':''}">${t.text}</span><span onclick="window.delT('${d}',${i})" class="del-btn">DEL</span></div>`; 
-    });
-}
-window.toggleT = (d, i) => { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d); window.refresh(); };
-window.delT = (d, i) => { let db = JSON.parse(localStorage.getItem('s_t')); db[d].splice(i, 1); localStorage.setItem('s_t', JSON.stringify(db)); window.syncData(d); window.refresh(); };
-
-// ================= TODAY LOGIC (LOCKED) =================
-window.addLog = () => {
-    let d = document.getElementById('todayDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
-    if (!s || !e || !a) return; 
-    let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
-    if (!db[d]) db[d] = []; db[d].push({start: s, end: e, act: a});
-    localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d); 
-    document.getElementById('logAct').value = ''; window.refresh();
-};
-function renderLog(d, db) {
-    const l = document.getElementById('logList'); if(!l) return; l.innerHTML = '';
-    (db[d] || []).forEach((item, i) => { 
-        l.innerHTML += `<div class="list-item"><span style="font-weight:800; color:var(--p); font-size:0.75rem; min-width:115px; text-align:left;">${format12(item.start)} — ${format12(item.end)}</span><span class="item-label">${item.act}</span><span onclick="window.delLog('${d}',${i})" class="del-btn">DEL</span></div>`; 
-    });
-}
-window.delLog = (d, i) => { let db = JSON.parse(localStorage.getItem('s_dayLog')); db[d].splice(i, 1); localStorage.setItem('s_dayLog', JSON.stringify(db)); window.syncData(d); window.refresh(); };
-
-// ================= STUDY LOGIC (LOCKED) =================
-window.addS = () => {
-    let d = document.getElementById('studyDate').value, h = parseFloat(document.getElementById('sHr').value), sub = document.getElementById('sSub').value;
-    let time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    if(!h) return; let db = JSON.parse(localStorage.getItem('s_s')) || {};
-    if(!db[d]) db[d] = []; db[d].push({ subject: sub, hours: h, time: time });
-    localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(d); document.getElementById('sHr').value = '';
-    window.refresh();
-};
-function renderS(d, db) {
-    const l = document.getElementById('sLog'); if(!l) return; l.innerHTML = '';
-    (db[d] || []).forEach((s, i) => { l.innerHTML += `<div class="list-item"><span class="item-label"><small>${s.time}</small> <b>${s.subject}</b>: ${s.hours}h</span><span onclick="window.delS('${d}',${i})" class="del-btn">DEL</span></div>`; });
-}
-window.delS = (d, i) => { let db = JSON.parse(localStorage.getItem('s_s')); db[d].splice(i, 1); localStorage.setItem('s_s', JSON.stringify(db)); window.syncData(d); window.refresh(); };
 
 // INIT
 document.getElementById('taskDate').valueAsDate = new Date();

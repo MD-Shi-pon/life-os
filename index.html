@@ -4,85 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SHIPON'S LIFE | Master OS</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./style.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="dark-mode">
 
-    <div class="theme-toggle" onclick="toggleTheme()">🌗</div>
+    <div class="theme-toggle" onclick="window.toggleTheme()">🌗</div>
 
     <div id="homeP" class="page active-page">
-        <h1 class="main-title">SHIPON'S LIFE</h1>
-        <div class="glass-card mastery-hero">
-            <small id="homeDay"></small>
-            <div id="lifeH">0.0</div>
-            <small class="label">Lifetime Study Hours</small>
+        <h1 style="margin:0; font-weight:800; letter-spacing: -2px;">SHIPON'S LIFE</h1>
+        <div class="glass-card" style="text-align: center; border-left: 8px solid var(--p); margin-top: 20px;">
+            <small id="homeDay" style="text-transform: uppercase; font-weight: 800; color: var(--p); letter-spacing: 1px;"></small>
+            <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0</div>
+            <small style="opacity: 0.6; font-weight: 700;">Lifetime Mastery Hours</small>
         </div>
         <div class="glass-card">
             <input type="date" id="mainDate" onchange="window.refresh()">
-            <button onclick="window.syncData(document.getElementById('mainDate').value)" class="btn-s">🔄 CLOUD SYNC</button>
+            <button onclick="window.syncData(document.getElementById('mainDate').value)" style="background:var(--s); margin-top: 15px;">🔄 GLOBAL CLOUD SYNC</button>
         </div>
     </div>
 
     <div id="statsP" class="page">
         <h1>Analytics</h1>
-        <div class="glass-card chart-container"><canvas id="mainChart"></canvas></div>
+        <div class="glass-card" style="height: 300px;"><canvas id="mainChart"></canvas></div>
     </div>
 
     <div id="tasksP" class="page">
-        <div class="flex-header">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
             <h1>Mission</h1>
-            <input type="date" id="taskDate" onchange="window.refresh()" class="date-chip p-bg">
+            <input type="date" id="taskDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--p); border: none; color: white; border-radius: 8px;">
         </div>
         <div class="glass-card">
-            <input type="text" id="tIn" placeholder="Commit to a task...">
-            <button onclick="addT()">ADD TASK</button>
+            <input type="text" id="tIn" placeholder="New goal...">
+            <button onclick="window.addT()">ADD TASK</button>
         </div>
         <div id="tList"></div>
     </div>
 
     <div id="dayLogP" class="page">
-        <div class="flex-header">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
             <h1>Today</h1>
-            <input type="date" id="todayDate" onchange="window.refresh()" class="date-chip s-bg">
+            <input type="date" id="todayDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--s); border: none; color: white; border-radius: 8px;">
         </div>
         <div class="glass-card">
-            <div class="time-grid">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <input type="time" id="startTime"><input type="time" id="endTime">
             </div>
-            <input type="text" id="logAct" placeholder="Activity...">
-            <button onclick="addLog()">LOG ROUTINE</button>
+            <input type="text" id="logAct" placeholder="Activity..."><button onclick="window.addLog()">LOG ROUTINE</button>
         </div>
         <div id="logList"></div>
     </div>
 
     <div id="studyP" class="page">
-        <div class="flex-header">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
             <h1>Study</h1>
-            <input type="date" id="studyDate" onchange="window.refresh()" class="date-chip p-bg">
+            <input type="date" id="studyDate" onchange="window.refresh()" style="width: auto; height: 35px; padding: 0 10px; font-size: 0.8rem; background: var(--p); border: none; color: white; border-radius: 8px;">
         </div>
-        <div class="glass-card">
-            <select id="sSub"></select>
-            <input type="number" id="sHr" placeholder="Hours" step="0.5">
-            <button onclick="addS()">SAVE PROGRESS</button>
-            <hr class="divider">
-            <input type="text" id="newSubIn" placeholder="New Field...">
-            <button onclick="addNewSub()" class="btn-dark">+ ADD SUBJECT</button>
-        </div>
-        <div id="sLog"></div>
-        <h3 class="section-label">Manage Fields</h3>
-        <div id="subManageList"></div>
-    </div>
-
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="nav('homeP', this)">Home</div>
-        <div class="nav-item" onclick="nav('statsP', this)">Stats</div>
-        <div class="nav-item" onclick="nav('tasksP', this)">Tasks</div>
-        <div class="nav-item" onclick="nav('dayLogP', this)">Today</div>
-        <div class="nav-item" onclick="nav('studyP', this)">Study</div>
-    </nav>
-
-    <script type="module" src="app.js"></script>
-</body>
-</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHIPON's Life | Pro</title>
+    <title>SHIPON's Life | Unlimited</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -30,84 +30,74 @@
               tasks: JSON.parse(localStorage.getItem('s_t'))?.[date] || [],
               study: JSON.parse(localStorage.getItem('s_s'))?.[date] || [],
               links: JSON.parse(localStorage.getItem('s_l')) || [],
-              mode: document.body.classList.contains('light-mode') ? 'light' : 'dark'
+              subs: JSON.parse(localStorage.getItem('s_subs')) || ["English (IELTS)", "Digital Marketing"]
           };
           try {
               await setDoc(doc(db, "users", "shipon", "history", date), data);
-              alert("🚀 Data Archived Successfully");
-          } catch (e) { alert("Error: " + e.message); }
+              alert("🚀 SHIPON's Data Synced");
+          } catch (e) { alert("Sync Error: " + e.message); }
       };
     </script>
 
     <style>
-        :root { --p: #6366f1; --s: #10b981; --a: #f59e0b; --bg: #020617; --glass: rgba(15, 23, 42, 0.8); --text: #f8fafc; }
-        .light-mode { --bg: #f8fafc; --glass: rgba(255, 255, 255, 0.9); --text: #0f172a; }
+        :root { --p: #6366f1; --s: #10b981; --a: #f59e0b; --bg: #020617; --glass: rgba(15, 23, 42, 0.85); --text: #f8fafc; --border: rgba(255, 255, 255, 0.1); }
+        .light-mode { --bg: #ffffff; --glass: rgba(241, 245, 249, 0.9); --text: #0f172a; --border: rgba(15, 23, 42, 0.1); }
 
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); 
-            min-height: 100vh; transition: background 0.3s; overflow-x: hidden;
-        }
-
-        /* Sidebar Navigation */
-        .sidebar { 
-            position: fixed; left: -260px; top: 0; height: 100%; width: 250px; 
-            background: var(--glass); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1);
-            transition: 0.3s ease; z-index: 2000; padding-top: 60px;
-        }
-        .sidebar.open { left: 0; }
-        .nav-item { padding: 18px 25px; font-weight: 800; cursor: pointer; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; }
-        .nav-item.active { color: var(--p); border-left: 4px solid var(--p); background: rgba(99, 102, 241, 0.1); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); min-height: 100vh; transition: 0.4s; overflow-x: hidden; }
         
-        .menu-toggle { position: fixed; top: 20px; left: 20px; z-index: 2100; font-size: 1.5rem; cursor: pointer; color: var(--p); }
+        .sidebar { position: fixed; left: -260px; top: 0; height: 100%; width: 250px; background: var(--glass); backdrop-filter: blur(25px); border-right: 1px solid var(--border); transition: 0.3s ease-out; z-index: 2000; padding-top: 80px; }
+        .sidebar.open { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.3); }
+        .nav-item { padding: 20px 30px; font-weight: 800; cursor: pointer; color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-item.active { color: var(--text); border-left: 5px solid var(--p); background: rgba(99, 102, 241, 0.1); }
+        
+        .menu-toggle { position: fixed; top: 25px; left: 25px; z-index: 2100; font-size: 1.4rem; cursor: pointer; color: var(--p); font-weight: 900; }
+        .btn-mode { position: fixed; top: 22px; right: 25px; width: auto; padding: 10px 20px; background: var(--p); color: white; z-index: 2100; font-size: 0.75rem; border-radius: 15px; border:none; font-weight:800; }
 
-        .page { display: none; padding: 80px 25px 40px; max-width: 480px; margin: 0 auto; animation: fadeIn 0.4s; }
+        .page { display: none; padding: 100px 25px 40px; max-width: 480px; margin: 0 auto; animation: fadeIn 0.4s ease; }
         .active-page { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .glass-card { background: var(--glass); border-radius: 32px; padding: 25px; margin-bottom: 20px; border: 1px solid rgba(128,128,128,0.1); }
-        .lock-notice { display: none; color: #f43f5e; font-weight: 800; text-align: center; margin-bottom: 15px; font-size: 0.7rem; }
-        .locked input, .locked button, .locked select { opacity: 0.2; pointer-events: none; }
+        .glass-card { background: var(--glass); border-radius: 35px; padding: 25px; margin-bottom: 22px; border: 1px solid var(--border); }
+        .locked { opacity: 0.25; pointer-events: none; filter: grayscale(1); }
 
-        button { width: 100%; padding: 16px; margin: 10px 0; border-radius: 20px; border: none; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        button { width: 100%; padding: 18px; margin: 10px 0; border-radius: 22px; border: none; font-weight: 800; cursor: pointer; transition: 0.3s; }
         .btn-p { background: var(--p); color: white; }
-        .btn-mode { position: fixed; top: 20px; right: 20px; width: auto; padding: 10px 15px; background: rgba(128,128,128,0.2); z-index: 2100; }
-
-        input, select { width: 100%; padding: 16px; border-radius: 20px; border: 1px solid rgba(128,128,128,0.2); background: transparent; color: inherit; margin: 8px 0; outline: none; box-sizing: border-box; }
-        .item { padding: 16px; background: rgba(128,128,128,0.05); border-radius: 20px; margin-bottom: 12px; display: flex; align-items: center; }
-        .timer-val { font-size: 3.5rem; font-weight: 900; color: var(--a); margin: 10px 0; }
+        
+        input, select { width: 100%; padding: 16px; border-radius: 20px; border: 1px solid var(--border); background: rgba(128,128,128,0.05); color: inherit; margin: 10px 0; outline: none; box-sizing: border-box; }
+        .item { padding: 18px; background: rgba(128,128,128,0.08); border-radius: 22px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); }
+        .timer-val { font-size: 4rem; font-weight: 900; color: var(--a); margin: 15px 0; }
     </style>
 </head>
 <body class="dark-mode">
 
-    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-    <button class="btn-mode" onclick="toggleDayNight()">🌗 Mode</button>
+    <div class="menu-toggle" onclick="toggleMenu()">MENU</div>
+    <button class="btn-mode" onclick="toggleDayNight()">THEME</button>
 
     <div class="sidebar" id="sidebar">
-        <div class="nav-item active" onclick="nav('homeP')">🏠 Dashboard</div>
-        <div class="nav-item" onclick="nav('tasksP')">🎯 Priority Tasks</div>
-        <div class="nav-item" onclick="nav('studyP')">🧠 Deep Study</div>
-        <div class="nav-item" onclick="nav('vaultP')">🔗 Link Vault</div>
+        <div class="nav-item active" onclick="nav('homeP', this)">DASHBOARD</div>
+        <div class="nav-item" onclick="nav('tasksP', this)">PRIORITY TASKS</div>
+        <div class="nav-item" onclick="nav('studyP', this)">DEEP STUDY</div>
+        <div class="nav-item" onclick="nav('vaultP', this)">LINK VAULT</div>
     </div>
 
     <div id="homeP" class="page active-page">
-        <h1 style="font-size: 2.5rem; margin-bottom: 5px;">SHIPON's Life</h1>
+        <h1 style="font-size: 2.8rem; letter-spacing: -2px;">SHIPON's Life</h1>
         <div class="glass-card" style="text-align: center; border: 2px solid var(--a);">
-            <small style="text-transform: uppercase; letter-spacing: 2px; color: var(--a);">Total Mastery</small>
-            <div style="font-size: 4rem; font-weight: 900;" id="lifeH">0.0h</div>
+            <small style="text-transform: uppercase; letter-spacing: 3px; color: var(--a); font-weight: 800;">TOTAL MASTERY</small>
+            <div style="font-size: 4.5rem; font-weight: 900;" id="lifeH">0.0h</div>
         </div>
         <div class="glass-card">
-            <div id="lockNotice" class="lock-notice">🔒 HISTORY LOCKED: INTEGRITY MODE ACTIVE</div>
             <input type="date" id="mainDate" onchange="refresh()">
-            <div id="editArea"><button onclick="backupToCloud()" class="btn-p" style="background:var(--s)">☁️ Sync to Cloud</button></div>
-            <div style="height:140px; margin-top:15px"><canvas id="myChart"></canvas></div>
+            <button onclick="backupToCloud()" class="btn-p" style="background:var(--s)">SYNC TO CLOUD</button>
+            <div style="height:150px; margin-top:20px"><canvas id="myChart"></canvas></div>
         </div>
     </div>
 
     <div id="tasksP" class="page">
         <h1>Priority Tasks</h1>
         <div id="taskLockArea" class="glass-card">
-            <input type="text" id="tIn" placeholder="Daily focus item...">
-            <button onclick="addT()" class="btn-p">Add Goal</button>
+            <input type="text" id="tIn" placeholder="Daily focus goal...">
+            <button onclick="addT()" class="btn-p">COMMIT GOAL</button>
         </div>
         <div id="tList"></div>
     </div>
@@ -115,17 +105,25 @@
     <div id="studyP" class="page">
         <h1>Deep Study</h1>
         <div class="glass-card" style="text-align: center;">
-            <input type="number" id="customTime" placeholder="Set Minutes" value="25" style="width: 50%; text-align: center;">
+            <input type="number" id="customTime" value="25" style="width: 40%; text-align: center; font-size: 1.5rem; font-weight: 800; border: none; background: none; color:inherit;">
             <div class="timer-val" id="timer">25:00</div>
-            <div style="display: flex; gap: 10px;">
-                <button onclick="startTimer()" style="background:var(--a)">Start</button>
-                <button onclick="resetTimer()" style="background:#475569">Reset</button>
+            <div style="display: flex; gap: 12px;">
+                <button onclick="startTimer()" style="background:var(--a); color: #000;">START</button>
+                <button onclick="resetTimer()" style="background:#475569; color: #fff;">RESET</button>
             </div>
         </div>
+        
         <div id="studyLockArea" class="glass-card">
-            <select id="sSub"><option>English (IELTS)</option><option>Digital Marketing</option></select>
+            <label style="font-size: 0.7rem; font-weight: 800; opacity: 0.6;">SELECT SUBJECT</label>
+            <select id="sSub"></select>
+            
             <input type="number" id="sHr" placeholder="Manual Hours Log" step="0.5">
-            <button onclick="addS()" class="btn-p">Log Session</button>
+            <button onclick="addS()" class="btn-p">LOG PROGRESS</button>
+            
+            <hr style="opacity: 0.1; margin: 20px 0;">
+            <label style="font-size: 0.7rem; font-weight: 800; opacity: 0.6;">MANAGE LIST</label>
+            <input type="text" id="newSubInput" placeholder="New Subject Name...">
+            <button onclick="addNewSub()" style="background: #475569; font-size: 0.8rem;">+ ADD TO LIST</button>
         </div>
         <div id="sLog"></div>
     </div>
@@ -133,9 +131,9 @@
     <div id="vaultP" class="page">
         <h1>Link Vault</h1>
         <div class="glass-card">
-            <input type="text" id="lTitle" placeholder="Link Name">
+            <input type="text" id="lTitle" placeholder="Resource Name">
             <input type="text" id="lUrl" placeholder="https://...">
-            <button onclick="addL()" style="background:var(--a); color:#000">Save Resource</button>
+            <button onclick="addL()" style="background:var(--a); color:#000">SAVE RESOURCE</button>
         </div>
         <div id="lList"></div>
     </div>
@@ -144,15 +142,17 @@
         let taskDB = JSON.parse(localStorage.getItem('s_t')) || {};
         let studyDB = JSON.parse(localStorage.getItem('s_s')) || {};
         let linkDB = JSON.parse(localStorage.getItem('s_l')) || [];
+        let subList = JSON.parse(localStorage.getItem('s_subs')) || ["English (IELTS)", "Digital Marketing"];
         let tInt;
 
         function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); }
         function toggleDayNight() { document.body.classList.toggle('light-mode'); }
 
-        function nav(id) {
+        function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.getElementById(id).classList.add('active-page');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
             toggleMenu(); refresh();
         }
 
@@ -161,28 +161,43 @@
             const selDate = document.getElementById('mainDate').value;
             const isPast = selDate < today;
 
-            document.getElementById('lockNotice').style.display = isPast ? 'block' : 'none';
-            const locks = [document.getElementById('editArea'), document.getElementById('taskLockArea'), document.getElementById('studyLockArea')];
+            const locks = [document.getElementById('taskLockArea'), document.getElementById('studyLockArea')];
             locks.forEach(l => isPast ? l.classList.add('locked') : l.classList.remove('locked'));
 
             let tL = 0; Object.values(studyDB).forEach(day => day.forEach(s => tL += s.hours));
             document.getElementById('lifeH').innerText = tL.toFixed(1) + "h";
 
+            // Update Subject Dropdown
+            const sel = document.getElementById('sSub'); sel.innerHTML = '';
+            subList.forEach(s => sel.innerHTML += `<option>${s}</option>`);
+
             renderT(selDate, isPast); renderS(selDate); renderL(); updateChart();
-            localStorage.setItem('s_t', JSON.stringify(taskDB)); localStorage.setItem('s_s', JSON.stringify(studyDB)); localStorage.setItem('s_l', JSON.stringify(linkDB));
+            localStorage.setItem('s_t', JSON.stringify(taskDB)); 
+            localStorage.setItem('s_s', JSON.stringify(studyDB)); 
+            localStorage.setItem('s_l', JSON.stringify(linkDB));
+            localStorage.setItem('s_subs', JSON.stringify(subList));
+        }
+
+        function addNewSub() {
+            const val = document.getElementById('newSubInput').value;
+            if(val && !subList.includes(val)) {
+                subList.push(val);
+                document.getElementById('newSubInput').value = '';
+                refresh();
+                alert("✅ Added: " + val);
+            }
         }
 
         function startTimer() {
             clearInterval(tInt);
-            let mins = parseInt(document.getElementById('customTime').value) || 25;
-            let time = mins * 60;
+            let time = (parseInt(document.getElementById('customTime').value) || 25) * 60;
             tInt = setInterval(() => {
                 let m = Math.floor(time / 60); let s = time % 60;
                 document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
                 if (time-- <= 0) {
                     clearInterval(tInt);
                     new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play();
-                    alert("Focus Session Complete!");
+                    alert("Focus session complete!");
                 }
             }, 1000);
         }
@@ -198,7 +213,7 @@
         function renderT(d, isPast) {
             const l = document.getElementById('tList'); l.innerHTML = '';
             (taskDB[d] || []).forEach((t, i) => {
-                l.innerHTML += `<div class="item"><input type="checkbox" ${t.done?'checked':''} ${isPast?'disabled':''} onchange="toggleT('${d}',${i})"><span>${t.text}</span></div>`;
+                l.innerHTML += `<div class="item"><input type="checkbox" style="width:22px; height:22px;" ${t.done?'checked':''} ${isPast?'disabled':''} onchange="toggleT('${d}',${i})"><span style="flex:1; margin-left:15px; font-weight:700;" class="${t.done?'completed':''}">${t.text}</span></div>`;
             });
         }
         function toggleT(d, i) { taskDB[d][i].done = !taskDB[d][i].done; refresh(); }
@@ -211,7 +226,7 @@
         }
         function renderS(d) {
             const l = document.getElementById('sLog'); l.innerHTML = '';
-            (studyDB[d] || []).forEach(s => l.innerHTML += `<div class="item"><b>${s.subject}</b>: ${s.hours}h</div>`);
+            (studyDB[d] || []).forEach(s => l.innerHTML += `<div class="item"><b>${s.subject}</b> <span>${s.hours}h</span></div>`);
         }
 
         function addL() {
@@ -220,7 +235,7 @@
         }
         function renderL() {
             const l = document.getElementById('lList'); l.innerHTML = '';
-            linkDB.forEach((link, i) => l.innerHTML += `<div class="item" style="justify:space-between"><a href="${link.u}" target="_blank" style="color:var(--s);text-decoration:none">🔗 ${link.t}</a><span style="color:#ef4444;cursor:pointer;font-size:0.7rem" onclick="delL(${i})">DEL</span></div>`);
+            linkDB.forEach((link, i) => l.innerHTML += `<div class="item"><a href="${link.u}" target="_blank" style="color:var(--s);text-decoration:none;font-weight:800;">🔗 ${link.t}</a><span style="color:#ef4444;cursor:pointer;font-size:0.75rem;font-weight:800;" onclick="delL(${i})">DELETE</span></div>`);
         }
         function delL(i) { linkDB.splice(i, 1); refresh(); }
 
@@ -237,7 +252,7 @@
             if(window.chartO) window.chartO.destroy();
             window.chartO = new Chart(ctx, { 
                 type:'line', data:{ labels, datasets:[{label:'Hours', data, borderColor:'#6366f1', tension:0.4, fill:true, backgroundColor:'rgba(99, 102, 241, 0.1)'}] }, 
-                options:{responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{y:{display:false}, x:{ticks:{color:'#64748b'}}}} 
+                options:{responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{y:{display:false}, x:{ticks:{color:'#64748b', font:{weight:'800'}}, grid:{display:false}}}} 
             });
         }
         document.getElementById('mainDate').valueAsDate = new Date();

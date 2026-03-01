@@ -88,23 +88,30 @@ window.refresh = function() {
     updateChart(sDB);
 };
 
-// ================= TASKS LOGIC =================
+// ================= TASKS LOGIC (NEW CLEAN ALIGNMENT) =================
 window.addT = () => {
     let d = document.getElementById('taskDate').value, v = document.getElementById('tIn').value;
-    if(!v) return; 
+    if(!v || v.trim() === "") return; 
     let db = JSON.parse(localStorage.getItem('s_t')) || {};
     if(!db[d]) db[d] = []; 
     db[d].push({text: v, done: false});
     localStorage.setItem('s_t', JSON.stringify(db)); 
     window.syncData(d); 
     document.getElementById('tIn').value='';
+    window.refresh();
 };
 
 function renderT(d, db) {
     const l = document.getElementById('tList'); 
+    if(!l) return;
     l.innerHTML = '';
     (db[d] || []).forEach((t, i) => { 
-        l.innerHTML += `<div class="list-item"><input type="checkbox" ${t.done?'checked':''} onchange="window.toggleT('${d}',${i})"><span class="item-label ${t.done?'motivation-line':''}">${t.text}</span><span onclick="window.delT('${d}',${i})" class="del-btn">DEL</span></div>`; 
+        l.innerHTML += `
+            <div class="list-item">
+                <input type="checkbox" ${t.done?'checked':''} onchange="window.toggleT('${d}',${i})" style="width:20px; height:20px; accent-color:var(--s);">
+                <span class="item-label ${t.done?'motivation-line':''}">${t.text}</span>
+                <span onclick="window.delT('${d}',${i})" class="del-btn">DEL</span>
+            </div>`; 
     });
 }
 
@@ -113,6 +120,7 @@ window.toggleT = (d, i) => {
     db[d][i].done = !db[d][i].done; 
     localStorage.setItem('s_t', JSON.stringify(db)); 
     window.syncData(d); 
+    window.refresh();
 };
 
 window.delT = (d, i) => { 
@@ -120,14 +128,12 @@ window.delT = (d, i) => {
     db[d].splice(i, 1); 
     localStorage.setItem('s_t', JSON.stringify(db)); 
     window.syncData(d); 
+    window.refresh();
 };
 
-// ================= TODAY LOGIC (12H FIX) =================
+// ================= TODAY LOGIC (LOCKED - 12H) =================
 window.addLog = () => {
-    let d = document.getElementById('todayDate').value;
-    let s = document.getElementById('startTime').value;
-    let e = document.getElementById('endTime').value;
-    let a = document.getElementById('logAct').value;
+    let d = document.getElementById('todayDate').value, s = document.getElementById('startTime').value, e = document.getElementById('endTime').value, a = document.getElementById('logAct').value;
     if (!s || !e || !a) return; 
     let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
     if (!db[d]) db[d] = []; 
@@ -162,7 +168,7 @@ window.delLog = (d, i) => {
     window.refresh();
 };
 
-// ================= STUDY LOGIC (UNTOUCHED) =================
+// ================= STUDY LOGIC (LOCKED) =================
 window.addS = () => {
     let d = document.getElementById('studyDate').value;
     let h = parseFloat(document.getElementById('sHr').value);
@@ -179,6 +185,7 @@ window.addS = () => {
 
 function renderS(d, db) {
     const l = document.getElementById('sLog'); 
+    if(!l) return;
     l.innerHTML = '';
     (db[d] || []).forEach((s, i) => { 
         l.innerHTML += `<div class="list-item"><span class="item-label"><small>${s.time}</small> <b>${s.subject}</b>: ${s.hours}h</span><span onclick="window.delS('${d}',${i})" class="del-btn">DEL</span></div>`; 

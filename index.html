@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIPON'S LIFE | Private Account</title>
+    <title>SHIPON'S LIFE | Pro Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -18,8 +18,7 @@
         projectId: "shipon-life-os",
         storageBucket: "shipon-life-os.firebasestorage.app",
         messagingSenderId: "957123699373",
-        appId: "1:957123699373:web:b3c579ad5c2604cf6b5c24",
-        measurementId: "G-F5HDLWS5WC"
+        appId: "1:957123699373:web:b3c579ad5c2604cf6b5c24"
       };
 
       const app = initializeApp(firebaseConfig);
@@ -27,31 +26,30 @@
       const auth = getAuth(app);
       const provider = new GoogleAuthProvider();
 
-      let currentUser = null;
+      window.currentUser = null;
 
-      // 1. AUTH LOGIC
-      window.login = () => signInWithPopup(auth, provider);
-      window.logout = () => signOut(auth);
+      // AUTH FUNCTIONS
+      window.login = () => signInWithPopup(auth, provider).catch(e => alert("Login Blocked: Ensure popups are allowed."));
+      window.logout = () => signOut(auth).then(() => location.reload());
 
       onAuthStateChanged(auth, (user) => {
         if (user) {
-          currentUser = user;
+          window.currentUser = user;
           document.getElementById('authScreen').style.display = 'none';
           document.getElementById('appContent').style.display = 'block';
-          document.getElementById('userName').innerText = user.displayName;
-          syncToCloud(true); // Auto-sync on login
+          document.getElementById('userEmail').innerText = user.email;
+          syncToCloud(true);
         } else {
-          currentUser = null;
           document.getElementById('authScreen').style.display = 'flex';
           document.getElementById('appContent').style.display = 'none';
         }
       });
 
-      // 2. UNIVERSAL SYNC
+      // CORE SYNC LOGIC
       window.syncToCloud = async (silent = false) => {
-          if (!currentUser) return;
+          if (!window.currentUser) return;
           const date = document.getElementById('mainDate').value;
-          const userPath = `users/${currentUser.uid}/history`;
+          const userPath = `users/${window.currentUser.uid}/history`;
           
           const localData = {
               tasks: JSON.parse(localStorage.getItem('s_t'))?.[date] || [],
@@ -63,7 +61,10 @@
           try {
               await setDoc(doc(db, userPath, date), localData);
               const snap = await getDocs(collection(db, userPath));
-              let s_s = {}, s_t = {}, s_d = {};
+              let s_s = JSON.parse(localStorage.getItem('s_s')) || {};
+              let s_t = JSON.parse(localStorage.getItem('s_t')) || {};
+              let s_d = JSON.parse(localStorage.getItem('s_dayLog')) || {};
+
               snap.forEach(d => {
                   const data = d.data();
                   s_s[d.id] = data.study || [];
@@ -76,30 +77,29 @@
               localStorage.setItem('s_dayLog', JSON.stringify(s_d));
               
               window.refresh();
-              if(!silent) alert("🚀 Account Synced!");
-          } catch (e) { console.error("Sync Error", e); }
+              if(!silent) alert("🚀 All Devices Synced!");
+          } catch (e) { console.error("Sync error", e); }
       };
     </script>
 
     <style>
         :root { --p: #6366f1; --s: #10b981; --bg: #0f172a; --surface: #1e293b; --text: #f8fafc; --border: rgba(255, 255, 255, 0.1); }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; -webkit-tap-highlight-color: transparent; }
         
-        /* Auth Screen */
-        #authScreen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; padding: 20px; text-align: center; }
+        #authScreen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; padding: 30px; }
         
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--surface); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+        .nav-item { flex: 1; text-align: center; color: #94a3b8; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
         .nav-item.active { color: var(--p); }
 
-        .header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
-        .page { display: none; padding: 0 20px; animation: fadeInUp 0.4s ease; }
+        .header { padding: 25px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+        .page { display: none; padding: 0 20px; animation: fadeInUp 0.3s ease; }
         .active-page { display: block; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .m3-card { background: var(--surface); border-radius: 28px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); }
-        input, select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid var(--border); background: rgba(128,128,128,0.05); color: inherit; margin: 8px 0; box-sizing: border-box; font-family: inherit; }
-        button { width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; transition: 0.2s; }
+        input, select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: inherit; margin: 8px 0; font-family: inherit; font-size: 1rem; }
+        button { width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; background: var(--p); color: white; margin-top: 10px; }
         .list-item { display: flex; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 20px; margin-bottom: 10px; border: 1px solid var(--border); }
         .motivation-line { text-decoration: line-through; text-decoration-thickness: 4px; text-decoration-color: var(--s); opacity: 0.4; font-weight: 800; }
     </style>
@@ -107,15 +107,15 @@
 <body>
 
     <div id="authScreen">
-        <h1 style="font-size: 2.5rem; letter-spacing: -2px;">SHIPON'S LIFE</h1>
-        <p style="opacity:0.7; margin-bottom: 30px;">Login to sync your laptop and phone</p>
-        <button onclick="login()" style="max-width: 300px; background: white; color: black;">Sign in with Google</button>
+        <h1 style="font-size: 2.5rem; letter-spacing: -2px; margin-bottom: 5px;">SHIPON'S LIFE</h1>
+        <p style="opacity:0.6; margin-bottom: 30px;">Account Sync: Laptop & Phone</p>
+        <button onclick="login()" style="background:white; color:black; width: auto; padding: 15px 40px;">Sign in with Google</button>
     </div>
 
     <div id="appContent" style="display:none;">
         <div class="header">
-            <h1 style="margin:0; font-weight:800; font-size: 1.2rem;">SHIPON'S LIFE</h1>
-            <span id="userName" style="font-size: 0.7rem; font-weight: 800; opacity: 0.6;"></span>
+            <h1 style="font-weight:800; font-size: 1.2rem;">SHIPON'S LIFE</h1>
+            <span id="userEmail" style="font-size: 0.6rem; opacity: 0.5;"></span>
         </div>
 
         <div id="homeP" class="page active-page">
@@ -125,13 +125,13 @@
             </div>
             <div class="m3-card">
                 <input type="date" id="mainDate" onchange="window.refresh()" style="border:none; color:var(--p); font-weight:800;">
-                <button onclick="window.syncToCloud()" style="background:var(--s); margin-top: 15px;">🔄 FORCE SYNC</button>
-                <button onclick="logout()" style="background:transparent; color:#ef4444; font-size:0.7rem; margin-top:10px;">Logout</button>
+                <button onclick="window.syncToCloud()" style="background:var(--s); margin-top: 15px;">🔄 FORCE SYNC NOW</button>
+                <button onclick="logout()" style="background:transparent; color:#ef4444; font-size:0.7rem; margin-top:10px;">Logout Account</button>
             </div>
         </div>
 
         <div id="statsP" class="page">
-            <div class="m3-card" style="height: 350px;"><canvas id="mainChart"></canvas></div>
+            <div class="m3-card" style="height: 300px;"><canvas id="mainChart"></canvas></div>
             <div class="m3-card">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <input type="date" id="dateA" onchange="updateChart()">
@@ -142,7 +142,7 @@
 
         <div id="tasksP" class="page">
             <div class="m3-card">
-                <input type="text" id="tIn" placeholder="Enter daily task...">
+                <input type="text" id="tIn" placeholder="New goal for today...">
                 <button onclick="addT()">ADD TASK</button>
             </div>
             <div id="tList"></div>
@@ -153,10 +153,10 @@
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <input type="time" id="startTime"><input type="time" id="endTime">
                 </div>
-                <input type="text" id="logAct" placeholder="Activity...">
+                <input type="text" id="logAct" placeholder="Activity (e.g. English Practice)">
                 <button onclick="addLog()">LOG TIME</button>
             </div>
-            <div id="logList" class="m3-card"></div>
+            <div id="logList"></div>
         </div>
 
         <div id="studyP" class="page">
@@ -165,7 +165,7 @@
                 <input type="number" id="sHr" placeholder="Duration (Hours)" step="0.5">
                 <button onclick="addS()">SAVE PROGRESS</button>
                 <hr style="opacity: 0.1; margin: 20px 0;">
-                <input type="text" id="newSub" placeholder="New Field...">
+                <input type="text" id="newSub" placeholder="New Field (e.g. Digital Marketing)">
                 <button onclick="addNewSub()" style="background:#475569">+ ADD SUBJECT</button>
             </div>
             <div id="sLog"></div>
@@ -181,7 +181,6 @@
     </div>
 
     <script>
-        // Shared logic functions
         window.refresh = function() {
             const date = document.getElementById('mainDate').value || new Date().toISOString().split('T')[0];
             const sDB = JSON.parse(localStorage.getItem('s_s')) || {};
@@ -211,24 +210,25 @@
 
         function addT() {
             let d = document.getElementById('mainDate').value; let v = document.getElementById('tIn').value;
-            let db = JSON.parse(localStorage.getItem('s_t')) || {};
+            if(!v) return; let db = JSON.parse(localStorage.getItem('s_t')) || {};
             if(!db[d]) db[d] = []; db[d].push({text: v, done: false});
-            localStorage.setItem('s_t', JSON.stringify(db)); triggerSync();
+            localStorage.setItem('s_t', JSON.stringify(db)); window.refresh(); triggerSync();
         }
         function renderT(d, db) {
             const l = document.getElementById('tList'); l.innerHTML = '';
             (db[d] || []).forEach((t, i) => {
-                l.innerHTML += `<div class="list-item"><input type="checkbox" ${t.done?'checked':''} onchange="toggleT('${d}',${i})"><span style="flex:1; margin-left:15px; font-weight:700;" class="${t.done?'motivation-line':''}"> ${t.text}</span></div>`;
+                l.innerHTML += `<div class="list-item"><input type="checkbox" style="width:22px; height:22px;" ${t.done?'checked':''} onchange="toggleT('${d}',${i})"><span style="flex:1; margin-left:15px; font-weight:700;" class="${t.done?'motivation-line':''}"> ${t.text}</span></div>`;
             });
         }
-        function toggleT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); triggerSync(); }
+        function toggleT(d, i) { let db = JSON.parse(localStorage.getItem('s_t')); db[d][i].done = !db[d][i].done; localStorage.setItem('s_t', JSON.stringify(db)); window.refresh(); triggerSync(); }
 
         function addS() {
             let d = document.getElementById('mainDate').value; let h = parseFloat(document.getElementById('sHr').value);
             let sDB = JSON.parse(localStorage.getItem('s_s')) || {}; let sub = document.getElementById('sSub').value;
-            if(!sDB[d]) sDB[d] = []; let ex = sDB[d].find(x => x.subject === sub);
+            if(!h) return; if(!sDB[d]) sDB[d] = [];
+            let ex = sDB[d].find(x => x.subject === sub);
             if(ex) ex.hours += h; else sDB[d].push({subject: sub, hours: h});
-            localStorage.setItem('s_s', JSON.stringify(sDB)); triggerSync();
+            localStorage.setItem('s_s', JSON.stringify(sDB)); window.refresh(); triggerSync();
         }
         function renderS(d, db) {
             const l = document.getElementById('sLog'); l.innerHTML = '';
@@ -238,16 +238,21 @@
         function addLog() {
             let d = document.getElementById('mainDate').value; let s = document.getElementById('startTime').value;
             let e = document.getElementById('endTime').value; let a = document.getElementById('logAct').value;
+            if(!s || !e || !a) return;
             let db = JSON.parse(localStorage.getItem('s_dayLog')) || {};
             if(!db[d]) db[d] = []; db[d].push({start: s, end: e, act: a});
-            localStorage.setItem('s_dayLog', JSON.stringify(db)); triggerSync();
+            localStorage.setItem('s_dayLog', JSON.stringify(db)); window.refresh(); triggerSync();
         }
         function renderLog(d, db) {
             const l = document.getElementById('logList'); l.innerHTML = '';
             (db[d] || []).forEach(item => { l.innerHTML += `<div class="list-item"><b>${item.start}-${item.end}</b> <span style="margin-left:10px">${item.act}</span></div>`; });
         }
 
-        function addNewSub() { const v = document.getElementById('newSub').value; let subs = JSON.parse(localStorage.getItem('s_subs')) || []; if(v && !subs.includes(v)) { subs.push(v); localStorage.setItem('s_subs', JSON.stringify(subs)); triggerSync(); } }
+        function addNewSub() { 
+            const v = document.getElementById('newSub').value; 
+            let subs = JSON.parse(localStorage.getItem('s_subs')) || ["English", "Marketing"]; 
+            if(v && !subs.includes(v)) { subs.push(v); localStorage.setItem('s_subs', JSON.stringify(subs)); window.refresh(); triggerSync(); } 
+        }
 
         function updateChart(sDB) {
             const ctx = document.getElementById('mainChart').getContext('2d');

@@ -1,65 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SHIPON'S LIFE</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHIPON'S LIFE</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-  <meta name="theme-color" content="#0f172a">
-  <link rel="stylesheet" href="style.css?v=5">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
 
-<header class="app-header">
-  <h1>SHIPON'S LIFE</h1>
+<header class="header">
+  <h1>Shipon's Life</h1>
   <p id="todayDate"></p>
 </header>
 
 <main>
 
+<!-- HOME -->
 <section id="home" class="tab active">
-  <h2>Lifetime Mastery</h2>
-
-  <div class="card">
-    <span>Total Study Hours</span>
-    <h3 id="lifetimeHours">0</h3>
-  </div>
-
-  <div class="sync-card">
-    <div class="sync-status">
-      <span id="syncDot"></span>
-      <span id="syncText">Checking...</span>
-    </div>
-    <button id="manualSync">Sync Now</button>
+  <div class="glass-card">
+    <h3>Lifetime Study Hours</h3>
+    <h1 id="lifetimeHours">0</h1>
   </div>
 </section>
 
+<!-- TASKS -->
 <section id="tasks" class="tab">
   <h2>Tasks</h2>
-  <div class="row">
-    <input type="text" id="taskInput" placeholder="New Task">
-    <button id="addTask">Add</button>
+  <div class="input-row">
+    <input type="text" id="taskInput" placeholder="Add Task">
+    <button id="addTask">+</button>
   </div>
   <ul id="taskList"></ul>
 </section>
 
+<!-- STUDY -->
 <section id="study" class="tab">
   <h2>Study</h2>
-  <div class="row">
+  <div class="input-row">
     <input type="text" id="subjectInput" placeholder="Subject">
     <input type="number" id="hoursInput" placeholder="Hours" step="0.25">
-    <button id="addStudy">Add</button>
+    <button id="addStudy">+</button>
   </div>
   <ul id="studyList"></ul>
+</section>
+
+<!-- ANALYZE -->
+<section id="analyze" class="tab">
+  <h2>Analyze</h2>
+
+  <div class="filter-row">
+    <select id="timeRange">
+      <option value="daily">Daily</option>
+      <option value="weekly">Weekly</option>
+      <option value="monthly">Monthly</option>
+      <option value="yearly">Yearly</option>
+    </select>
+  </div>
+
+  <canvas id="mainChart"></canvas>
 </section>
 
 </main>
 
 <nav class="bottom-nav">
-  <button data-tab="home">Home</button>
-  <button data-tab="tasks">Tasks</button>
-  <button data-tab="study">Study</button>
+  <button data-tab="home">🏠</button>
+  <button data-tab="tasks">✅</button>
+  <button data-tab="study">📚</button>
+  <button data-tab="analyze">📊</button>
 </nav>
 
 <script type="module" src="app.js"></script>
